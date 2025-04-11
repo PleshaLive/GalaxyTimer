@@ -12,7 +12,7 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
-      // При получении события jsonUpdate обновляем блок JSON
+      // При получении события jsonUpdate обновляем блк JSON
       socket.on("jsonUpdate", data => {
         console.log("Получено обновление JSON:", data);
         const jsonOutput = document.getElementById("jsonOutput");
