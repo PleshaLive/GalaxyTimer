@@ -7,35 +7,33 @@ const session = require("express-session");
 const http = require("http");
 const { Server: SocketIOServer } = require("socket.io");
 
-// Создаем приложение Express
 const app = express();
-// Здесь используем жестко заданный порт, т.к. на Railway работает именно так
 const port = 3000;
 
-// Для отладки логируем все входящие запросы
+// Логирование входящих запросов
 app.use((req, res, next) => {
   console.log(`[LOG] ${req.method} ${req.path}`);
   next();
 });
 
-// Health-check (используйте его в настройках Railway для проверки работоспособности)
+// Health-check
 app.get("/health", (req, res) => {
   res.status(200).json({ ok: true });
 });
 
-// Middleware: парсеры формы и куков
+// Парсеры форм и куков
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Настройка сессий (для авторизации)
+// Настройка сессий
 app.use(session({
   secret: "322223",
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // для HTTPS установить true
+  cookie: { secure: false }
 }));
 
-// Роут для страницы логина (файл login.html должен быть в папке public)
+// Роут для логина
 app.get("/login", (req, res) => {
   if (req.session.authenticated) return res.redirect("/");
   res.sendFile(path.join(__dirname, "public", "login.html"));
@@ -50,16 +48,13 @@ app.post("/login", (req, res) => {
   res.redirect("/login?error=1");
 });
 
-// Роут для корневого пути — если пользователь не аутентифицирован, перенаправляем на /login;
-// иначе отдаем index.html (он должен лежать в папке public)
+// Корневой роут (index.html) для аутентифицированных пользователей
 app.get("/", (req, res) => {
-  if (!req.session.authenticated) {
-    return res.redirect("/login");
-  }
+  if (!req.session.authenticated) return res.redirect("/login");
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// Middleware авторизации: все запросы, кроме /api, /login, /login.css, /health, проходят
+// Middleware авторизации для остальных роутов
 app.use((req, res, next) => {
   if (
     req.path.startsWith("/api/") ||
@@ -80,46 +75,37 @@ app.use(express.static(path.join(__dirname, "public")));
    Работа с данными: matches, mapVeto, VRS, customFields
    ==================================== */
 
-// Дефолтные пути для логотипов (оставляем без изменений)
+// Пути логотипов по умолчанию
 const defaultTeam1Logo = "C:\\projects\\vMix_score\\public\\logos\\default1.png";
 const defaultTeam2Logo = "C:\\projects\\vMix_score\\public\\logos\\default2.png";
 
-// Данные хранятся в памяти
+// Данные в памяти
 let savedMatches = [];
 let savedMapVeto = {};
 let savedVRS = {
-  1: {
-    TEAM1: { winPoints: 35, losePoints: -35, rank: 4, currentPoints: 84 },
-    TEAM2: { winPoints: 35, losePoints: -35, rank: 2, currentPoints: 80 }
-  },
-  2: {
-    TEAM1: { winPoints: 35, losePoints: -35, rank: 5, currentPoints: 75 },
-    TEAM2: { winPoints: 35, losePoints: -35, rank: 1, currentPoints: 90 }
-  },
-  3: {
-    TEAM1: { winPoints: 40, losePoints: -20, rank: 6, currentPoints: 60 },
-    TEAM2: { winPoints: 40, losePoints: -20, rank: 3, currentPoints: 85 }
-  },
-  4: {
-    TEAM1: { winPoints: 25, losePoints: -25, rank: 7, currentPoints: 50 },
-    TEAM2: { winPoints: 25, losePoints: -25, rank: 8, currentPoints: 40 }
-  }
+  1: { TEAM1: { winPoints: 35, losePoints: -35, rank: 4, currentPoints: 84 },
+       TEAM2: { winPoints: 35, losePoints: -35, rank: 2, currentPoints: 80 } },
+  2: { TEAM1: { winPoints: 35, losePoints: -35, rank: 5, currentPoints: 75 },
+       TEAM2: { winPoints: 35, losePoints: -35, rank: 1, currentPoints: 90 } },
+  3: { TEAM1: { winPoints: 40, losePoints: -20, rank: 6, currentPoints: 60 },
+       TEAM2: { winPoints: 40, losePoints: -20, rank: 3, currentPoints: 85 } },
+  4: { TEAM1: { winPoints: 25, losePoints: -25, rank: 7, currentPoints: 50 },
+       TEAM2: { winPoints: 25, losePoints: -25, rank: 8, currentPoints: 40 } }
 };
 
-// Дополнительные данные – верхний блок (custom fields)
 let customFieldsData = {};
 
-// Путь к файлу базы данных (db.json)
+// Путь к файлу базы данных
 const dbFilePath = path.join(__dirname, "db.json");
 
-// Функция загрузки данных из db.json (если файла нет, создаётся новый)
+// Функция загрузки данных из db.json
 function loadDataFromFile() {
   if (!fs.existsSync(dbFilePath)) {
     fs.writeFileSync(dbFilePath, JSON.stringify({
       matches: [],
       mapVeto: {},
       vrs: {},
-      customFields: {}   // Добавляем поле для custom fields
+      customFields: {}
     }, null, 2));
   }
   const rawData = fs.readFileSync(dbFilePath, "utf8");
@@ -127,17 +113,17 @@ function loadDataFromFile() {
   savedMatches = jsonData.matches || [];
   savedMapVeto = jsonData.mapVeto || {};
   savedVRS = jsonData.vrs || {};
-  customFieldsData = jsonData.customFields || {}; // Загружаем custom fields
+  customFieldsData = jsonData.customFields || {};
 }
 loadDataFromFile();
 
-// Функция сохранения данных в db.json
+// Сохранение данных в db.json
 function saveDataToFile() {
   const jsonData = {
     matches: savedMatches,
     mapVeto: savedMapVeto,
     vrs: savedVRS,
-    customFields: customFieldsData  // Сохраняем custom fields
+    customFields: customFieldsData
   };
   fs.writeFileSync(dbFilePath, JSON.stringify(jsonData, null, 2), "utf8");
 }
@@ -147,26 +133,22 @@ function formatWinPoints(value) {
   if (value === "" || value === null || value === undefined) return "";
   const num = Number(value);
   if (isNaN(num)) return value;
-  return (num >= 0 ? "+" : "") + num;
+  return num >= 0 ? `+${num}` : `${num}`;
 }
 
 /**
- * Функция выбора логотипа для команды.
+ * Функция выбора логотипа для команды в зависимости от статуса матча
  */
 function getLogo(match, team) {
   let rawLogo;
   if (match.FINISHED_MATCH_STATUS === "FINISHED") {
-    rawLogo = (team === "TEAM1") ? match.FINISHED_TEAM1_LOGO : match.FINISHED_TEAM2_LOGO;
+    rawLogo = team === "TEAM1" ? match.FINISHED_TEAM1_LOGO : match.FINISHED_TEAM2_LOGO;
   } else {
-    rawLogo = (team === "TEAM1") ? match.UPCOM_TEAM1_LOGO : match.UPCOM_TEAM2_LOGO;
+    rawLogo = team === "TEAM1" ? match.UPCOM_TEAM1_LOGO : match.UPCOM_TEAM2_LOGO;
   }
-  if (!rawLogo) {
-    return (team === "TEAM1") ? defaultTeam1Logo : defaultTeam2Logo;
-  }
+  if (!rawLogo) return team === "TEAM1" ? defaultTeam1Logo : defaultTeam2Logo;
   const normalized = rawLogo.replace(/\\/g, "/").toLowerCase();
-  if (normalized.endsWith("none.png")) {
-    return (team === "TEAM1") ? defaultTeam1Logo : defaultTeam2Logo;
-  }
+  if (normalized.endsWith("none.png")) return team === "TEAM1" ? defaultTeam1Logo : defaultTeam2Logo;
   return rawLogo;
 }
 
@@ -174,7 +156,7 @@ function getLogo(match, team) {
    API эндпоинты
    ==================================== */
 
-// --- API для матчей ---
+// API для матчей
 app.get("/api/matchdata", (req, res) => {
   res.json(savedMatches);
 });
@@ -191,7 +173,7 @@ app.post("/api/matchdata", (req, res) => {
   savedMatches = Array.isArray(req.body) ? req.body : [req.body];
   console.log("Получены matchdata:", savedMatches);
   
-  // Если матч завершён, обновляем VRS
+  // Если матч завершён – обновляем VRS
   savedMatches.forEach((match, idx) => {
     const matchId = idx + 1;
     if (match.FINISHED_MATCH_STATUS === "FINISHED") {
@@ -210,26 +192,22 @@ app.post("/api/matchdata", (req, res) => {
   });
   
   saveDataToFile();
-  
-  // Эмитим событие "jsonUpdate" с актуальными данными матчей
   io.emit("jsonUpdate", savedMatches);
-  
   res.json(savedMatches);
 });
 
-// --- API для Map Veto ---
+// API для Map Veto
 app.get("/api/mapveto", (req, res) => res.json(savedMapVeto));
 
 app.post("/api/mapveto", (req, res) => {
   savedMapVeto = req.body;
   console.log("Получены данные mapveto:", savedMapVeto);
   saveDataToFile();
-  // Отправляем обновление Map Veto всем клиентам
   io.emit("mapVetoUpdate", savedMapVeto);
   res.json(savedMapVeto);
 });
 
-// --- API для VRS ---
+// API для VRS
 function getVRSResponse(matchId) {
   const vrsData = savedVRS[matchId] || {
     TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints: "" },
@@ -238,15 +216,14 @@ function getVRSResponse(matchId) {
   const match = savedMatches[matchId - 1] || {};
   const team1Logo = getLogo(match, "TEAM1");
   const team2Logo = getLogo(match, "TEAM2");
-  
   const emptyFin = {
     TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", logo: team1Logo },
     TEAM2: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", logo: team2Logo }
   };
-  
+
   let winBgTeam1 = "C:\\projects\\NewTimer\\files\\idle.png";
   let winBgTeam2 = "C:\\projects\\NewTimer\\files\\idle.png";
-  
+
   if (match.FINISHED_MATCH_STATUS === "FINISHED") {
     if (match.TEAMWINNER === match.FINISHED_TEAM1) {
       winBgTeam1 = "C:\\projects\\NewTimer\\files\\win.png";
@@ -256,7 +233,7 @@ function getVRSResponse(matchId) {
         FINISHED: {
           TEAM1: {
             winPoints: formatWinPoints(vrsData.TEAM1.winPoints),
-            losePoints: "",  // оставляем пустым, если матч завершён
+            losePoints: "",
             rank: vrsData.TEAM1.rank,
             currentPoints_win: vrsData.TEAM1.currentPoints,
             currentPoints_lose: "",
@@ -309,12 +286,11 @@ function getVRSResponse(matchId) {
       };
     }
   }
-  
   return {
     UPCOM: {
       TEAM1: {
         winPoints: formatWinPoints(vrsData.TEAM1.winPoints),
-        losePoints: -Math.abs(vrsData.TEAM1.losePoints), // гарантируем отрицательное значение
+        losePoints: -Math.abs(vrsData.TEAM1.losePoints),
         rank: vrsData.TEAM1.rank,
         currentPoints: vrsData.TEAM1.currentPoints,
         logo: team1Logo
@@ -345,27 +321,24 @@ app.post("/api/vrs", (req, res) => {
   savedVRS = req.body;
   console.log("Получены данные VRS:", savedVRS);
   saveDataToFile();
-  // Эмитим событие "vrsUpdate" для всех клиентов
   io.emit("vrsUpdate", savedVRS);
   res.json(savedVRS);
 });
 
-// --- API для custom fields ---
-// GET custom fields
+// API для custom fields
 app.get("/api/customfields", (req, res) => {
   res.json([customFieldsData]);
 });
-// POST custom fields
+
 app.post("/api/customfields", (req, res) => {
   customFieldsData = req.body;
   console.log("Получены custom fields:", customFieldsData);
   saveDataToFile();
-  // Оповещаем всех клиентов
   io.emit("customFieldsUpdate", customFieldsData);
   res.json(customFieldsData);
 });
 
-// --- API для списка команд из файла data.json ---
+// API для списка команд (data.json)
 const teamsDataFile = path.join(__dirname, "data.json");
 app.get("/api/teams", (req, res) => {
   fs.readFile(teamsDataFile, "utf8", (err, data) => {
@@ -391,9 +364,7 @@ const io = new SocketIOServer(server);
 
 io.on("connection", (socket) => {
   console.log("Клиент подключён");
-  // Отправляем текущие данные матчей сразу при подключении
   socket.emit("jsonUpdate", savedMatches);
-  // Отправляем custom fields, чтобы верхний блок отобразил актуальные значения
   socket.emit("customFieldsUpdate", customFieldsData);
 });
 
