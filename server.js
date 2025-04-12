@@ -1,128 +1,402 @@
-const express = require('express');
-const fs = require('fs');
-const http = require('http');
-const path = require('path');
+// server.js
+const express = require("express");
+const path = require("path");
+const fs = require("fs");
+const cookieParser = require("cookie-parser");
+const session = require("express-session");
+const http = require("http");
+const { Server: SocketIOServer } = require("socket.io");
+
+// Создаем приложение Express
 const app = express();
+// Здесь используем жестко заданный порт, т.к. на Railway работает именно так
+const port = 3000;
 
-// Настраиваем Express и Socket.IO
-const server = http.createServer(app);
-const io = require('socket.io')(server);  // Интеграция Socket.IO с сервером Express&#8203;:contentReference[oaicite:0]{index=0}
+// Для отладки логируем все входящие запросы
+app.use((req, res, next) => {
+  console.log(`[LOG] ${req.method} ${req.path}`);
+  next();
+});
 
-// Мидлвэр для разбора JSON тела запросов (встроенный в Express 4+)&#8203;:contentReference[oaicite:1]{index=1}
+// Health-check (используйте его в настройках Railway для проверки работоспособности)
+app.get("/health", (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+// Middleware: парсеры формы и куков
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
+// Настройка сессий (для авторизации)
+app.use(session({
+  secret: "322223",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // для HTTPS установить true
+}));
+
+// Роут для страницы логина (файл login.html должен быть в папке public)
+app.get("/login", (req, res) => {
+  if (req.session.authenticated) return res.redirect("/");
+  res.sendFile(path.join(__dirname, "public", "login.html"));
+});
+
+app.post("/login", (req, res) => {
+  const { username, password } = req.body;
+  if (username === "StarGalaxy" && password === "FuckTheWorld1996") {
+    req.session.authenticated = true;
+    return res.redirect("/");
+  }
+  res.redirect("/login?error=1");
+});
+
+// Роут для корневого пути — если пользователь не аутентифицирован, перенаправляем на /login;
+// иначе отдаем index.html (он должен лежать в папке public)
+app.get("/", (req, res) => {
+  if (!req.session.authenticated) {
+    return res.redirect("/login");
+  }
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Middleware авторизации: все запросы, кроме /api, /login, /login.css, /health, проходят
+app.use((req, res, next) => {
+  if (
+    req.path.startsWith("/api/") ||
+    req.session.authenticated ||
+    req.path === "/login" ||
+    req.path === "/login.css" ||
+    req.path === "/health"
+  ) {
+    return next();
+  }
+  res.redirect("/login");
+});
+
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
-// Загружаем список команд из data.json
-let teams = [];
-try {
-  const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf-8'));
-  if (Array.isArray(data)) {
-    // Если data.json содержит массив (просто список команд)
-    teams = data;
-  } else if (data.teams) {
-    // Если файл содержит объект с полем teams
-    teams = data.teams;
+/* ====================================
+   Работа с данными: matches, mapVeto, VRS, customFields
+   ==================================== */
+
+// Дефолтные пути для логотипов (оставляем без изменений)
+const defaultTeam1Logo = "C:\\projects\\vMix_score\\public\\logos\\default1.png";
+const defaultTeam2Logo = "C:\\projects\\vMix_score\\public\\logos\\default2.png";
+
+// Данные хранятся в памяти
+let savedMatches = [];
+let savedMapVeto = {};
+let savedVRS = {
+  1: {
+    TEAM1: { winPoints: 35, losePoints: -35, rank: 4, currentPoints: 84 },
+    TEAM2: { winPoints: 35, losePoints: -35, rank: 2, currentPoints: 80 }
+  },
+  2: {
+    TEAM1: { winPoints: 35, losePoints: -35, rank: 5, currentPoints: 75 },
+    TEAM2: { winPoints: 35, losePoints: -35, rank: 1, currentPoints: 90 }
+  },
+  3: {
+    TEAM1: { winPoints: 40, losePoints: -20, rank: 6, currentPoints: 60 },
+    TEAM2: { winPoints: 40, losePoints: -20, rank: 3, currentPoints: 85 }
+  },
+  4: {
+    TEAM1: { winPoints: 25, losePoints: -25, rank: 7, currentPoints: 50 },
+    TEAM2: { winPoints: 25, losePoints: -25, rank: 8, currentPoints: 40 }
   }
-} catch (err) {
-  console.error("Ошибка чтения data.json:", err);
+};
+
+// Дополнительные данные – верхний блок (custom fields)
+let customFieldsData = {};
+
+// Путь к файлу базы данных (db.json)
+const dbFilePath = path.join(__dirname, "db.json");
+
+// Функция загрузки данных из db.json (если файла нет, создаётся новый)
+function loadDataFromFile() {
+  if (!fs.existsSync(dbFilePath)) {
+    fs.writeFileSync(dbFilePath, JSON.stringify({
+      matches: [],
+      mapVeto: {},
+      vrs: {},
+      customFields: {}   // Добавляем поле для custom fields
+    }, null, 2));
+  }
+  const rawData = fs.readFileSync(dbFilePath, "utf8");
+  const jsonData = JSON.parse(rawData);
+  savedMatches = jsonData.matches || [];
+  savedMapVeto = jsonData.mapVeto || {};
+  savedVRS = jsonData.vrs || {};
+  customFieldsData = jsonData.customFields || {}; // Загружаем custom fields
+}
+loadDataFromFile();
+
+// Функция сохранения данных в db.json
+function saveDataToFile() {
+  const jsonData = {
+    matches: savedMatches,
+    mapVeto: savedMapVeto,
+    vrs: savedVRS,
+    customFields: customFieldsData  // Сохраняем custom fields
+  };
+  fs.writeFileSync(dbFilePath, JSON.stringify(jsonData, null, 2), "utf8");
 }
 
-// Загружаем или инициализируем список матчей
-let matches = [];
-const matchesFile = path.join(__dirname, 'matches.json');
-if (fs.existsSync(matchesFile)) {
-  try {
-    matches = JSON.parse(fs.readFileSync(matchesFile, 'utf-8'));
-  } catch (err) {
-    console.error("Ошибка чтения matches.json, будет использован пустой список матчей.", err);
-    matches = [];
-  }
-} else {
-  // Если файла нет, инициализируем демо-матчи
-  matches = [
-    {
-      id: 1,
-      team1: "NAVI Junior",
-      team2: "9INE",
-      time: "10:00 CEST",
-      status: "FINISHED",
-      winner: 2,  // 1 = team1, 2 = team2, null = не определён
-      maps: ["Mirage"],        // список карт, сыгранных или выбранных
-      vrs: [ { score1: 12, score2: 16 } ],  // результаты по картам (соответствуют списку maps)
-      customFields: [ { name: "Comment", value: "Quarterfinal" } ]
-    },
-    {
-      id: 2,
-      team1: "",
-      team2: "",
-      time: "17:00 CEST",
-      status: "UPCOM",   // UPCOM = предстоящий, LIVE = в процессе, FINISHED = завершён
-      winner: null,
-      maps: [],          // пока нет карт
-      vrs: [],           // пока нет результатов
-      customFields: []   // нет дополнительных полей
-    }
-  ];
-  // Сохраняем инициализированные матчи в файл matches.json
-  fs.writeFileSync(matchesFile, JSON.stringify(matches, null, 2));
+// Функция форматирования winPoints
+function formatWinPoints(value) {
+  if (value === "" || value === null || value === undefined) return "";
+  const num = Number(value);
+  if (isNaN(num)) return value;
+  return (num >= 0 ? "+" : "") + num;
 }
 
-// Статически раздаём содержимое папки public (HTML, CSS, JS файлы)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// API: получить список команд
-app.get('/api/teams', (req, res) => {
-  res.json(teams);
-});
-
-// API: получить список матчей
-app.get('/api/matches', (req, res) => {
-  res.json(matches);
-});
-
-// API: сохранить/обновить данные матча (создание нового матча также возможно)
-app.post('/api/matches/:id', (req, res) => {
-  const matchId = parseInt(req.params.id);
-  const updatedMatch = req.body;
-  updatedMatch.id = matchId;  // убеждаемся, что id соответствует пути
-
-  // Ищем матч с таким ID
-  const index = matches.findIndex(m => m.id === matchId);
-  if (index === -1) {
-    // Если матч не найден, трактуем как создание нового
-    matches.push(updatedMatch);
+/**
+ * Функция выбора логотипа для команды.
+ */
+function getLogo(match, team) {
+  let rawLogo;
+  if (match.FINISHED_MATCH_STATUS === "FINISHED") {
+    rawLogo = (team === "TEAM1") ? match.FINISHED_TEAM1_LOGO : match.FINISHED_TEAM2_LOGO;
   } else {
-    // Обновляем существующий матч
-    matches[index] = updatedMatch;
+    rawLogo = (team === "TEAM1") ? match.UPCOM_TEAM1_LOGO : match.UPCOM_TEAM2_LOGO;
   }
-
-  // Сохраняем изменения в файл
-  try {
-    fs.writeFileSync(matchesFile, JSON.stringify(matches, null, 2));
-  } catch (err) {
-    console.error("Ошибка сохранения matches.json:", err);
+  if (!rawLogo) {
+    return (team === "TEAM1") ? defaultTeam1Logo : defaultTeam2Logo;
   }
+  const normalized = rawLogo.replace(/\\/g, "/").toLowerCase();
+  if (normalized.endsWith("none.png")) {
+    return (team === "TEAM1") ? defaultTeam1Logo : defaultTeam2Logo;
+  }
+  return rawLogo;
+}
 
-  // Отправляем обновлённые данные всем подключённым клиентам через Socket.IO
-  io.sockets.emit('matchUpdated', updatedMatch);  // оповещение всех клиентов&#8203;:contentReference[oaicite:2]{index=2}
+/* ====================================
+   API эндпоинты
+   ==================================== */
 
-  // Отвечаем успешным результатом (обновлённым матчем)
-  res.json(updatedMatch);
+// --- API для матчей ---
+app.get("/api/matchdata", (req, res) => {
+  res.json(savedMatches);
 });
 
-// Подключение нового клиента через Socket.IO
-io.on('connection', (socket) => {
-  console.log("Клиент подключился:", socket.id);
+app.get("/api/matchdata/:matchIndex", (req, res) => {
+  const index = parseInt(req.params.matchIndex, 10) - 1;
+  if (isNaN(index) || index < 0 || index >= savedMatches.length) {
+    return res.status(404).json({ message: `Матч с индексом ${req.params.matchIndex} не найден.` });
+  }
+  res.json([savedMatches[index]]);
+});
 
-  // Опционально, можно сразу отправить новые клиенту текущие данные:
-  // socket.emit('initialData', { teams, matches });
+app.post("/api/matchdata", (req, res) => {
+  savedMatches = Array.isArray(req.body) ? req.body : [req.body];
+  console.log("Получены matchdata:", savedMatches);
+  
+  // Если матч завершён, обновляем VRS
+  savedMatches.forEach((match, idx) => {
+    const matchId = idx + 1;
+    if (match.FINISHED_MATCH_STATUS === "FINISHED") {
+      const winner = match.TEAMWINNER;
+      const vrsData = savedVRS[matchId];
+      if (!vrsData) return;
+      if (winner === match.FINISHED_TEAM1) {
+        vrsData.TEAM1.currentPoints += vrsData.TEAM1.winPoints;
+        vrsData.TEAM2.currentPoints += vrsData.TEAM2.losePoints;
+      } else if (winner === match.FINISHED_TEAM2) {
+        vrsData.TEAM2.currentPoints += vrsData.TEAM2.winPoints;
+        vrsData.TEAM1.currentPoints += vrsData.TEAM1.losePoints;
+      }
+      console.log(`Обновлены VRS для матча ${matchId}:`, vrsData);
+    }
+  });
+  
+  saveDataToFile();
+  
+  // Эмитим событие "jsonUpdate" с актуальными данными матчей
+  io.emit("jsonUpdate", savedMatches);
+  
+  res.json(savedMatches);
+});
 
-  socket.on('disconnect', () => {
-    console.log("Клиент отключился:", socket.id);
+// --- API для Map Veto ---
+app.get("/api/mapveto", (req, res) => res.json(savedMapVeto));
+
+app.post("/api/mapveto", (req, res) => {
+  savedMapVeto = req.body;
+  console.log("Получены данные mapveto:", savedMapVeto);
+  saveDataToFile();
+  // Отправляем обновление Map Veto всем клиентам
+  io.emit("mapVetoUpdate", savedMapVeto);
+  res.json(savedMapVeto);
+});
+
+// --- API для VRS ---
+function getVRSResponse(matchId) {
+  const vrsData = savedVRS[matchId] || {
+    TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints: "" },
+    TEAM2: { winPoints: "", losePoints: "", rank: "", currentPoints: "" }
+  };
+  const match = savedMatches[matchId - 1] || {};
+  const team1Logo = getLogo(match, "TEAM1");
+  const team2Logo = getLogo(match, "TEAM2");
+  
+  const emptyFin = {
+    TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", logo: team1Logo },
+    TEAM2: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", logo: team2Logo }
+  };
+  
+  let winBgTeam1 = "C:\\projects\\NewTimer\\files\\idle.png";
+  let winBgTeam2 = "C:\\projects\\NewTimer\\files\\idle.png";
+  
+  if (match.FINISHED_MATCH_STATUS === "FINISHED") {
+    if (match.TEAMWINNER === match.FINISHED_TEAM1) {
+      winBgTeam1 = "C:\\projects\\NewTimer\\files\\win.png";
+      winBgTeam2 = "C:\\projects\\NewTimer\\files\\lose.png";
+      return {
+        UPCOM: emptyFin,
+        FINISHED: {
+          TEAM1: {
+            winPoints: formatWinPoints(vrsData.TEAM1.winPoints),
+            losePoints: "",  // оставляем пустым, если матч завершён
+            rank: vrsData.TEAM1.rank,
+            currentPoints_win: vrsData.TEAM1.currentPoints,
+            currentPoints_lose: "",
+            logo: team1Logo
+          },
+          TEAM2: {
+            winPoints: "",
+            losePoints: -Math.abs(vrsData.TEAM2.losePoints),
+            rank: vrsData.TEAM2.rank,
+            currentPoints_win: "",
+            currentPoints_lose: vrsData.TEAM2.currentPoints,
+            logo: team2Logo
+          }
+        },
+        WIN_BG_TEAM_1: winBgTeam1,
+        WIN_BG_TEAM_2: winBgTeam2
+      };
+    } else if (match.TEAMWINNER === match.FINISHED_TEAM2) {
+      winBgTeam1 = "C:\\projects\\NewTimer\\files\\lose.png";
+      winBgTeam2 = "C:\\projects\\NewTimer\\files\\win.png";
+      return {
+        UPCOM: emptyFin,
+        FINISHED: {
+          TEAM1: {
+            winPoints: "",
+            losePoints: -Math.abs(vrsData.TEAM1.losePoints),
+            rank: vrsData.TEAM1.rank,
+            currentPoints_win: "",
+            currentPoints_lose: vrsData.TEAM1.currentPoints,
+            logo: team1Logo
+          },
+          TEAM2: {
+            winPoints: formatWinPoints(vrsData.TEAM2.winPoints),
+            losePoints: "",
+            rank: vrsData.TEAM2.rank,
+            currentPoints_win: vrsData.TEAM2.currentPoints,
+            currentPoints_lose: "",
+            logo: team2Logo
+          }
+        },
+        WIN_BG_TEAM_1: winBgTeam1,
+        WIN_BG_TEAM_2: winBgTeam2
+      };
+    } else {
+      return {
+        UPCOM: emptyFin,
+        FINISHED: emptyFin,
+        WIN_BG_TEAM_1: winBgTeam1,
+        WIN_BG_TEAM_2: winBgTeam2
+      };
+    }
+  }
+  
+  return {
+    UPCOM: {
+      TEAM1: {
+        winPoints: formatWinPoints(vrsData.TEAM1.winPoints),
+        losePoints: -Math.abs(vrsData.TEAM1.losePoints), // гарантируем отрицательное значение
+        rank: vrsData.TEAM1.rank,
+        currentPoints: vrsData.TEAM1.currentPoints,
+        logo: team1Logo
+      },
+      TEAM2: {
+        winPoints: formatWinPoints(vrsData.TEAM2.winPoints),
+        losePoints: -Math.abs(vrsData.TEAM2.losePoints),
+        rank: vrsData.TEAM2.rank,
+        currentPoints: vrsData.TEAM2.currentPoints,
+        logo: team2Logo
+      }
+    },
+    FINISHED: emptyFin,
+    WIN_BG_TEAM_1: "C:\\projects\\NewTimer\\files\\idle.png",
+    WIN_BG_TEAM_2: "C:\\projects\\NewTimer\\files\\idle.png"
+  };
+}
+
+app.get("/api/vrs/:id", (req, res) => {
+  const matchId = parseInt(req.params.id, 10);
+  if (isNaN(matchId) || matchId < 1 || matchId > 4) {
+    return res.status(404).json({ error: "Некорректный номер матча" });
+  }
+  res.json([getVRSResponse(matchId)]);
+});
+
+app.post("/api/vrs", (req, res) => {
+  savedVRS = req.body;
+  console.log("Получены данные VRS:", savedVRS);
+  saveDataToFile();
+  // Эмитим событие "vrsUpdate" для всех клиентов
+  io.emit("vrsUpdate", savedVRS);
+  res.json(savedVRS);
+});
+
+// --- API для custom fields ---
+// GET custom fields
+app.get("/api/customfields", (req, res) => {
+  res.json([customFieldsData]);
+});
+// POST custom fields
+app.post("/api/customfields", (req, res) => {
+  customFieldsData = req.body;
+  console.log("Получены custom fields:", customFieldsData);
+  saveDataToFile();
+  // Оповещаем всех клиентов
+  io.emit("customFieldsUpdate", customFieldsData);
+  res.json(customFieldsData);
+});
+
+// --- API для списка команд из файла data.json ---
+const teamsDataFile = path.join(__dirname, "data.json");
+app.get("/api/teams", (req, res) => {
+  fs.readFile(teamsDataFile, "utf8", (err, data) => {
+    if (err) {
+      console.error("Ошибка чтения data.json:", err);
+      return res.status(500).json({ error: "Не удалось прочитать файл команд." });
+    }
+    try {
+      const teamsData = JSON.parse(data);
+      res.json(teamsData);
+    } catch (e) {
+      console.error("Ошибка парсинга JSON:", e);
+      res.status(500).json({ error: "Ошибка парсинга JSON." });
+    }
   });
 });
 
-// Запуск сервера
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+/* ====================================
+   Socket.io и запуск сервера
+   ==================================== */
+const server = http.createServer(app);
+const io = new SocketIOServer(server);
+
+io.on("connection", (socket) => {
+  console.log("Клиент подключён");
+  // Отправляем текущие данные матчей сразу при подключении
+  socket.emit("jsonUpdate", savedMatches);
+  // Отправляем custom fields, чтобы верхний блок отобразил актуальные значения
+  socket.emit("customFieldsUpdate", customFieldsData);
+});
+
+server.listen(port, "0.0.0.0", () => {
+  console.log(`Сервер запущен на http://0.0.0.0:${port}`);
 });
