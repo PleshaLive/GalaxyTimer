@@ -1,45 +1,39 @@
-/* ========== Переменные ========== */
+/* ========== Переменные "Clean Focus" ========== */
 :root {
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
   /* Цвета */
-  --bg-gradient-start: #1a1a2e;
-  --bg-gradient-end: #16213e;
-  --bg-card: rgba(40, 42, 58, 0.85);
-  --bg-element: #2f3244;
-  --bg-element-hover: #3a3e52;
-  --text-color: #e0e0e0;
-  --text-color-secondary: #a0a0b0;
-  --text-color-headings: #ffffff;
-  --border-color: rgba(140, 140, 160, 0.25);
-  --border-color-heavy: rgba(140, 140, 160, 0.5);
-  --accent-glow: rgba(116, 110, 200, 0.5);
-  --accent-gradient-start: #332F6D;
-  --accent-gradient-end: #746EC8;
-  --color-live: #e74c3c; /* Red */
-  --color-finished: #7f8c8d; /* Gray */
-  --color-upcoming: #3498db; /* Blue */
-  --color-winner: #2ecc71; /* Green */
-  --team1-color: #3498db; /* Blue */
-  --team2-color: #e67e22; /* Orange */
+  --clr-bg: #1A1D21;              /* Очень темный фон */
+  --clr-bg-alt: #16181C;           /* Альтернативный темный (для шапки) */
+  --clr-card-bg: #262A30;         /* Фон карточки */
+  --clr-element-bg: #353941;      /* Фон элементов */
+  --clr-element-bg-hover: #41454E; /* Фон элементов при наведении */
+  --clr-text-primary: #EAEAEA;    /* Основной текст (светло-серый) */
+  --clr-text-secondary: #999DAA;  /* Вторичный текст (сероватый) */
+  --clr-text-headings: #FFFFFF;   /* Заголовки (белый) */
+  --clr-border: rgba(153, 157, 170, 0.2); /* Тонкая граница */
+  --clr-border-focus: #00BFFF;    /* Цвет границы/тени при фокусе (синий) */
+  --clr-primary: #00BFFF;         /* Основной акцент (Deep Sky Blue) */
+  --clr-primary-hover: #00A8E6;   /* Акцент при наведении */
+  --clr-primary-disabled: #555;
+  --clr-success: #2ECC71;         /* Зеленый */
+  --clr-team1: #00BFFF;           /* Синий */
+  --clr-team2: #FFA500;           /* Оранжевый */
 
   /* Размеры и отступы */
-  --header-height: 65px;
-  --button-height: 48px;
-  --top-gap: 20px;
-  --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px);
+  --header-height: 60px;
+  --button-height: 44px;
+  --top-gap: 15px;
+  --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 15px);
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
   --spacing-lg: 16px;
-  --spacing-xl: 24px;
-  --spacing-xxl: 32px;
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  --border-radius-lg: 12px;
-  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  --card-glow: 0 0 15px rgba(116, 110, 200, 0.1);
+  --spacing-xl: 20px;
+  --spacing-xxl: 30px;
+  --border-radius: 6px; /* Единый радиус скругления */
+  --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 /* ========== Общие стили и сброс ========== */
@@ -49,566 +43,286 @@
   padding: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-  background-attachment: fixed;
-  color: var(--text-color);
+  background-color: var(--clr-bg);
+  color: var(--clr-text-primary);
   font-family: var(--font-family);
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.5;
   font-size: 14px;
   padding-top: var(--body-padding-top);
 }
 
 .container {
-  max-width: 1600px;
+  max-width: 1700px; /* Чуть шире */
   margin: 0 auto;
   padding: 0 var(--spacing-xl) var(--spacing-xxl);
 }
 
 /* Стилизация скроллбара */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg-element); }
-::-webkit-scrollbar-thumb { background: var(--bg-element-hover); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-glow); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--clr-element-bg); }
+::-webkit-scrollbar-thumb { background: var(--clr-element-bg-hover); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--clr-primary); }
+
+/* Общие стили элементов форм */
+input[type="text"],
+input[type="date"],
+select {
+    background-color: var(--clr-element-bg);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--clr-text-primary);
+    font-family: inherit;
+    font-size: 13px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--clr-border-focus);
+    box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2); /* Тень в цвет фокуса */
+}
+select {
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23999DAA'%3E%3Cpath d='M7 10l-5-5h10z'/%3E%3C/svg%3E"); /* Немного крупнее стрелка */
+    background-repeat: no-repeat;
+    background-position: right var(--spacing-md) center;
+    padding-right: calc(var(--spacing-md) + 18px); /* Место под стрелку */
+}
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--clr-text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+::placeholder {
+    color: var(--clr-text-secondary);
+    opacity: 0.7;
+}
 
 /* ========== Шапка страницы ========== */
 .page-header {
-  background: rgba(22, 33, 62, 0.85);
-  backdrop-filter: blur(10px);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-bottom: 1px solid var(--border-color);
+  background-color: var(--clr-bg-alt);
+  padding: 0 var(--spacing-xl); /* Вертикальный паддинг не нужен при фикс. высоте */
+  border-bottom: 1px solid var(--clr-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* Разрешаем перенос для адаптивности */
   gap: var(--spacing-lg);
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: var(--header-height);
-  z-index: 1100;
+  z-index: 100;
 }
-
-.header-section {
-  display: flex;
-  gap: var(--spacing-md);
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.tournament-info {
-    justify-content: flex-end;
-}
-
+.header-section { display: flex; gap: var(--spacing-md); align-items: center; flex-wrap: wrap; }
+.tournament-info { justify-content: flex-end; }
 .page-header input[type="text"],
-.page-header input[type="date"] {
-  background: var(--bg-element);
-  border: 1px solid var(--border-color);
-  color: var(--text-color);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius-sm);
-  font-size: 13px;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  min-width: 160px;
-}
-.page-header input:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 5px var(--accent-glow);
-}
-
-.tournament-dates {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-.tournament-dates label {
-    color: var(--text-color-secondary);
-    font-size: 12px;
-    white-space: nowrap;
-}
-#tournamentDayDisplay {
-    font-weight: 600;
-    color: var(--text-color-headings);
-    margin: 0 var(--spacing-sm);
-}
+.page-header input[type="date"] { font-size: 12px; padding: var(--spacing-xs) var(--spacing-sm);}
+.tournament-dates label { color: var(--clr-text-secondary); font-size: 11px; }
+#tournamentDayDisplay { font-weight: 600; color: var(--clr-text-primary); margin: 0 var(--spacing-xs); }
 
 /* ========== Кнопка APPLY ========== */
 .apply-button {
   position: fixed;
   top: calc(var(--header-height) + var(--top-gap));
   right: var(--spacing-xl);
-  z-index: 1200;
+  z-index: 110; /* Выше шапки */
   width: auto;
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: 0 var(--spacing-xl); /* Горизонтальный паддинг */
   height: var(--button-height);
-  background: linear-gradient(45deg, var(--accent-gradient-start), var(--accent-gradient-end));
+  background-color: var(--clr-primary);
   border: none;
-  border-radius: var(--border-radius-md);
+  border-radius: var(--border-radius);
   font-family: var(--font-family);
-  font-weight: 700;
-  font-size: 16px;
+  font-weight: 600; /* Немного тоньше */
+  font-size: 15px;
   color: #ffffff;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 8px var(--accent-glow);
-  letter-spacing: 0.5px;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  letter-spacing: 0.3px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
-
 .apply-button:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 12px var(--accent-glow);
+  background-color: var(--clr-primary-hover);
+  box-shadow: 0 4px 12px rgba(0, 191, 255, 0.2);
 }
-.apply-button:active {
-  transform: translateY(0) scale(0.98);
-  filter: brightness(0.95);
-}
+.apply-button:active { transform: scale(0.98); }
 
 /* ========== Основная панель ========== */
-.dashboard {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--spacing-xxl);
-}
-
-.dashboard h1 { /* Заголовок "Интерфейс матчей" */
+.dashboard { display: grid; grid-template-columns: 1fr; gap: var(--spacing-xxl); }
+.dashboard h1 {
   text-align: center;
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  color: var(--text-color-headings);
+  color: var(--clr-text-headings);
   margin-bottom: var(--spacing-lg);
 }
-
-.matches {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: var(--spacing-xl);
-}
+.matches { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: var(--spacing-xl); }
 
 /* ========== Карточка матча ========== */
 .match-column {
-  background: var(--bg-card);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  padding: var(--spacing-lg); /* Уменьшил паддинг для V1 структуры */
-  box-shadow: var(--card-shadow), var(--card-glow);
+  background-color: var(--clr-card-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--clr-border);
+  padding: var(--spacing-lg);
+  box-shadow: var(--card-shadow);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md); /* Уменьшил gap */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  position: relative;
+  gap: var(--spacing-lg); /* Основной отступ между блоками */
+  transition: border-color 0.3s ease, transform 0.2s ease;
 }
-.match-column:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(116, 110, 200, 0.15);
-}
+.match-column:hover { border-color: var(--clr-primary); transform: translateY(-3px); }
 
 /* --- Шапка карточки --- */
-.match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* Убрана рамка снизу для V1 структуры */
-    padding-bottom: var(--spacing-xs); /* Меньший отступ */
-    gap: var(--spacing-md);
-}
-.match-header h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-color-headings);
-    margin: 0;
-    white-space: nowrap;
-}
-.match-meta {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
+.match-header { display: flex; justify-content: space-between; align-items: center; gap: var(--spacing-md); }
+.match-header h2 { font-size: 18px; font-weight: 600; color: var(--clr-text-headings); margin: 0; }
+.match-meta { display: flex; align-items: center; gap: var(--spacing-sm); }
 .match-meta .status-select,
-.match-meta .time-input {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    font-size: 12px;
-    font-weight: 500;
-    text-align: center;
-    color: var(--text-color-secondary);
-    transition: all 0.2s ease;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+.match-meta .time-input { font-size: 11px; padding: 3px 6px; border-radius: 4px; background-color: var(--clr-element-bg); }
+.match-meta .status-select { padding-right: 18px; background-position: right 4px center; }
+.match-meta .time-input { min-width: 55px; }
+/* Статусы - подсветка текста */
+.status-select option:checked { /* Стиль для выбранного option */
+  font-weight: bold;
 }
-.match-meta .status-select {
-    padding-right: 20px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    cursor: pointer;
-}
-.match-meta select:focus,
-.match-meta input:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 4px var(--accent-glow);
-    color: var(--text-color);
-}
-/* Убраны стили для статусов по data-атрибуту, т.к. JS их не ставит в V1 */
-/* Можно добавить стили по value, но они менее надежны */
-.match-meta select option[value="LIVE"] { background: var(--color-live); color: white; }
-.match-meta select option[value="FINISHED"] { background: var(--color-finished); color: white; }
-.match-meta select option[value="UPCOM"] { background: var(--color-upcoming); color: white; }
+.status-select option[value="LIVE"] { color: var(--clr-primary); }
+.status-select option[value="FINISHED"] { color: var(--clr-text-secondary); }
+.status-select option[value="UPCOM"] { color: var(--clr-text-primary); }
 
-
-.match-meta .time-input { min-width: 60px; }
-
-/* --- Кнопки победителя (Оригинальная структура) --- */
-.winner-buttons {
-    display: flex;
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-sm);
-}
-.original-winner-btn { /* Стилизуем оригинальные кнопки */
+/* --- Кнопки победителя (Оригинал) --- */
+.winner-buttons { display: flex; gap: var(--spacing-sm); }
+.original-winner-btn {
     flex-grow: 1;
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
+    background-color: var(--clr-element-bg);
+    border: 1px solid var(--clr-border);
+    border-radius: var(--border-radius);
     padding: var(--spacing-sm);
-    color: var(--text-color-secondary);
-    font-size: 13px;
+    color: var(--clr-text-secondary);
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
 }
-.original-winner-btn:hover {
-    background-color: var(--bg-element-hover);
-    border-color: var(--bg-element-hover);
-    color: var(--text-color);
-}
-.original-winner-btn.winner-selected { /* Стиль для выбранной кнопки */
-    background-color: var(--color-winner);
-    border-color: var(--color-winner);
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
-}
+.original-winner-btn:hover { background-color: var(--clr-element-bg-hover); border-color: var(--clr-text-secondary); color: var(--clr-text-primary); }
+.original-winner-btn.winner-selected { background-color: var(--clr-success); border-color: var(--clr-success); color: #fff; font-weight: 600; }
 
-
-/* --- Информация о командах (Оригинальная структура) --- */
-.form-group {
-    margin-bottom: var(--spacing-sm); /* Отступ между группами лейбл+селект */
+/* --- Инфо о командах (Оригинал) --- */
+.form-group { margin-bottom: var(--spacing-sm); }
+.team-select {
+    font-size: 14px;
+    font-weight: 500;
+    border-left-width: 3px;
+    padding-left: calc(var(--spacing-md) - 2px);
 }
-.form-group label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-color-secondary);
-    margin-bottom: var(--spacing-xs);
-}
-.team-select { /* Общие стили для селектов команд */
-    width: 100%;
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    color: var(--text-color-headings);
-    padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-sm);
-    font-size: 15px;
-    font-weight: 600;
-    text-align: left;
-    cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right var(--spacing-md) center;
-    transition: all 0.2s ease;
-    min-height: calc(var(--spacing-sm) * 2 + 15px + 2px);
-    border-left-width: 4px; /* Толщина для цветного индикатора */
-    border-left-style: solid;
-    border-left-color: transparent; /* По умолчанию прозрачная */
-    padding-left: calc(var(--spacing-md) - 3px); /* Компенсация */
-}
-/* Цветные индикаторы для команд */
-.team-1-select { border-left-color: var(--team1-color); }
-.team-2-select { border-left-color: var(--team2-color); }
-
-.team-select:hover { background-color: var(--bg-element-hover); }
-.team-select:focus {
-    outline: none;
-    border-color: var(--accent-glow); /* Цвет рамки при фокусе */
-    border-left-color: var(--accent-glow); /* Левая тоже подсвечивается */
-    box-shadow: 0 0 5px var(--accent-glow);
-}
-/* Убраны стили для .team-side, .vs-separator, .winner-btn */
-
+.team-1-select { border-left-color: var(--clr-team1); }
+.team-2-select { border-left-color: var(--clr-team2); }
+.team-select:focus { border-left-color: var(--clr-border-focus); } /* При фокусе основной цвет */
 
 /* --- Секция карт --- */
-.maps {
-    /* Убраны border-top и margin-top, т.к. структура V1 другая */
-    padding-top: var(--spacing-md); /* Небольшой отступ сверху */
-}
-.maps h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-color-secondary);
-    text-align: center;
-    margin-bottom: var(--spacing-md);
-}
+.maps { border-top: 1px solid var(--clr-border); padding-top: var(--spacing-lg); margin-top: var(--spacing-lg);}
+.maps h3 { font-size: 13px; font-weight: 600; color: var(--clr-text-secondary); text-align: center; margin-bottom: var(--spacing-md); text-transform: uppercase; letter-spacing: 0.5px; }
 .map-row {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-sm);
-  background: rgba(0,0,0, 0.15);
-  padding: var(--spacing-sm);
-  border-radius: var(--border-radius-sm);
-  border: 1px solid transparent;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  gap: var(--spacing-md); /* Немного больше разрыв */
+  margin-bottom: var(--spacing-xs); /* Ряды ближе друг к другу */
+  padding: var(--spacing-xs) 0; /* Вертикальный отступ убрали, только между рядами */
 }
-.map-row:focus-within,
-.map-row:hover {
-    background: rgba(0,0,0, 0.25);
-    border-color: var(--border-color-heavy);
-}
-
 .map-name-select {
     flex-grow: 1;
     background: transparent;
     border: none;
-    color: var(--text-color);
+    color: var(--clr-text-primary);
     font-size: 14px;
-    padding: var(--spacing-xs) 0;
+    font-weight: 500; /* Чуть жирнее название карты */
+    padding: 0;
     cursor: pointer;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+    background-image: none; /* Убираем стрелку */
 }
 .map-name-select:focus { outline: none; }
-
 .map-score-input {
     flex-shrink: 0;
-    width: 80px;
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
+    width: 70px; /* Немного уже */
+    background-color: var(--clr-element-bg);
+    border: 1px solid var(--clr-border);
+    color: var(--clr-text-primary);
     text-align: center;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    transition: all 0.2s ease;
+    border-radius: 4px; /* Меньше скругление */
 }
-.map-score-input:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 4px var(--accent-glow);
-    background-color: var(--bg-element-hover);
-}
-.map-score-input::placeholder {
-    color: var(--text-color-secondary);
-    font-weight: 500;
-    font-style: italic;
-    opacity: 0.8;
-}
-
+.map-score-input::placeholder { font-style: normal; opacity: 0.6; font-weight: 500; }
 
 /* --- Блок VRS --- */
-.vrs-block {
-    background: rgba(0,0,0, 0.15);
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius-md);
-    /* Убран border-top и margin-top для V1 */
-    margin-top: var(--spacing-md); /* Добавлен небольшой отступ */
-}
-.vrs-block h3 {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-color-secondary);
-    text-align: center;
-    margin-bottom: var(--spacing-sm);
-}
-.vrs-content {
-    overflow-x: auto;
-}
-.vrs-block table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-}
-.vrs-block th, .vrs-block td {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border: 1px solid var(--border-color);
-    text-align: center;
-}
-.vrs-block th {
-    background-color: rgba(0,0,0, 0.2);
-    font-weight: 600;
-    color: var(--text-color-secondary);
-}
-.vrs-block input {
-    width: 100%;
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    text-align: center;
-    font-size: 12px;
-    padding: var(--spacing-xs);
-    border-radius: var(--border-radius-sm);
-}
-.vrs-block input:focus {
-    outline: none;
-    border-color: var(--accent-glow);
-    box-shadow: 0 0 4px var(--accent-glow);
-}
+.vrs-block { background-color: rgba(0,0,0, 0.1); padding: var(--spacing-md); border-radius: var(--border-radius); margin-top: var(--spacing-lg); }
+.vrs-block h3 { font-size: 13px; font-weight: 600; color: var(--clr-text-secondary); text-align: center; margin-bottom: var(--spacing-sm); text-transform: uppercase; letter-spacing: 0.5px; }
+.vrs-content { overflow-x: auto; }
+.vrs-block table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.vrs-block th, .vrs-block td { padding: var(--spacing-xs) var(--spacing-sm); border: 1px solid var(--clr-border); text-align: center; }
+.vrs-block th { background-color: var(--clr-element-bg); font-weight: 600; color: var(--clr-text-secondary); }
+.vrs-block input { width: 100%; background: var(--clr-element-bg-hover); border: 1px solid var(--clr-border); color: var(--clr-text-primary); text-align: center; font-size: 11px; padding: var(--spacing-xs); border-radius: 4px; }
+.vrs-block input:focus { border-color: var(--clr-border-focus); box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2); }
 
 /* ========== MAP VETO ========== */
-.map-veto-block {
-  background: var(--bg-card);
-  padding: var(--spacing-xl);
-  border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--card-shadow);
-}
-.map-veto-block h1 {
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--text-color-headings);
-    margin-bottom: var(--spacing-xl);
-}
-.map-veto-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-}
-.map-veto-header label {
-    color: var(--text-color-secondary);
-    font-size: 14px;
-}
-.map-veto-header select {
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-sm);
-    min-width: 200px;
-    cursor: pointer;
-}
-.map-veto-header select:focus { outline: none; border-color: var(--accent-glow); }
-
+.map-veto-block { background-color: var(--clr-card-bg); padding: var(--spacing-xl); border-radius: var(--border-radius); border: 1px solid var(--clr-border); box-shadow: var(--card-shadow); }
+.map-veto-block h1 { text-align: center; font-size: 22px; font-weight: 700; color: var(--clr-text-headings); margin-bottom: var(--spacing-xl); }
+.map-veto-header { display: flex; justify-content: center; align-items: center; gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }
+.map-veto-header label { color: var(--clr-text-secondary); font-size: 14px; }
+.map-veto-header select { min-width: 250px; } /* Шире селект матча */
 .table-wrapper { overflow-x: auto; }
-
-#vetoTable {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-#vetoTable th, #vetoTable td {
-    padding: var(--spacing-md);
-    border: 1px solid var(--border-color);
-    text-align: center;
-    vertical-align: middle;
-}
-#vetoTable th {
-    background: var(--bg-element);
-    font-weight: 600;
-    color: var(--text-color-secondary);
-}
-#vetoTable tbody tr:nth-child(even) {
-    background: rgba(0,0,0, 0.1);
-}
-#vetoTable select {
-    background: var(--bg-element);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: var(--spacing-sm);
-    border-radius: var(--border-radius-sm);
-    width: 100%;
-    min-width: 100px;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-}
-#vetoTable select:focus { outline: none; border-color: var(--accent-glow); }
-
-/* Цвета для селекта команды в вето (через data-атрибут, JS нужен) */
-#vetoTable .veto-team {
-    border-left-width: 4px;
-    border-left-style: solid;
-    padding-left: calc(var(--spacing-sm) - 3px);
-    border-left-color: transparent; /* По умолчанию */
-}
-#vetoTable .veto-team[data-team="TEAM1"] { border-left-color: var(--team1-color); }
-#vetoTable .veto-team[data-team="TEAM2"] { border-left-color: var(--team2-color); }
+#vetoTable { width: 100%; border-collapse: collapse; font-size: 13px; }
+#vetoTable th, #vetoTable td { padding: var(--spacing-md); border: 1px solid var(--clr-border); text-align: center; vertical-align: middle; }
+#vetoTable th { background-color: var(--clr-element-bg); font-weight: 600; color: var(--clr-text-secondary); }
+#vetoTable tbody tr:nth-child(even) { background-color: rgba(0,0,0, 0.1); }
+#vetoTable select { min-width: 100px; background-position: right var(--spacing-sm) center; /* Поправить позицию стрелки */}
+/* Цвета для селекта команды в вето */
+#vetoTable .veto-team { border-left-width: 3px; padding-left: calc(var(--spacing-sm) - 2px); }
+#vetoTable .veto-team[data-team="TEAM1"] { border-left-color: var(--clr-team1); }
+#vetoTable .veto-team[data-team="TEAM2"] { border-left-color: var(--clr-team2); }
+#vetoTable .veto-team:focus { border-left-color: var(--clr-border-focus); }
 
 /* ========== JSON OUTPUT ========== */
-.json-output {
-  margin-top: var(--spacing-xxl);
-  background: var(--bg-element);
-  color: var(--text-color-secondary);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-sm);
-  white-space: pre-wrap;
-  font-family: monospace;
-  font-size: 12px;
-  border: 1px solid var(--border-color);
-  max-height: 400px;
-  overflow: auto;
-}
+.json-output { margin-top: var(--spacing-xxl); background-color: var(--clr-element-bg); color: var(--clr-text-secondary); padding: var(--spacing-lg); border-radius: var(--border-radius); white-space: pre-wrap; font-family: monospace; font-size: 12px; border: 1px solid var(--clr-border); max-height: 400px; overflow: auto; }
 
 /* ========== Адаптивность ========== */
 @media (max-width: 1200px) {
-    .matches {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    }
+    .matches { grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); } /* Чуть уже мин. ширина */
     body { padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px); }
 }
-
 @media (max-width: 768px) {
-    :root {
-         --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px);
-    }
+    :root { --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px); }
     body { font-size: 13px; padding-top: var(--body-padding-top); }
-    .page-header {
-        justify-content: center;
-    }
-    .apply-button {
-        font-size: 14px;
-        padding: var(--spacing-sm) var(--spacing-lg);
-        right: var(--spacing-md);
-         top: calc(var(--header-height) + var(--top-gap) - 5px);
-    }
+    .page-header { justify-content: center; }
+    .apply-button { font-size: 14px; padding: 0 var(--spacing-lg); right: var(--spacing-md); top: calc(var(--header-height) + var(--top-gap) - 5px); }
     .dashboard h1 { font-size: 22px; }
-    .match-column { padding: var(--spacing-lg); }
+    .match-column { padding: var(--spacing-md); gap: var(--spacing-md); }
     .match-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-sm); }
-    .match-meta { width: 100%; justify-content: flex-end;}
-
-    .winner-buttons { flex-direction: column;} /* Кнопки друг под другом */
-    .original-winner-btn { width: 100%; } /* Кнопки на всю ширину */
+    .match-meta { width: 100%; justify-content: flex-end; }
+    .winner-buttons { flex-direction: column; }
+    .original-winner-btn { width: 100%; }
 }
 @media (max-width: 480px) {
-     .matches {
-        grid-template-columns: 1fr;
-    }
-     .page-header { padding: var(--spacing-sm) var(--spacing-md); flex-direction: column; height: auto; --header-height: 100px; /* Пример */}
+     .matches { grid-template-columns: 1fr; }
+     .page-header { padding: var(--spacing-sm) var(--spacing-md); flex-direction: column; height: auto; --header-height: 100px; /* Обновляем переменную */ }
      .header-section { width: 100%; justify-content: center; }
      .apply-button { width: calc(100% - 2 * var(--spacing-md)); right: var(--spacing-md); }
-     :root { /* Пересчет отступа */
-         --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px);
-     }
+     :root { /* Пересчет отступа */ --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px); }
      body { padding-top: var(--body-padding-top); }
-
 }
