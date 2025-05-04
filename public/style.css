@@ -1,502 +1,609 @@
-/* ========== Переменные для управления стилями ========== */
+/* ========== Переменные ========== */
 :root {
-  --bg-main: #222;
-  --bg-gradient-start: #222;
-  --bg-gradient-end: #2C243B;
-  --bg-card: #333; /* Фон карточек и блоков */
-  --bg-element: #444; /* Фон инпутов, селектов */
-  --bg-element-hover: #555; /* Фон при наведении */
-  --border-color: #555; /* Цвет рамок */
-  --text-color: #fff; /* Основной цвет текста */
-  --text-color-secondary: #ccc; /* Второстепенный цвет текста (лейблы) */
-  --accent-color: #503BA9; /* Основной акцентный цвет (фиолетовый) */
-  --accent-color-focus: rgba(80, 59, 169, 0.6); /* Подсветка фокуса */
-  --accent-gradient-start: #332F6D; /* Градиент кнопки Apply */
-  --accent-gradient-end: #746EC8; /* Градиент кнопки Apply */
-  --success-color: #28a745; /* Цвет для успешных действий (выбранный победитель) */
-  --danger-color: #dc3545; /* Цвет для обозначения бана (можно использовать для вето) */
-  --border-radius-sm: 4px;
-  --border-radius-md: 8px;
-  --border-radius-lg: 10px;
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+  /* Цвета */
+  --bg-gradient-start: #1a1a2e; /* Темно-сине-фиолетовый */
+  --bg-gradient-end: #16213e;   /* Глубокий синий */
+  --bg-card: rgba(40, 42, 58, 0.8); /* Полупрозрачный фон карточки */
+  --bg-element: #2f3244; /* Фон элементов управления */
+  --bg-element-hover: #3a3e52;
+  --text-color: #e0e0e0; /* Светло-серый основной текст */
+  --text-color-secondary: #a0a0b0; /* Более тусклый текст */
+  --text-color-headings: #ffffff; /* Белый для заголовков */
+  --border-color: rgba(140, 140, 160, 0.2); /* Полупрозрачная рамка */
+  --border-color-heavy: rgba(140, 140, 160, 0.4);
+  --accent-glow: rgba(116, 110, 200, 0.5); /* Фиолетовое свечение */
+  --accent-gradient-start: #332F6D;
+  --accent-gradient-end: #746EC8;
+  --color-live: #e74c3c; /* Красный для LIVE */
+  --color-finished: #7f8c8d; /* Серый для FINISHED */
+  --color-upcoming: #3498db; /* Синий для UPCOM */
+  --color-winner: #2ecc71; /* Зеленый для победителя */
+
+  /* Размеры и отступы */
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
   --spacing-lg: 16px;
-  --spacing-xl: 20px;
-  --font-family: Arial, sans-serif; /* Замените на 'Roboto', sans-serif если подключили Google Fonts */
-  --font-size-sm: 12px;
-  --font-size-md: 14px;
-  --font-size-lg: 16px;
-  --shadow-color: rgba(0, 0, 0, 0.3); /* Цвет тени */
-  --shadow-hover-color: rgba(0, 0, 0, 0.45); /* Цвет тени при наведении */
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --card-glow: 0 0 15px rgba(116, 110, 200, 0.1); /* Легкое свечение карты */
 }
 
-/* ========== Общие ========== */
+/* ========== Общие стили и сброс ========== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  /* Анимированный градиентный фон */
-  background: linear-gradient(-45deg, var(--bg-gradient-start), var(--bg-gradient-end), var(--bg-gradient-start), var(--bg-gradient-end));
-  background-size: 400% 400%;
-  animation: bgAnimation 20s ease infinite;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  background-attachment: fixed; /* Фиксируем фон */
   color: var(--text-color);
   font-family: var(--font-family);
   min-height: 100vh;
-  line-height: 1.6; /* Немного увеличим межстрочный интервал */
-}
-
-@keyframes bgAnimation {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  line-height: 1.6;
+  font-size: 14px;
+  padding-top: 80px; /* Отступ для фиксированной шапки/кнопки */
 }
 
 .container {
   max-width: 1600px;
-  margin: auto;
-  padding: var(--spacing-xl);
+  margin: 0 auto;
+  padding: 0 var(--spacing-xl) var(--spacing-xxl);
 }
 
-h1, h2, h3 {
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+/* Стилизация скроллбара */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-element); }
+::-webkit-scrollbar-thumb { background: var(--bg-element-hover); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-glow); }
 
-h1 { /* Главный заголовок страницы */
-  text-align: center;
-  margin-bottom: var(--spacing-xl);
-  font-size: 24px; /* Немного больше */
-}
-
-h2 { /* Заголовки карточек (Match 1, ...) */
-  font-size: var(--font-size-lg);
-  text-align: center;
-  margin-bottom: var(--spacing-sm); /* Уменьшим отступ, т.к. gap в .match-column */
-  font-weight: 500; /* Немного тоньше */
-}
-
-h3 { /* Заголовки внутри блоков (например, VRS) */
-  font-size: var(--font-size-md);
-  text-align: center;
-  margin-bottom: var(--spacing-sm);
-  font-weight: 500;
-}
-
-/* ========== Кастомные поля ========== */
-.custom-fields {
-  background: var(--bg-element); /* Используем цвет фона элементов */
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  margin-bottom: var(--spacing-xl);
+/* ========== Шапка страницы ========== */
+.page-header {
+  background: rgba(22, 33, 62, 0.8); /* --bg-gradient-end с прозрачностью */
+  backdrop-filter: blur(10px); /* Эффект размытия */
+  padding: var(--spacing-md) var(--spacing-xl);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
-  flex-wrap: wrap; /* Позволит переноситься на маленьких экранах */
-  gap: var(--spacing-md); /* Пространство между элементами */
+  justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  position: fixed; /* Фиксируем шапку */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100; /* Выше кнопки Apply */
 }
 
-.custom-fields input[type="text"],
-.custom-fields input[type="date"] {
-  flex-grow: 1; /* Позволит инпутам растягиваться */
-  min-width: 150px; /* Минимальная ширина для предотвращения сжатия */
+.header-section {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.tournament-info {
+    justify-content: flex-end;
+}
+
+.page-header input[type="text"],
+.page-header input[type="date"] {
+  background: var(--bg-element);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 160px;
+}
+.page-header input:focus {
+    outline: none;
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 5px var(--accent-glow);
 }
 
 .tournament-dates {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  flex-wrap: wrap; /* Перенос на маленьких экранах */
-  flex-grow: 2; /* Больше места для дат */
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
 }
-
 .tournament-dates label {
-  font-size: var(--font-size-sm);
-  color: var(--text-color-secondary);
+    color: var(--text-color-secondary);
+    font-size: 12px;
+    white-space: nowrap;
 }
-
 #tournamentDayDisplay {
-  font-weight: bold;
-  margin-left: var(--spacing-sm);
-  white-space: nowrap; /* Не переносить текст дня */
+    font-weight: 600;
+    color: var(--text-color-headings);
+    margin: 0 var(--spacing-sm);
 }
-
-/* ========== Общие стили для элементов форм ========== */
-label {
-  display: block; /* Лейбл над элементом */
-  margin-bottom: var(--spacing-xs);
-  font-size: var(--font-size-sm);
-  color: var(--text-color-secondary);
-  font-weight: 500;
-}
-
-select,
-input[type="text"],
-input[type="date"] {
-  width: 100%;
-  font-size: var(--font-size-md);
-  padding: var(--spacing-sm) var(--spacing-md); /* Больше горизонтальный паддинг */
-  border-radius: var(--border-radius-sm);
-  border: 1px solid var(--border-color);
-  background: var(--bg-element);
-  color: var(--text-color);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-}
-
-select:hover,
-input[type="text"]:hover,
-input[type="date"]:hover {
-    border-color: var(--bg-element-hover);
-}
-
-select:focus,
-input[type="text"]:focus,
-input[type="date"]:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px var(--accent-color-focus); /* Улучшенная подсветка фокуса */
-}
-
-/* Группировка элементов формы */
-.form-group {
-    margin-bottom: var(--spacing-sm); /* Отступ под группой */
-}
-
-/* ========== GRID-РАСКЛАДКА ========== */
-.dashboard {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 колонки */
-  grid-auto-rows: auto;
-  gap: var(--spacing-lg); /* Пространство между всеми элементами grid */
-}
-
-.matches {
-  grid-column: 1 / -1; /* Занимает всю ширину */
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Внутренняя сетка для матчей */
-  gap: var(--spacing-lg);
-}
-
-.map-veto-block {
-  grid-column: 1 / -1; /* Занимает всю ширину */
-}
-
-/* ========== СТИЛИ МАТЧЕЙ ========== */
-.match-column {
-  background: var(--bg-card);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 10px var(--shadow-color);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md); /* Пространство между элементами внутри колонки */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.match-column:hover {
-  transform: translateY(-5px); /* Более заметный подъем */
-  box-shadow: 0 8px 15px var(--shadow-hover-color);
-}
-
-/* ========== КНОПКИ ПОБЕДИТЕЛЯ ========== */
-.winner-buttons {
-  display: flex; /* Кнопки в ряд */
-  gap: var(--spacing-sm);
-  justify-content: center; /* Центрируем кнопки */
-}
-
-.winner-buttons button {
-  flex-grow: 1; /* Растягиваем кнопки */
-  font-size: var(--font-size-sm);
-  padding: var(--spacing-sm) var(--spacing-xs); /* Паддинг */
-  background: var(--bg-element);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  color: var(--text-color-secondary);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
-  text-align: center;
-}
-
-.winner-buttons button:hover {
-  background: var(--bg-element-hover);
-  border-color: var(--bg-element-hover);
-  color: var(--text-color);
-}
-
-.winner-buttons button:active {
-    transform: scale(0.98); /* Эффект нажатия */
-}
-
-/* Подсветка выбранного победителя */
-.winner-btn.winner-selected {
-  background-color: var(--success-color);
-  border-color: var(--success-color);
-  color: var(--text-color);
-  font-weight: bold;
-}
-
-/* ========== MAPS ========== */
-.maps {
-  margin-top: var(--spacing-sm); /* Небольшой отступ сверху */
-}
-
-.map-row {
-  display: flex;
-  gap: var(--spacing-sm); /* Пространство между селектом и инпутом */
-  margin-bottom: var(--spacing-sm); /* Отступ между рядами карт */
-  align-items: center; /* Выравнивание по центру */
-}
-
-.map-name-select {
-  flex: 1; /* Занимает доступное пространство */
-}
-
-.map-score-input {
-  width: 80px; /* Немного шире для счета типа 16:14 */
-  text-align: center;
-  flex-shrink: 0; /* Не сжимать инпут */
-}
-
-/* ========== VRS ========== */
-.vrs-block {
-  background: var(--bg-element); /* Тот же фон что и у инпутов */
-  padding: var(--spacing-md);
-  border-radius: var(--border-radius-md);
-  margin-top: auto; /* Прижимает блок VRS к низу карточки */
-  border: 1px solid var(--border-color); /* Тонкая рамка */
-}
-
-/* Стили для .vrs-table и его содержимого (если они добавляются JS) */
-.vrs-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: var(--font-size-sm);
-}
-
-.vrs-table th,
-.vrs-table td {
-  border: 1px solid var(--border-color);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  text-align: center;
-  background: transparent; /* Фон наследуется от .vrs-block */
-}
-
-.vrs-table th {
-  background-color: rgba(0,0,0, 0.2); /* Слегка темнее шапка */
-  font-weight: bold;
-}
-
-.vrs-table input {
-  width: 100%;
-  padding: var(--spacing-xs);
-  font-size: var(--font-size-sm);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-sm);
-  text-align: center;
-  background: var(--bg-card); /* Темнее чем фон блока */
-  color: var(--text-color);
-}
-
-/* ========== VS / NEXT ROW (СКРЫТО ПО УМОЛЧАНИЮ) ========== */
-.next-row {
-  grid-column: 1 / -1;
-  display: none; /* Скрыто по умолчанию, как и было */
-  grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-lg);
-}
-
-.next-column {
-  background: var(--bg-card);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  box-shadow: 0 4px 10px var(--shadow-color);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.next-column:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px var(--shadow-hover-color);
-}
-
-.next-column .vs,
-.next-column .next {
-  background: var(--bg-element);
-  padding: var(--spacing-md) 0;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-md);
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* ========== MAP VETO ========== */
-.map-veto-block {
-  background: var(--bg-card);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: 0 4px 10px var(--shadow-color);
-  position: relative;
-  overflow: hidden; /* Чтобы градиент не вылезал */
-}
-
-/* Убираем псевдоэлемент с анимацией, т.к. фон body уже анимирован */
-/* Если нужен отдельный эффект, можно вернуть и настроить */
-/* .map-veto-block::before { ... } */
-
-.map-veto-block h1 {
-  text-align: center;
-  margin-bottom: var(--spacing-lg); /* Больше отступ под заголовком */
-  font-size: 20px; /* Крупнее заголовок вето */
-}
-
-.map-veto-header {
-  display: flex;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-lg);
-  align-items: center;
-  justify-content: center; /* Центрируем выбор матча */
-}
-
-.map-veto-header label {
-    margin-bottom: 0; /* Убираем отступ у лейбла */
-    color: var(--text-color); /* Ярче цвет лейбла */
-}
-
-.map-veto-header select {
-    min-width: 200px; /* Ширина селекта матча */
-    width: auto; /* Автоширина */
-    flex-grow: 0; /* Не растягивать */
-}
-
-/* Обертка для таблицы для возможной горизонтальной прокрутки на малых экранах */
-.table-wrapper {
-    overflow-x: auto;
-}
-
-#vetoTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm); /* Мельче шрифт в таблице */
-  margin-top: var(--spacing-md);
-}
-
-#vetoTable th,
-#vetoTable td {
-  padding: var(--spacing-sm) var(--spacing-md); /* Немного больше паддинг */
-  border: 1px solid var(--border-color);
-  text-align: center;
-  vertical-align: middle; /* Выравнивание по центру */
-}
-
-#vetoTable th {
-  background: var(--bg-element-hover); /* Темнее шапка таблицы */
-  font-weight: bold;
-}
-
-/* Уменьшим размер селектов внутри таблицы для компактности */
-#vetoTable select {
-    font-size: var(--font-size-sm);
-    padding: var(--spacing-xs) var(--spacing-sm);
-    background-color: var(--bg-element); /* Слегка другой фон для селектов в таблице */
-}
-#vetoTable select:focus {
-    box-shadow: 0 0 0 2px var(--accent-color-focus); /* Меньшая подсветка */
-}
-
-/* Опционально: выделить BAN красным, PICK зеленым */
-#vetoTable .veto-action option[value="BAN"] { background: var(--danger-color); color: white; }
-#vetoTable .veto-action option[value="PICK"] { background: var(--success-color); color: white; }
 
 
 /* ========== Кнопка APPLY ========== */
 .apply-button {
   position: fixed;
-  top: var(--spacing-md); /* Отступ от верха */
-  right: var(--spacing-md); /* Отступ справа */
-  z-index: 1000;
-
-  width: 178px; /* Сохраняем размеры */
-  height: 62px;
-
-  background: linear-gradient(265.1deg, var(--accent-gradient-start) 2.59%, var(--accent-gradient-end) 96.74%);
-  border: 1px solid var(--accent-gradient-start); /* Рамка в цвет градиента */
-  border-radius: var(--border-radius-md); /* Скругление */
-
-  /* Используем системный шрифт или подключенный */
-  font-family: var(--font-family); /* Если 'Blender Pro' недоступен */
-  /* font-family: 'Blender Pro', sans-serif; */ /* Если шрифт подключен */
-  font-style: normal;
-  font-weight: 500;
-  font-size: 32px; /* Чуть меньше */
-  line-height: 1; /* Выравнивание текста по центру кнопки */
-  color: var(--text-color);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  top: 18px; /* Немного ниже шапки */
+  right: var(--spacing-xl);
+  z-index: 1200; /* Выше всего */
+  width: auto; /* Автоширина */
+  padding: var(--spacing-md) var(--spacing-xl); /* Паддинги */
+  height: auto;
+  background: linear-gradient(45deg, var(--accent-gradient-start), var(--accent-gradient-end));
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family);
+  font-weight: 700; /* Жирнее */
+  font-size: 16px;
+  color: #ffffff;
   cursor: pointer;
-
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0,0,0, 0.3);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 8px var(--accent-glow); /* Тень + свечение */
+  letter-spacing: 0.5px;
 }
 
 .apply-button:hover {
-  filter: brightness(1.15);
-  transform: scale(1.03); /* Немного увеличим эффект */
-  box-shadow: 0 4px 12px rgba(116, 110, 200, 0.4); /* Тень при наведении */
+  filter: brightness(1.1);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 12px var(--accent-glow);
 }
 .apply-button:active {
-    transform: scale(0.99); /* Эффект нажатия */
-    filter: brightness(1.05);
+  transform: translateY(0) scale(0.98);
+  filter: brightness(0.95);
 }
 
+
+/* ========== Основная панель ========== */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr; /* Заголовок и Veto занимают всю ширину */
+  gap: var(--spacing-xxl); /* Большой отступ между секциями */
+}
+
+.dashboard h1 { /* Заголовок "Матчи турнира" */
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-color-headings);
+  margin-bottom: var(--spacing-lg); /* Отступ под заголовком */
+}
+
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); /* Адаптивная сетка */
+  gap: var(--spacing-xl);
+}
+
+/* ========== Карточка матча ========== */
+.match-column {
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  padding: var(--spacing-xl);
+  box-shadow: var(--card-shadow), var(--card-glow);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl); /* Отступы между блоками в карточке */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden; /* Для градиентной рамки */
+  position: relative;
+}
+.match-column:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(116, 110, 200, 0.15);
+}
+
+/* --- Шапка карточки --- */
+.match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--spacing-md);
+    gap: var(--spacing-md);
+}
+.match-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color-headings);
+    margin: 0;
+    white-space: nowrap;
+}
+.match-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+.match-meta .status-select,
+.match-meta .time-input {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-color-secondary);
+    transition: all 0.2s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+.match-meta .status-select {
+    padding-right: 20px; /* Место для стрелки */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E"); /* Кастомная стрелка */
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    cursor: pointer;
+}
+.match-meta select:focus,
+.match-meta input:focus {
+    outline: none;
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 4px var(--accent-glow);
+    color: var(--text-color);
+}
+/* Цвета статусов */
+.match-meta select[value="LIVE"] { border-color: var(--color-live); color: var(--color-live); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e74c3c'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+.match-meta select[value="FINISHED"] { border-color: var(--color-finished); color: var(--color-finished); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237f8c8d'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+.match-meta select[value="UPCOM"] { border-color: var(--color-upcoming); color: var(--color-upcoming); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233498db'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+
+.match-meta .time-input { min-width: 60px; }
+
+/* --- Информация о командах --- */
+.teams-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch; /* Растянуть блоки по высоте */
+    gap: var(--spacing-md);
+}
+.team-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    position: relative; /* Для позиционирования кнопки победителя */
+}
+.team-side label {
+    font-size: 12px;
+    color: var(--text-color-secondary);
+    margin-bottom: 0;
+    text-align: center;
+}
+.team-select {
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color-headings);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E"); /* Стрелка */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: all 0.2s ease;
+}
+.team-select:hover { background-color: var(--bg-element-hover); }
+.team-select:focus {
+    outline: none;
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 5px var(--accent-glow);
+}
+.vs-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-color-secondary);
+    padding: 0 var(--spacing-sm);
+    align-self: center; /* Выровнять по центру вертикально */
+}
+.winner-btn {
+    position: absolute; /* Позиционируем кнопку */
+    top: 0; /* Выравниваем по верху селекта */
+    width: 28px;
+    height: 28px;
+    border-radius: 50%; /* Круглая кнопка */
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color-secondary);
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+.winner-btn-team1 { left: -14px; } /* Сдвигаем влево */
+.winner-btn-team2 { right: -14px; } /* Сдвигаем вправо */
+
+.winner-btn:hover {
+    background-color: var(--bg-element-hover);
+    color: var(--text-color);
+    transform: scale(1.1);
+}
+.winner-btn.winner-selected {
+    background-color: var(--color-winner);
+    border-color: var(--color-winner);
+    color: #fff;
+    box-shadow: 0 0 8px var(--color-winner);
+    transform: scale(1.1);
+}
+
+/* --- Секция карт --- */
+.maps {
+    border-top: 1px solid var(--border-color);
+    padding-top: var(--spacing-lg);
+    margin-top: var(--spacing-lg); /* Отделим от команд */
+}
+.maps h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+}
+.map-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  background: rgba(0,0,0, 0.15); /* Легкий фон для ряда */
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius-sm);
+  border: 1px solid transparent; /* Для обводки при фокусе */
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.map-row:focus-within, /* Подсветка ряда при фокусе внутри */
+.map-row:hover {
+    background: rgba(0,0,0, 0.25);
+    border-color: var(--border-color-heavy);
+}
+
+.map-name-select {
+    flex-grow: 1; /* Занимает большую часть */
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 14px;
+    padding: var(--spacing-xs) 0;
+    cursor: pointer;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Можно добавить иконку карты через ::before или background-image */
+}
+.map-name-select:focus { outline: none; }
+
+.map-score-input {
+    flex-shrink: 0; /* Не сжимать */
+    width: 80px; /* Фикс ширина */
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    transition: all 0.2s ease;
+}
+.map-score-input:focus {
+    outline: none;
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 4px var(--accent-glow);
+    background-color: var(--bg-element-hover);
+}
+.map-score-input::placeholder { /* Стиль для плейсхолдеров NEXT, TBD */
+    color: var(--text-color-secondary);
+    font-weight: 500;
+    font-style: italic;
+}
+/* Стилизация плейсхолдера "NEXT" */
+.map-score-input[placeholder="NEXT"] {
+    border-style: dashed;
+    border-color: var(--color-upcoming);
+    color: var(--color-upcoming);
+}
+/* Стилизация плейсхолдера "TBD" */
+.map-score-input[placeholder="TBD"] {
+    border-style: dashed;
+     border-color: var(--color-finished);
+    color: var(--color-finished);
+}
+
+
+/* --- Блок VRS --- */
+.vrs-block {
+    background: rgba(0,0,0, 0.15);
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    border-top: 1px solid var(--border-color);
+    margin-top: auto; /* Прижать к низу если надо */
+}
+.vrs-block h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    text-align: center;
+    margin-bottom: var(--spacing-sm);
+}
+.vrs-content {
+    overflow-x: auto; /* Скролл если таблица шире */
+}
+.vrs-block table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+.vrs-block th, .vrs-block td {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    text-align: center;
+}
+.vrs-block th {
+    background-color: rgba(0,0,0, 0.2);
+    font-weight: 600;
+    color: var(--text-color-secondary);
+}
+.vrs-block input {
+    width: 100%;
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    text-align: center;
+    font-size: 12px;
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+}
+.vrs-block input:focus {
+    outline: none;
+    border-color: var(--accent-glow);
+    box-shadow: 0 0 4px var(--accent-glow);
+}
+
+/* ========== MAP VETO ========== */
+.map-veto-block {
+  background: var(--bg-card);
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+}
+.map-veto-block h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-color-headings);
+    margin-bottom: var(--spacing-xl);
+}
+.map-veto-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+.map-veto-header label {
+    color: var(--text-color-secondary);
+    font-size: 14px;
+}
+.map-veto-header select {
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    min-width: 200px;
+    cursor: pointer;
+}
+.map-veto-header select:focus { outline: none; border-color: var(--accent-glow); }
+
+.table-wrapper { overflow-x: auto; }
+
+#vetoTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+#vetoTable th, #vetoTable td {
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    vertical-align: middle;
+}
+#vetoTable th {
+    background: var(--bg-element);
+    font-weight: 600;
+    color: var(--text-color-secondary);
+}
+#vetoTable tbody tr:nth-child(even) {
+    background: rgba(0,0,0, 0.1); /* Чередование строк */
+}
+#vetoTable select {
+    background: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    width: 100%;
+    min-width: 100px; /* Мин. ширина для селектов */
+    cursor: pointer;
+}
+#vetoTable select:focus { outline: none; border-color: var(--accent-glow); }
+
+/* Выделение BAN/PICK в таблице */
+#vetoTable .veto-action option[value="BAN"],
+#vetoTable .veto-action:has(option[value="BAN"]:checked) {
+    /* Можно добавить стили, например, цвет текста или фон для самого селекта, если BAN выбран */
+}
 
 /* ========== JSON OUTPUT ========== */
 .json-output {
-  margin-top: var(--spacing-xl);
-  background: #fff; /* Оставляем светлым для контраста */
-  color: #000;
+  margin-top: var(--spacing-xxl);
+  background: var(--bg-element); /* Темный фон */
+  color: var(--text-color-secondary);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-sm);
-  white-space: pre-wrap; /* Сохраняет форматирование JSON */
-  font-family: monospace; /* Моноширинный шрифт для кода */
-  font-size: var(--font-size-sm);
-  border: 1px solid #ccc;
-  max-height: 400px; /* Ограничим высоту */
-  overflow-y: auto; /* Добавим скролл при необходимости */
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  max-height: 400px;
+  overflow: auto;
 }
 
-/* ========== Адаптивность (Пример) ========== */
+/* ========== Адаптивность ========== */
 @media (max-width: 1200px) {
-  .dashboard, .matches {
-    grid-template-columns: repeat(2, 1fr); /* 2 колонки на средних экранах */
-  }
-  .map-veto-block, .matches {
-     grid-column: 1 / -1; /* Всегда на всю ширину */
-  }
+    .matches {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    }
 }
 
 @media (max-width: 768px) {
-  .dashboard, .matches {
-    grid-template-columns: 1fr; /* 1 колонка на малых экранах */
-  }
-   .apply-button {
-     width: auto; /* Автоширина кнопки */
-     padding: var(--spacing-sm) var(--spacing-lg);
-     height: auto;
-     font-size: 20px;
-     right: var(--spacing-sm);
-     top: var(--spacing-sm);
-   }
-   h1 { font-size: 20px; }
-   .custom-fields { flex-direction: column; align-items: stretch; } /* Элементы друг под другом */
+    body { font-size: 13px; padding-top: 100px; } /* Увеличить отступ, если шапка стала выше */
+    .page-header { justify-content: center; }
+    .dashboard h1 { font-size: 22px; }
+    .apply-button { font-size: 14px; padding: var(--spacing-sm) var(--spacing-lg); }
+    .match-column { padding: var(--spacing-lg); }
+    .match-header { flex-direction: column; align-items: flex-start; }
+    .teams-info { flex-direction: column; align-items: center; }
+    .vs-separator { margin: var(--spacing-sm) 0; }
+    .team-side { width: 100%; align-items: center; } /* Команды по центру */
+    .winner-btn { /* Корректировка позиций кнопок */
+       position: static;
+       margin-top: var(--spacing-xs);
+       width: 100px;
+       border-radius: var(--border-radius-sm);
+    }
+
+}
+@media (max-width: 480px) {
+     .matches {
+        grid-template-columns: 1fr; /* Строго одна колонка */
+    }
+     .page-header { padding: var(--spacing-sm) var(--spacing-md); }
+     .header-section { width: 100%; justify-content: center; }
 }
