@@ -1,3 +1,36 @@
+/* ========== Переменные для управления стилями ========== */
+:root {
+  --bg-main: #222;
+  --bg-gradient-start: #222;
+  --bg-gradient-end: #2C243B;
+  --bg-card: #333; /* Фон карточек и блоков */
+  --bg-element: #444; /* Фон инпутов, селектов */
+  --bg-element-hover: #555; /* Фон при наведении */
+  --border-color: #555; /* Цвет рамок */
+  --text-color: #fff; /* Основной цвет текста */
+  --text-color-secondary: #ccc; /* Второстепенный цвет текста (лейблы) */
+  --accent-color: #503BA9; /* Основной акцентный цвет (фиолетовый) */
+  --accent-color-focus: rgba(80, 59, 169, 0.6); /* Подсветка фокуса */
+  --accent-gradient-start: #332F6D; /* Градиент кнопки Apply */
+  --accent-gradient-end: #746EC8; /* Градиент кнопки Apply */
+  --success-color: #28a745; /* Цвет для успешных действий (выбранный победитель) */
+  --danger-color: #dc3545; /* Цвет для обозначения бана (можно использовать для вето) */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 10px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 20px;
+  --font-family: Arial, sans-serif; /* Замените на 'Roboto', sans-serif если подключили Google Fonts */
+  --font-size-sm: 12px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --shadow-color: rgba(0, 0, 0, 0.3); /* Цвет тени */
+  --shadow-hover-color: rgba(0, 0, 0, 0.45); /* Цвет тени при наведении */
+}
+
 /* ========== Общие ========== */
 * {
   box-sizing: border-box;
@@ -6,14 +39,14 @@
 }
 
 body {
-  /* Анимированный градиентный фон с сохранением основной цветовой гаммы */
-  background: linear-gradient(-45deg, #222, #2C243B, #222, #2C243B);
+  /* Анимированный градиентный фон */
+  background: linear-gradient(-45deg, var(--bg-gradient-start), var(--bg-gradient-end), var(--bg-gradient-start), var(--bg-gradient-end));
   background-size: 400% 400%;
   animation: bgAnimation 20s ease infinite;
-  color: #fff;
-  font-family: Arial, sans-serif;
+  color: var(--text-color);
+  font-family: var(--font-family);
   min-height: 100vh;
-  line-height: 1.5;
+  line-height: 1.6; /* Немного увеличим межстрочный интервал */
 }
 
 @keyframes bgAnimation {
@@ -25,335 +58,386 @@ body {
 .container {
   max-width: 1600px;
   margin: auto;
-  padding: 20px;
+  padding: var(--spacing-xl);
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
+h1, h2, h3 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+h1 { /* Главный заголовок страницы */
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  font-size: 24px; /* Немного больше */
+}
+
+h2 { /* Заголовки карточек (Match 1, ...) */
+  font-size: var(--font-size-lg);
+  text-align: center;
+  margin-bottom: var(--spacing-sm); /* Уменьшим отступ, т.к. gap в .match-column */
+  font-weight: 500; /* Немного тоньше */
+}
+
+h3 { /* Заголовки внутри блоков (например, VRS) */
+  font-size: var(--font-size-md);
+  text-align: center;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+/* ========== Кастомные поля ========== */
+.custom-fields {
+  background: var(--bg-element); /* Используем цвет фона элементов */
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-xl);
+  display: flex;
+  flex-wrap: wrap; /* Позволит переноситься на маленьких экранах */
+  gap: var(--spacing-md); /* Пространство между элементами */
+  align-items: center;
+}
+
+.custom-fields input[type="text"],
+.custom-fields input[type="date"] {
+  flex-grow: 1; /* Позволит инпутам растягиваться */
+  min-width: 150px; /* Минимальная ширина для предотвращения сжатия */
+}
+
+.tournament-dates {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap; /* Перенос на маленьких экранах */
+  flex-grow: 2; /* Больше места для дат */
+}
+
+.tournament-dates label {
+  font-size: var(--font-size-sm);
+  color: var(--text-color-secondary);
+}
+
+#tournamentDayDisplay {
+  font-weight: bold;
+  margin-left: var(--spacing-sm);
+  white-space: nowrap; /* Не переносить текст дня */
+}
+
+/* ========== Общие стили для элементов форм ========== */
+label {
+  display: block; /* Лейбл над элементом */
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+select,
+input[type="text"],
+input[type="date"] {
+  width: 100%;
+  font-size: var(--font-size-md);
+  padding: var(--spacing-sm) var(--spacing-md); /* Больше горизонтальный паддинг */
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-element);
+  color: var(--text-color);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+select:hover,
+input[type="text"]:hover,
+input[type="date"]:hover {
+    border-color: var(--bg-element-hover);
+}
+
+select:focus,
+input[type="text"]:focus,
+input[type="date"]:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-color-focus); /* Улучшенная подсветка фокуса */
+}
+
+/* Группировка элементов формы */
+.form-group {
+    margin-bottom: var(--spacing-sm); /* Отступ под группой */
 }
 
 /* ========== GRID-РАСКЛАДКА ========== */
 .dashboard {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, 1fr); /* 4 колонки */
   grid-auto-rows: auto;
-  gap: 16px;
+  gap: var(--spacing-lg); /* Пространство между всеми элементами grid */
 }
 
-.matches,
-.next-row {
-  grid-column: 1 / -1;
+.matches {
+  grid-column: 1 / -1; /* Занимает всю ширину */
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr); /* Внутренняя сетка для матчей */
+  gap: var(--spacing-lg);
 }
 
-/* ========== MAP VETO ========== */
 .map-veto-block {
-  grid-column: 1 / -1;
-  background: #333;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  position: relative;
-  overflow: hidden;
-}
-
-.map-veto-block h1 {
-  text-align: center;
-  margin-bottom: 12px;
-  font-size: 18px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-/* Добавим лёгкий градиент и анимацию для декоративного эффекта */
-.map-veto-block::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(80,59,169,0.15), transparent 60%);
-  animation: rotate 10s linear infinite;
-}
-@keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  grid-column: 1 / -1; /* Занимает всю ширину */
 }
 
 /* ========== СТИЛИ МАТЧЕЙ ========== */
 .match-column {
-  background: #333;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 10px var(--shadow-color);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  gap: var(--spacing-md); /* Пространство между элементами внутри колонки */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .match-column:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
-}
-
-.match-column h2 {
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  transform: translateY(-5px); /* Более заметный подъем */
+  box-shadow: 0 8px 15px var(--shadow-hover-color);
 }
 
 /* ========== КНОПКИ ПОБЕДИТЕЛЯ ========== */
 .winner-buttons {
-  text-align: center;
-  margin-bottom: 12px;
+  display: flex; /* Кнопки в ряд */
+  gap: var(--spacing-sm);
+  justify-content: center; /* Центрируем кнопки */
 }
 
 .winner-buttons button {
-  font-size: 12px;
-  padding: 6px 10px;
-  margin: 0 4px;
-  background: #555;
-  border: none;
-  border-radius: 4px;
-  color: #fff;
+  flex-grow: 1; /* Растягиваем кнопки */
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-sm) var(--spacing-xs); /* Паддинг */
+  background: var(--bg-element);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-color-secondary);
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+  text-align: center;
 }
 
 .winner-buttons button:hover {
-  background: #777;
-  transform: scale(1.05);
+  background: var(--bg-element-hover);
+  border-color: var(--bg-element-hover);
+  color: var(--text-color);
+}
+
+.winner-buttons button:active {
+    transform: scale(0.98); /* Эффект нажатия */
 }
 
 /* Подсветка выбранного победителя */
 .winner-btn.winner-selected {
-  background-color: #28a745;
-  color: #fff;
-}
-
-/* ========== ЭЛЕМЕНТЫ ФОРМ ========== */
-.status-select,
-.time-input,
-.team-select,
-.map-name-select,
-.map-score-input,
-.veto-action,
-.veto-map,
-.veto-team,
-.veto-side {
-  width: 100%;
-  font-size: 14px;
-  padding: 6px;
-  margin-bottom: 8px;
-  border-radius: 4px;
-  border: 1px solid #444;
-  background: #444;
-  color: #fff;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.status-select:focus,
-.time-input:focus,
-.team-select:focus,
-.map-name-select:focus,
-.map-score-input:focus,
-.veto-action:focus,
-.veto-map:focus,
-.veto-team:focus,
-.veto-side:focus {
-  outline: none;
-  border-color: #503BA9;
-  box-shadow: 0 0 8px rgba(80,59,169,0.6);
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: var(--text-color);
+  font-weight: bold;
 }
 
 /* ========== MAPS ========== */
 .maps {
-  margin-bottom: 12px;
+  margin-top: var(--spacing-sm); /* Небольшой отступ сверху */
 }
 
 .map-row {
   display: flex;
-  margin-bottom: 6px;
+  gap: var(--spacing-sm); /* Пространство между селектом и инпутом */
+  margin-bottom: var(--spacing-sm); /* Отступ между рядами карт */
+  align-items: center; /* Выравнивание по центру */
 }
 
 .map-name-select {
-  flex: 1;
-  border-radius: 4px 0 0 4px;
+  flex: 1; /* Занимает доступное пространство */
 }
 
 .map-score-input {
-  width: 60px;
+  width: 80px; /* Немного шире для счета типа 16:14 */
   text-align: center;
-  border-radius: 0 4px 4px 0;
-  margin-left: -1px;
+  flex-shrink: 0; /* Не сжимать инпут */
 }
 
 /* ========== VRS ========== */
 .vrs-block {
-  background: #444;
-  padding: 10px;
-  border-radius: 8px;
-  margin-top: auto;
-  transition: transform 0.3s ease;
+  background: var(--bg-element); /* Тот же фон что и у инпутов */
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  margin-top: auto; /* Прижимает блок VRS к низу карточки */
+  border: 1px solid var(--border-color); /* Тонкая рамка */
 }
 
-.vrs-block:hover {
-  transform: translateY(-2px);
-}
-
-.vrs-block h3 {
-  margin-bottom: 8px;
-  font-size: 14px;
-  text-align: center;
-}
-
+/* Стили для .vrs-table и его содержимого (если они добавляются JS) */
 .vrs-table {
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
 }
 
 .vrs-table th,
 .vrs-table td {
-  border: 1px solid #555;
-  padding: 6px 8px;
+  border: 1px solid var(--border-color);
+  padding: var(--spacing-xs) var(--spacing-sm);
   text-align: center;
-  background: #555;
+  background: transparent; /* Фон наследуется от .vrs-block */
 }
 
-.vrs-table tbody tr:nth-child(even) td {
-  background: #3f3f3f;
+.vrs-table th {
+  background-color: rgba(0,0,0, 0.2); /* Слегка темнее шапка */
+  font-weight: bold;
 }
 
 .vrs-table input {
   width: 100%;
-  padding: 4px;
-  font-size: 12px;
-  border: 1px solid #666;
-  border-radius: 4px;
+  padding: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
   text-align: center;
-  background: #666;
-  color: #fff;
+  background: var(--bg-card); /* Темнее чем фон блока */
+  color: var(--text-color);
 }
 
-/* ========== VS / NEXT ROW ========== */
+/* ========== VS / NEXT ROW (СКРЫТО ПО УМОЛЧАНИЮ) ========== */
+.next-row {
+  grid-column: 1 / -1;
+  display: none; /* Скрыто по умолчанию, как и было */
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-lg);
+}
+
 .next-column {
-  background: #333;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+  background: var(--bg-card);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: 0 4px 10px var(--shadow-color);
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .next-column:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.7);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px var(--shadow-hover-color);
 }
 
 .next-column .vs,
 .next-column .next {
-  background: #444;
-  padding: 10px 0;
-  border-radius: 4px;
-  margin-bottom: 8px;
-  font-size: 14px;
+  background: var(--bg-element);
+  padding: var(--spacing-md) 0;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-md);
+  font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
-.next-column .next {
-  margin-bottom: 0;
+/* ========== MAP VETO ========== */
+.map-veto-block {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 10px var(--shadow-color);
+  position: relative;
+  overflow: hidden; /* Чтобы градиент не вылезал */
 }
 
-/* ========== MAP VETO TABLE ========== */
+/* Убираем псевдоэлемент с анимацией, т.к. фон body уже анимирован */
+/* Если нужен отдельный эффект, можно вернуть и настроить */
+/* .map-veto-block::before { ... } */
+
+.map-veto-block h1 {
+  text-align: center;
+  margin-bottom: var(--spacing-lg); /* Больше отступ под заголовком */
+  font-size: 20px; /* Крупнее заголовок вето */
+}
+
+.map-veto-header {
+  display: flex;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  align-items: center;
+  justify-content: center; /* Центрируем выбор матча */
+}
+
+.map-veto-header label {
+    margin-bottom: 0; /* Убираем отступ у лейбла */
+    color: var(--text-color); /* Ярче цвет лейбла */
+}
+
+.map-veto-header select {
+    min-width: 200px; /* Ширина селекта матча */
+    width: auto; /* Автоширина */
+    flex-grow: 0; /* Не растягивать */
+}
+
+/* Обертка для таблицы для возможной горизонтальной прокрутки на малых экранах */
+.table-wrapper {
+    overflow-x: auto;
+}
+
 #vetoTable {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: var(--font-size-sm); /* Мельче шрифт в таблице */
+  margin-top: var(--spacing-md);
 }
 
 #vetoTable th,
 #vetoTable td {
-  padding: 10px;
-  border: 1px solid #444;
+  padding: var(--spacing-sm) var(--spacing-md); /* Немного больше паддинг */
+  border: 1px solid var(--border-color);
   text-align: center;
+  vertical-align: middle; /* Выравнивание по центру */
 }
 
 #vetoTable th {
-  background: #555;
+  background: var(--bg-element-hover); /* Темнее шапка таблицы */
+  font-weight: bold;
 }
 
-.veto-action,
-.veto-map,
-.veto-team,
-.veto-side {
-  transition: background-color 0.3s ease;
+/* Уменьшим размер селектов внутри таблицы для компактности */
+#vetoTable select {
+    font-size: var(--font-size-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background-color: var(--bg-element); /* Слегка другой фон для селектов в таблице */
+}
+#vetoTable select:focus {
+    box-shadow: 0 0 0 2px var(--accent-color-focus); /* Меньшая подсветка */
 }
 
-/* ========== JSON OUTPUT ========== */
-.json-output {
-  margin-top: 20px;
-  background: #fff;
-  color: #000;
-  padding: 10px;
-  border-radius: 5px;
-  white-space: pre-wrap;
-  font-family: monospace;
-}
+/* Опционально: выделить BAN красным, PICK зеленым */
+#vetoTable .veto-action option[value="BAN"] { background: var(--danger-color); color: white; }
+#vetoTable .veto-action option[value="PICK"] { background: var(--success-color); color: white; }
 
-/* ========== Скрытие NEXT ROW ========== */
-.next-row {
-  display: none;
-}
-.map-row {
-  display: flex;
-  /* Раньше у вас было margin-bottom: 6px; можно оставить */
-  margin-bottom: 6px;
-  
-  /* Добавляем зазор между дочерними элементами */
-  gap: 16px;
-}
-.map-veto-block::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(80,59,169,0.15), transparent 60%);
-  animation: rotate 10s linear infinite;
-  pointer-events: none; /* <--- вот это главное */
-}
 
+/* ========== Кнопка APPLY ========== */
 .apply-button {
-  position: fixed;      /* Было absolute */
-  top: 10px;            /* Ставим, как раньше */
-  right: 10px;          /* Ставим, как раньше */
-  z-index: 1000;        /* Чтобы не заслоняли другие элементы */
+  position: fixed;
+  top: var(--spacing-md); /* Отступ от верха */
+  right: var(--spacing-md); /* Отступ справа */
+  z-index: 1000;
 
-  width: 178px;
+  width: 178px; /* Сохраняем размеры */
   height: 62px;
 
-  background: linear-gradient(265.1deg, #332F6D 2.59%, #746EC8 96.74%);
-  border: 1px solid #311748;
-  border-radius: 12px;
+  background: linear-gradient(265.1deg, var(--accent-gradient-start) 2.59%, var(--accent-gradient-end) 96.74%);
+  border: 1px solid var(--accent-gradient-start); /* Рамка в цвет градиента */
+  border-radius: var(--border-radius-md); /* Скругление */
 
-  font-family: 'Blender Pro', sans-serif;
+  /* Используем системный шрифт или подключенный */
+  font-family: var(--font-family); /* Если 'Blender Pro' недоступен */
+  /* font-family: 'Blender Pro', sans-serif; */ /* Если шрифт подключен */
   font-style: normal;
   font-weight: 500;
-  font-size: 39px;
-  line-height: 47px;
-  color: #FFFFFF;
+  font-size: 32px; /* Чуть меньше */
+  line-height: 1; /* Выравнивание текста по центру кнопки */
+  color: var(--text-color);
 
   display: flex;
   align-items: center;
@@ -361,12 +445,58 @@ h1 {
   padding: 0;
   cursor: pointer;
 
-  transition: all 0.3s ease;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0, 0.3);
 }
 
 .apply-button:hover {
-  filter: brightness(1.15); 
-  transform: scale(1.02);   
-  box-shadow: 0 0 10px rgba(116, 110, 200, 0.5);
+  filter: brightness(1.15);
+  transform: scale(1.03); /* Немного увеличим эффект */
+  box-shadow: 0 4px 12px rgba(116, 110, 200, 0.4); /* Тень при наведении */
+}
+.apply-button:active {
+    transform: scale(0.99); /* Эффект нажатия */
+    filter: brightness(1.05);
 }
 
+
+/* ========== JSON OUTPUT ========== */
+.json-output {
+  margin-top: var(--spacing-xl);
+  background: #fff; /* Оставляем светлым для контраста */
+  color: #000;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  white-space: pre-wrap; /* Сохраняет форматирование JSON */
+  font-family: monospace; /* Моноширинный шрифт для кода */
+  font-size: var(--font-size-sm);
+  border: 1px solid #ccc;
+  max-height: 400px; /* Ограничим высоту */
+  overflow-y: auto; /* Добавим скролл при необходимости */
+}
+
+/* ========== Адаптивность (Пример) ========== */
+@media (max-width: 1200px) {
+  .dashboard, .matches {
+    grid-template-columns: repeat(2, 1fr); /* 2 колонки на средних экранах */
+  }
+  .map-veto-block, .matches {
+     grid-column: 1 / -1; /* Всегда на всю ширину */
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard, .matches {
+    grid-template-columns: 1fr; /* 1 колонка на малых экранах */
+  }
+   .apply-button {
+     width: auto; /* Автоширина кнопки */
+     padding: var(--spacing-sm) var(--spacing-lg);
+     height: auto;
+     font-size: 20px;
+     right: var(--spacing-sm);
+     top: var(--spacing-sm);
+   }
+   h1 { font-size: 20px; }
+   .custom-fields { flex-direction: column; align-items: stretch; } /* Элементы друг под другом */
+}
