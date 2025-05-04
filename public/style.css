@@ -3,25 +3,32 @@
   --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
   /* Цвета */
-  --bg-gradient-start: #1a1a2e; /* Темно-сине-фиолетовый */
-  --bg-gradient-end: #16213e;   /* Глубокий синий */
-  --bg-card: rgba(40, 42, 58, 0.8); /* Полупрозрачный фон карточки */
-  --bg-element: #2f3244; /* Фон элементов управления */
+  --bg-gradient-start: #1a1a2e;
+  --bg-gradient-end: #16213e;
+  --bg-card: rgba(40, 42, 58, 0.85); /* Чуть менее прозрачный */
+  --bg-element: #2f3244;
   --bg-element-hover: #3a3e52;
-  --text-color: #e0e0e0; /* Светло-серый основной текст */
-  --text-color-secondary: #a0a0b0; /* Более тусклый текст */
-  --text-color-headings: #ffffff; /* Белый для заголовков */
-  --border-color: rgba(140, 140, 160, 0.2); /* Полупрозрачная рамка */
-  --border-color-heavy: rgba(140, 140, 160, 0.4);
-  --accent-glow: rgba(116, 110, 200, 0.5); /* Фиолетовое свечение */
+  --text-color: #e0e0e0;
+  --text-color-secondary: #a0a0b0;
+  --text-color-headings: #ffffff;
+  --border-color: rgba(140, 140, 160, 0.25); /* Чуть виднее */
+  --border-color-heavy: rgba(140, 140, 160, 0.5);
+  --accent-glow: rgba(116, 110, 200, 0.5);
   --accent-gradient-start: #332F6D;
   --accent-gradient-end: #746EC8;
-  --color-live: #e74c3c; /* Красный для LIVE */
-  --color-finished: #7f8c8d; /* Серый для FINISHED */
-  --color-upcoming: #3498db; /* Синий для UPCOM */
-  --color-winner: #2ecc71; /* Зеленый для победителя */
+  --color-live: #e74c3c; /* Red */
+  --color-finished: #7f8c8d; /* Gray */
+  --color-upcoming: #3498db; /* Blue */
+  --color-winner: #2ecc71; /* Green */
+  --team1-color: #3498db; /* Blue */
+  --team2-color: #e67e22; /* Orange */
 
   /* Размеры и отступы */
+  --header-height: 65px; /* Примерная высота шапки */
+  --button-height: 48px; /* Примерная высота кнопки */
+  --top-gap: 20px;      /* Отступ между шапкой и кнопкой */
+  --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px); /* Общий отступ */
+
   --spacing-xs: 4px;
   --spacing-sm: 8px;
   --spacing-md: 12px;
@@ -32,7 +39,7 @@
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  --card-glow: 0 0 15px rgba(116, 110, 200, 0.1); /* Легкое свечение карты */
+  --card-glow: 0 0 15px rgba(116, 110, 200, 0.1);
 }
 
 /* ========== Общие стили и сброс ========== */
@@ -48,13 +55,13 @@ html {
 
 body {
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
-  background-attachment: fixed; /* Фиксируем фон */
+  background-attachment: fixed;
   color: var(--text-color);
   font-family: var(--font-family);
   min-height: 100vh;
   line-height: 1.6;
   font-size: 14px;
-  padding-top: 80px; /* Отступ для фиксированной шапки/кнопки */
+  padding-top: var(--body-padding-top); /* Применяем расчетный отступ */
 }
 
 .container {
@@ -71,8 +78,8 @@ body {
 
 /* ========== Шапка страницы ========== */
 .page-header {
-  background: rgba(22, 33, 62, 0.8); /* --bg-gradient-end с прозрачностью */
-  backdrop-filter: blur(10px); /* Эффект размытия */
+  background: rgba(22, 33, 62, 0.85);
+  backdrop-filter: blur(10px);
   padding: var(--spacing-md) var(--spacing-xl);
   border-bottom: 1px solid var(--border-color);
   display: flex;
@@ -80,11 +87,12 @@ body {
   align-items: center;
   flex-wrap: wrap;
   gap: var(--spacing-lg);
-  position: fixed; /* Фиксируем шапку */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1100; /* Выше кнопки Apply */
+  height: var(--header-height); /* Задаем высоту */
+  z-index: 1100; /* Ниже кнопки */
 }
 
 .header-section {
@@ -135,23 +143,26 @@ body {
 /* ========== Кнопка APPLY ========== */
 .apply-button {
   position: fixed;
-  top: 18px; /* Немного ниже шапки */
+  top: calc(var(--header-height) + var(--top-gap)); /* Позиция под шапкой с отступом */
   right: var(--spacing-xl);
   z-index: 1200; /* Выше всего */
-  width: auto; /* Автоширина */
-  padding: var(--spacing-md) var(--spacing-xl); /* Паддинги */
-  height: auto;
+  width: auto;
+  padding: var(--spacing-md) var(--spacing-xl);
+  height: var(--button-height); /* Задаем высоту */
   background: linear-gradient(45deg, var(--accent-gradient-start), var(--accent-gradient-end));
   border: none;
   border-radius: var(--border-radius-md);
   font-family: var(--font-family);
-  font-weight: 700; /* Жирнее */
+  font-weight: 700;
   font-size: 16px;
   color: #ffffff;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 8px var(--accent-glow); /* Тень + свечение */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 8px var(--accent-glow);
   letter-spacing: 0.5px;
+  display: flex; /* Центрирование текста */
+  align-items: center;
+  justify-content: center;
 }
 
 .apply-button:hover {
@@ -168,21 +179,21 @@ body {
 /* ========== Основная панель ========== */
 .dashboard {
   display: grid;
-  grid-template-columns: 1fr; /* Заголовок и Veto занимают всю ширину */
-  gap: var(--spacing-xxl); /* Большой отступ между секциями */
+  grid-template-columns: 1fr;
+  gap: var(--spacing-xxl);
 }
 
-.dashboard h1 { /* Заголовок "Матчи турнира" */
+.dashboard h1 {
   text-align: center;
   font-size: 28px;
   font-weight: 700;
   color: var(--text-color-headings);
-  margin-bottom: var(--spacing-lg); /* Отступ под заголовком */
+  margin-bottom: var(--spacing-lg);
 }
 
 .matches {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); /* Адаптивная сетка */
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
   gap: var(--spacing-xl);
 }
 
@@ -195,9 +206,9 @@ body {
   box-shadow: var(--card-shadow), var(--card-glow);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl); /* Отступы между блоками в карточке */
+  gap: var(--spacing-xl);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden; /* Для градиентной рамки */
+  overflow: hidden;
   position: relative;
 }
 .match-column:hover {
@@ -242,8 +253,8 @@ body {
     appearance: none;
 }
 .match-meta .status-select {
-    padding-right: 20px; /* Место для стрелки */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E"); /* Кастомная стрелка */
+    padding-right: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 6px center;
     cursor: pointer;
@@ -255,10 +266,10 @@ body {
     box-shadow: 0 0 4px var(--accent-glow);
     color: var(--text-color);
 }
-/* Цвета статусов */
-.match-meta select[value="LIVE"] { border-color: var(--color-live); color: var(--color-live); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e74c3c'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
-.match-meta select[value="FINISHED"] { border-color: var(--color-finished); color: var(--color-finished); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237f8c8d'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
-.match-meta select[value="UPCOM"] { border-color: var(--color-upcoming); color: var(--color-upcoming); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233498db'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+/* Цвета статусов через data-атрибут */
+.match-meta select[data-status="LIVE"] { border-color: var(--color-live); color: var(--color-live); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e74c3c'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+.match-meta select[data-status="FINISHED"] { border-color: var(--color-finished); color: var(--color-finished); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%237f8c8d'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
+.match-meta select[data-status="UPCOM"] { border-color: var(--color-upcoming); color: var(--color-upcoming); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%233498db'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");}
 
 .match-meta .time-input { min-width: 60px; }
 
@@ -266,7 +277,7 @@ body {
 .teams-info {
     display: flex;
     justify-content: space-between;
-    align-items: stretch; /* Растянуть блоки по высоте */
+    align-items: stretch;
     gap: var(--spacing-md);
 }
 .team-side {
@@ -274,8 +285,23 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    position: relative; /* Для позиционирования кнопки победителя */
+    position: relative;
+    padding-left: var(--spacing-md); /* Место для цветной полоски */
 }
+/* Цветная полоска для команд */
+.team-side::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px; /* Небольшой отступ сверху */
+    bottom: 5px; /* Небольшой отступ снизу */
+    width: 4px;
+    background-color: var(--text-color-secondary); /* Цвет по умолчанию */
+    border-radius: 2px;
+}
+.team-side.team-1::before { background-color: var(--team1-color); }
+.team-side.team-2::before { background-color: var(--team2-color); }
+
 .team-side label {
     font-size: 12px;
     color: var(--text-color-secondary);
@@ -296,7 +322,7 @@ body {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E"); /* Стрелка */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23a0a0b0'%3E%3Cpath d='M6 9l-4-4h8z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     transition: all 0.2s ease;
@@ -315,14 +341,15 @@ body {
     font-weight: 700;
     color: var(--text-color-secondary);
     padding: 0 var(--spacing-sm);
-    align-self: center; /* Выровнять по центру вертикально */
+    align-self: center;
 }
 .winner-btn {
-    position: absolute; /* Позиционируем кнопку */
-    top: 0; /* Выравниваем по верху селекта */
+    position: absolute;
+    top: 50%; /* Центрируем кнопку по вертикали относительно блока */
+    transform: translateY(-50%); /* Точное центрирование */
     width: 28px;
     height: 28px;
-    border-radius: 50%; /* Круглая кнопка */
+    border-radius: 50%;
     background: var(--bg-element);
     border: 1px solid var(--border-color);
     color: var(--text-color-secondary);
@@ -335,28 +362,29 @@ body {
     transition: all 0.2s ease;
     padding: 0;
     line-height: 1;
+    z-index: 2; /* Над цветной полоской */
 }
-.winner-btn-team1 { left: -14px; } /* Сдвигаем влево */
-.winner-btn-team2 { right: -14px; } /* Сдвигаем вправо */
+.winner-btn-team1 { left: -2px; } /* Сдвигаем на полоску */
+.winner-btn-team2 { right: -16px; transform: translate(50%, -50%); } /* Правее */
 
 .winner-btn:hover {
     background-color: var(--bg-element-hover);
     color: var(--text-color);
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
 }
 .winner-btn.winner-selected {
     background-color: var(--color-winner);
     border-color: var(--color-winner);
     color: #fff;
     box-shadow: 0 0 8px var(--color-winner);
-    transform: scale(1.1);
+    transform: translateY(-50%) scale(1.1);
 }
 
 /* --- Секция карт --- */
 .maps {
     border-top: 1px solid var(--border-color);
     padding-top: var(--spacing-lg);
-    margin-top: var(--spacing-lg); /* Отделим от команд */
+    margin-top: var(--spacing-lg);
 }
 .maps h3 {
     font-size: 14px;
@@ -370,20 +398,20 @@ body {
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-sm);
-  background: rgba(0,0,0, 0.15); /* Легкий фон для ряда */
+  background: rgba(0,0,0, 0.15);
   padding: var(--spacing-sm);
   border-radius: var(--border-radius-sm);
-  border: 1px solid transparent; /* Для обводки при фокусе */
+  border: 1px solid transparent;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
-.map-row:focus-within, /* Подсветка ряда при фокусе внутри */
+.map-row:focus-within,
 .map-row:hover {
     background: rgba(0,0,0, 0.25);
     border-color: var(--border-color-heavy);
 }
 
 .map-name-select {
-    flex-grow: 1; /* Занимает большую часть */
+    flex-grow: 1;
     background: transparent;
     border: none;
     color: var(--text-color);
@@ -393,13 +421,13 @@ body {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    /* Можно добавить иконку карты через ::before или background-image */
+    /* Стрелку можно добавить через background-image, если нужно */
 }
 .map-name-select:focus { outline: none; }
 
 .map-score-input {
-    flex-shrink: 0; /* Не сжимать */
-    width: 80px; /* Фикс ширина */
+    flex-shrink: 0;
+    width: 80px;
     background: var(--bg-element);
     border: 1px solid var(--border-color);
     color: var(--text-color);
@@ -416,23 +444,13 @@ body {
     box-shadow: 0 0 4px var(--accent-glow);
     background-color: var(--bg-element-hover);
 }
-.map-score-input::placeholder { /* Стиль для плейсхолдеров NEXT, TBD */
+.map-score-input::placeholder {
     color: var(--text-color-secondary);
     font-weight: 500;
     font-style: italic;
+    opacity: 0.8; /* Немного прозрачнее */
 }
-/* Стилизация плейсхолдера "NEXT" */
-.map-score-input[placeholder="NEXT"] {
-    border-style: dashed;
-    border-color: var(--color-upcoming);
-    color: var(--color-upcoming);
-}
-/* Стилизация плейсхолдера "TBD" */
-.map-score-input[placeholder="TBD"] {
-    border-style: dashed;
-     border-color: var(--color-finished);
-    color: var(--color-finished);
-}
+/* Убраны стили для NEXT/TBD с рамкой */
 
 
 /* --- Блок VRS --- */
@@ -441,7 +459,7 @@ body {
     padding: var(--spacing-md);
     border-radius: var(--border-radius-md);
     border-top: 1px solid var(--border-color);
-    margin-top: auto; /* Прижать к низу если надо */
+    margin-top: auto;
 }
 .vrs-block h3 {
     font-size: 14px;
@@ -451,7 +469,7 @@ body {
     margin-bottom: var(--spacing-sm);
 }
 .vrs-content {
-    overflow-x: auto; /* Скролл если таблица шире */
+    overflow-x: auto;
 }
 .vrs-block table {
     width: 100%;
@@ -540,7 +558,7 @@ body {
     color: var(--text-color-secondary);
 }
 #vetoTable tbody tr:nth-child(even) {
-    background: rgba(0,0,0, 0.1); /* Чередование строк */
+    background: rgba(0,0,0, 0.1);
 }
 #vetoTable select {
     background: var(--bg-element);
@@ -549,21 +567,29 @@ body {
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-sm);
     width: 100%;
-    min-width: 100px; /* Мин. ширина для селектов */
+    min-width: 100px;
     cursor: pointer;
+    transition: border-color 0.2s ease;
 }
 #vetoTable select:focus { outline: none; border-color: var(--accent-glow); }
 
-/* Выделение BAN/PICK в таблице */
-#vetoTable .veto-action option[value="BAN"],
-#vetoTable .veto-action:has(option[value="BAN"]:checked) {
-    /* Можно добавить стили, например, цвет текста или фон для самого селекта, если BAN выбран */
+/* Цвета для селекта команды в вето */
+#vetoTable .veto-team {
+    border-left-width: 4px; /* Делаем левую рамку толще для цвета */
+    border-left-style: solid;
+    padding-left: calc(var(--spacing-sm) - 3px); /* Компенсируем толщину рамки */
 }
+#vetoTable .veto-team[data-team="TEAM1"] { border-left-color: var(--team1-color); }
+#vetoTable .veto-team[data-team="TEAM2"] { border-left-color: var(--team2-color); }
+/* Стиль для опций внутри селекта (может не работать во всех браузерах) */
+#vetoTable .veto-team option[value="TEAM1"] { background-color: var(--team1-color); color: white; }
+#vetoTable .veto-team option[value="TEAM2"] { background-color: var(--team2-color); color: white; }
+
 
 /* ========== JSON OUTPUT ========== */
 .json-output {
   margin-top: var(--spacing-xxl);
-  background: var(--bg-element); /* Темный фон */
+  background: var(--bg-element);
   color: var(--text-color-secondary);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-sm);
@@ -580,30 +606,60 @@ body {
     .matches {
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     }
+    /* Убедимся, что отступ сверху достаточен */
+    body { padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px); }
 }
 
 @media (max-width: 768px) {
-    body { font-size: 13px; padding-top: 100px; } /* Увеличить отступ, если шапка стала выше */
-    .page-header { justify-content: center; }
-    .dashboard h1 { font-size: 22px; }
-    .apply-button { font-size: 14px; padding: var(--spacing-sm) var(--spacing-lg); }
-    .match-column { padding: var(--spacing-lg); }
-    .match-header { flex-direction: column; align-items: flex-start; }
-    .teams-info { flex-direction: column; align-items: center; }
-    .vs-separator { margin: var(--spacing-sm) 0; }
-    .team-side { width: 100%; align-items: center; } /* Команды по центру */
-    .winner-btn { /* Корректировка позиций кнопок */
-       position: static;
-       margin-top: var(--spacing-xs);
-       width: 100px;
-       border-radius: var(--border-radius-sm);
+    :root {
+        /* Пересчитываем отступ для мобильных, если шапка/кнопка изменятся */
+         --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px);
     }
+    body { font-size: 13px; padding-top: var(--body-padding-top); }
+    .page-header {
+        /* Можно сделать шапку выше на мобильных, если нужно */
+        /* height: auto; */
+        /* --header-height: 80px; */ /* Обновить значение */
+        justify-content: center;
+    }
+    .apply-button {
+        /* --button-height: 40px; */ /* Обновить значение */
+        font-size: 14px;
+        padding: var(--spacing-sm) var(--spacing-lg);
+        right: var(--spacing-md);
+         top: calc(var(--header-height) + var(--top-gap) - 5px); /* Поднять чуть ближе к шапке */
+    }
+    .dashboard h1 { font-size: 22px; }
+    .match-column { padding: var(--spacing-lg); }
+    .match-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-sm); }
+    .match-meta { width: 100%; justify-content: flex-end;} /* Сдвинуть статус/время вправо */
 
+    .teams-info { flex-direction: column; align-items: stretch; } /* Команды друг под другом */
+    .vs-separator { margin: var(--spacing-sm) 0; }
+    .team-side { width: 100%; padding-left: var(--spacing-md); }
+    .team-side::before { top: 0; bottom: 0; } /* Полоска на всю высоту */
+    .winner-btn {
+       /* Оставить абсолютное позиционирование или изменить? */
+       /* Если оставить, то настроить позицию */
+        top: 5px;
+        transform: none;
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+    }
+     .winner-btn-team1 { left: -12px; }
+     .winner-btn-team2 { right: -12px; }
 }
 @media (max-width: 480px) {
      .matches {
         grid-template-columns: 1fr; /* Строго одна колонка */
     }
-     .page-header { padding: var(--spacing-sm) var(--spacing-md); }
+     .page-header { padding: var(--spacing-sm) var(--spacing-md); flex-direction: column; height: auto; --header-height: 100px; /* Пример */}
      .header-section { width: 100%; justify-content: center; }
+     .apply-button { width: calc(100% - 2 * var(--spacing-md)); right: var(--spacing-md); } /* Кнопка на всю ширину */
+     :root { /* Пересчет отступа */
+         --body-padding-top: calc(var(--header-height) + var(--button-height) + var(--top-gap) + 10px);
+     }
+     body { padding-top: var(--body-padding-top); }
+
 }
