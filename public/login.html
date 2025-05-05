@@ -2,10 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Вход в Dashboard</title>
-  <!-- Подключаем Blender Pro -->
-  <link href="https://fonts.googleapis.com/css2?family=Blender+Pro:wght@500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="login.css" />
 </head>
 <body>
@@ -13,15 +11,28 @@
     <form action="/login" method="post" class="login-form">
       <div class="form-group">
         <label for="username">ЛОГИН</label>
-        <input id="username" type="text" name="username" required />
+        <input id="username" type="text" name="username" required autocomplete="username" />
       </div>
       <div class="form-group">
         <label for="password">ПАРОЛЬ</label>
-        <input id="password" type="password" name="password" required />
+        <input id="password" type="password" name="password" required autocomplete="current-password"/>
       </div>
       <button type="submit">ВОЙТИ</button>
-      <p class="error">Неверный логин или пароль</p>
+      <p class="error" id="errorMessage">Неверный логин или пароль</p>
     </form>
   </div>
+
+  <script>
+    // Простой скрипт для отображения сообщения об ошибке, если URL содержит ?error=1
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const errorParam = urlParams.get('error');
+      const errorMessageElement = document.getElementById('errorMessage');
+
+      if (errorParam === '1' && errorMessageElement) {
+        errorMessageElement.classList.add('visible'); // Показываем сообщение
+      }
+    });
+  </script>
 </body>
 </html>
