@@ -43,7 +43,7 @@ export async function initMatches() {
       // Привязываем обработчики для кнопок выбора победителя
       attachWinnerButtons();
       // Привязываем обработчики для обновления цвета селекта статуса и автозаполнения
-      attachStatusChangeHandlers(); // Используем новую функцию
+      attachStatusChangeHandlers();
 
       // Первоначальное обновление UI для всех матчей после загрузки списка команд
       for (let m = 1; m <= 4; m++) {
@@ -54,6 +54,24 @@ export async function initMatches() {
             updateStatusColor(statusSelectElement); // Устанавливаем цвет селекта статуса
         }
       }
+
+      // --- НОВОЕ: Добавляем слушатель Socket.IO для обновления команд ---
+      if (typeof io !== 'undefined') {
+          const socket = io(); // Подключаемся к сокету
+          socket.on('teamsUpdate', (updatedTeams) => {
+              console.log('[SOCKET][Matches] Received teamsUpdate:', updatedTeams);
+              // Обновляем выпадающие списки новым списком команд
+              populateTeamSelects(Array.isArray(updatedTeams) ? updatedTeams : []);
+              // После обновления списков нужно обновить и лейблы кнопок победителей
+              for (let m = 1; m <= 4; m++) {
+                  updateWinnerButtonLabels(m);
+              }
+          });
+          console.log('[Matches] Socket listener for "teamsUpdate" attached.');
+      } else {
+          console.warn("[Matches] Socket.IO client not found. Real-time team updates on this page might not work.");
+      }
+      // --- КОНЕЦ НОВОГО КОДА ---
 
       teamsInitialized = true; // Устанавливаем флаг завершения инициализации
       console.log("[Matches] Teams initialization completed.");
@@ -113,17 +131,17 @@ export function populateTeamSelects(teamsList) {
     // Добавляем опции для каждой команды из списка
     teamsList.forEach(team => {
       // Пропускаем команды без имени или логотипа
-      if (!team.name || !team.logo) return;
+      // Убираем проверку на лого, т.к. решили его не использовать пока
+      if (!team.name) return;
 
       // Создаем <option> для первого селекта
       const opt1 = document.createElement("option");
       opt1.value = team.name; // Значение - имя команды
       opt1.textContent = team.name; // Текст - имя команды
-      // Сохраняем путь к логотипу в data-атрибуте
-      // Обрабатываем как абсолютные, так и относительные пути из data.json
-      opt1.dataset.logo = team.logo.startsWith('C:')
+      // Сохраняем путь к логотипу в data-атрибуте (даже если он пустой)
+      opt1.dataset.logo = team.logo ? (team.logo.startsWith('C:')
         ? team.logo
-        : "C:\\projects\\vMix_score\\public" + (team.logo.startsWith('/') ? team.logo : '/' + team.logo);
+        : "C:\\projects\\vMix_score\\public" + (team.logo.startsWith('/') ? team.logo : '/' + team.logo)) : defaultOption.dataset.logo;
       sel1.appendChild(opt1);
 
       // Создаем <option> для второго селекта (можно клонировать)
@@ -132,9 +150,18 @@ export function populateTeamSelects(teamsList) {
       sel2.appendChild(opt2);
     });
 
-    // Пытаемся восстановить предыдущее выбранное значение (если оно было)
-    sel1.value = currentVal1 || ""; // Если было пустое, останется пустое
-    sel2.value = currentVal2 || "";
+    // Пытаемся восстановить предыдущее выбранное значение
+    // Проверяем, существует ли еще такая опция
+    if (sel1.querySelector(`option[value="${CSS.escape(currentVal1)}"]`)) {
+        sel1.value = currentVal1;
+    } else {
+        sel1.value = ""; // Сбрасываем, если старой команды больше нет
+    }
+     if (sel2.querySelector(`option[value="${CSS.escape(currentVal2)}"]`)) {
+        sel2.value = currentVal2;
+    } else {
+        sel2.value = ""; // Сбрасываем, если старой команды больше нет
+    }
   }
    console.log("[Matches] Team selects populated/repopulated.");
 }
@@ -340,52 +367,30 @@ export function gatherSingleMatchData(matchIndex) {
       maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
 
-    // --- ИЗМЕНЕНИЕ ЛОГИКИ АВТОЗАПОЛНЕНИЯ ДЛЯ LIVE ---
+    // Автозаполнение счета карт ("NEXT", "DECIDER", "MATCH X") в зависимости от статуса
      if (statusText === "LIVE") {
-        const score1 = maps.MAP1_SCORE;
-        const score2 = maps.MAP2_SCORE;
-        const score3 = maps.MAP3_SCORE; // Текущее значение счета 3 карты
-
-        const isScore1Numeric = SCORE_REGEX.test(score1);
-        const isScore2Numeric = SCORE_REGEX.test(score2);
-        const isScore3Numeric = SCORE_REGEX.test(score3); // Проверяем и 3-ю карту
-
-        // 1. Если первая карта сыграна (счет есть), а вторая еще нет (счет не числовой)
-        if (isScore1Numeric && !isScore2Numeric) {
-            maps.MAP2_SCORE = "NEXT";    // Вторая карта - следующая
-            maps.MAP3_SCORE = "DECIDER"; // Третья карта - решающая
-            console.log(`[Gather] LIVE: Map1 (${score1}) done, Map2 not numeric. Setting Map2=NEXT, Map3=DECIDER`);
-        }
-        // 2. Если первая И вторая карты сыграны (счета есть)
-        else if (isScore1Numeric && isScore2Numeric) {
-             // И третья карта еще не сыграна (не числовой счет)
-             if (!isScore3Numeric) {
-                 maps.MAP3_SCORE = "NEXT"; // Третья карта - следующая
-                 console.log(`[Gather] LIVE: Map1 (${score1}) & Map2 (${score2}) done, Map3 not numeric. Setting Map3=NEXT`);
-             } else {
-                 // Все 3 карты сыграны или введены вручную
-                 console.log(`[Gather] LIVE: Map1 (${score1}), Map2 (${score2}), Map3 (${score3}) seem complete or manually set.`);
-             }
-        }
-        // 3. Если первая карта не сыграна (нет счета или не число)
-        else if (!isScore1Numeric) {
-             // Можно сбросить счет 2 и 3 карты, если нужно строгое поведение,
-             // но пока оставим как есть, чтобы не стирать введенные вручную данные.
-             console.log(`[Gather] LIVE: Initial state or Map1 score not numeric (${score1}). No auto-fill applied.`);
-        }
-    }
-    // --- КОНЕЦ ИЗМЕНЕНИЯ ЛОГИКИ АВТОЗАПОЛНЕНИЯ ДЛЯ LIVE ---
-    else if (statusText === "FINISHED") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-        // Если две карты сыграны, а третья не является счетом, считаем ее решающей (DECIDER)
+        const isScore1Numeric = SCORE_REGEX.test(s1);
+        const isScore2Numeric = SCORE_REGEX.test(s2);
+        const isScore3Numeric = SCORE_REGEX.test(s3);
+
+        if (isScore1Numeric && !isScore2Numeric) {
+            maps.MAP2_SCORE = "NEXT";
+            maps.MAP3_SCORE = "DECIDER";
+        } else if (isScore1Numeric && isScore2Numeric && !isScore3Numeric) {
+            maps.MAP3_SCORE = "NEXT";
+        }
+    } else if (statusText === "FINISHED") {
+        const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || !SCORE_REGEX.test(s3))) {
             maps.MAP3_SCORE = "DECIDER";
         }
     } else if (statusText === "UPCOM") {
-        // Для предстоящих матчей, если счет первой карты не введен, ставим NEXT
         if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
-        // Устанавливаем счет 3 карты в "MATCH X" для UPCOM
-        maps.MAP3_SCORE = `MATCH ${m}`;
+        // Устанавливаем счет 3 карты в "MATCH X" для UPCOM, только если он не был введен вручную
+        if (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ")) { // Проверяем, не был ли он уже установлен или изменен
+             maps.MAP3_SCORE = `MATCH ${m}`;
+        }
     }
 
     // Определение иконок счета для разных статусов (MP*_FIN/LIVE/UPC)
@@ -469,9 +474,9 @@ export function gatherSingleMatchData(matchIndex) {
       LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "",
       LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "",
       LIVE_MAP2: statusText === "LIVE" ? maps.MAP2 : "",
-      LIVE_MAP2_SCORE: statusText === "LIVE" ? maps.MAP2_SCORE : "", // Будет NEXT или счет
+      LIVE_MAP2_SCORE: statusText === "LIVE" ? maps.MAP2_SCORE : "",
       LIVE_MAP3: statusText === "LIVE" ? maps.MAP3 : "",
-      LIVE_MAP3_SCORE: statusText === "LIVE" ? maps.MAP3_SCORE : "", // Будет DECIDER, NEXT или счет
+      LIVE_MAP3_SCORE: statusText === "LIVE" ? maps.MAP3_SCORE : "",
       LIVE_Cest: liveCestValue,
       LIVE_VS: liveVs,
       LIVE_STATUS: liveStatusValue,
@@ -492,7 +497,7 @@ export function gatherSingleMatchData(matchIndex) {
       FINISHED_MAP2: statusText === "FINISHED" ? maps.MAP2 : "",
       FINISHED_MAP2_SCORE: statusText === "FINISHED" ? maps.MAP2_SCORE : "",
       FINISHED_MAP3: statusText === "FINISHED" ? maps.MAP3 : "",
-      FINISHED_MAP3_SCORE: statusText === "FINISHED" ? maps.MAP3_SCORE : "", // Будет DECIDER или счет
+      FINISHED_MAP3_SCORE: statusText === "FINISHED" ? maps.MAP3_SCORE : "",
       FIN_RectangleUP: finRectUp,
       FIN_RectangleLOW: finRectLow
     };
