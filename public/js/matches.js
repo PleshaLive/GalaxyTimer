@@ -3,57 +3,81 @@
 // ----------------------
 // Инициализация всего
 // ----------------------
-
-
-
 export function initMatches() {
   // Загружаем список команд и инициализируем селекты
   fetch("/api/teams")
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+    })
     .then(data => {
-      const teamsList = data.teams || data;
+      // Убедимся, что data.teams это массив
+      const teamsList = Array.isArray(data.teams) ? data.teams : (Array.isArray(data) ? data : []);
+      if (teamsList.length === 0) {
+          console.warn("Список команд пуст или не получен.");
+      }
       populateTeamSelects(teamsList);
-      attachTeamLogoUpdates();
+      attachTeamLogoUpdates(); // Обновление лейблов кнопок происходит здесь
       attachWinnerButtons();
-      attachStatusColorUpdates();
+      attachStatusColorUpdates(); // Привязываем обновление цвета статусов
 
-      // После инициализации селектов и кнопок обновляем лейблы, подсветку и цвета статусов
+      // Первоначальное обновление UI после загрузки списка команд
       for (let m = 1; m <= 4; m++) {
-        updateWinnerButtonLabels(m);
-        refreshWinnerHighlight(m);
+        updateWinnerButtonLabels(m); // Обновляем текст кнопок
+        refreshWinnerHighlight(m); // Снимаем подсветку по умолчанию
         const sel = document.getElementById("statusSelect" + m);
-        if (sel) updateStatusColor(sel);
+        if (sel) updateStatusColor(sel); // Применяем цвет статуса
       }
     })
     .catch(err => console.error("Ошибка загрузки /api/teams:", err));
-// loadState();       // убрано, чтобы не загружать данные из localStorage
-// bindSaveListeners(); // убрано, чтобы не сохранять изменения в localStorage
-// window.addEventListener("beforeunload", saveState);
 }
 
 // ----------------------
 // Заполнение селектов команд
 // ----------------------
 export function populateTeamSelects(teamsList) {
+  // Добавим опцию "Пусто" или "Выберите команду"
+  const defaultOption = document.createElement("option");
+  defaultOption.value = ""; // Пустое значение
+  defaultOption.textContent = "-"; // Или "Выберите команду"
+  defaultOption.dataset.logo = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Лого по умолчанию
+
   for (let m = 1; m <= 4; m++) {
     const sel1 = document.getElementById("team1Select" + m);
     const sel2 = document.getElementById("team2Select" + m);
     if (!sel1 || !sel2) continue;
+
+    // Очищаем предыдущие опции
     sel1.innerHTML = "";
     sel2.innerHTML = "";
+
+    // Добавляем опцию по умолчанию
+    sel1.appendChild(defaultOption.cloneNode(true));
+    sel2.appendChild(defaultOption.cloneNode(true));
+
+    // Заполняем командами
     teamsList.forEach(team => {
+      if (!team.name || !team.logo) return; // Пропускаем команды без имени или лого
+
       const opt1 = document.createElement("option");
       opt1.value = team.name;
       opt1.textContent = team.name;
-      opt1.dataset.logo = "C:\\projects\\vMix_score\\public" + team.logo;
+      // Убедимся, что путь к лого корректный
+      opt1.dataset.logo = team.logo.startsWith('/')
+        ? "C:\\projects\\vMix_score\\public" + team.logo
+        : "C:\\projects\\vMix_score\\public\\" + team.logo; // Добавляем слеш, если его нет
       sel1.appendChild(opt1);
 
       const opt2 = document.createElement("option");
       opt2.value = team.name;
       opt2.textContent = team.name;
-      opt2.dataset.logo = "C:\\projects\\vMix_score\\public" + team.logo;
+      opt2.dataset.logo = opt1.dataset.logo; // Используем тот же путь
       sel2.appendChild(opt2);
     });
+
+    // Устанавливаем значение по умолчанию (пустое)
+    sel1.value = "";
+    sel2.value = "";
   }
 }
 
@@ -67,27 +91,34 @@ export function attachTeamLogoUpdates() {
     if (!sel1 || !sel2) continue;
 
     sel1.addEventListener("change", () => {
-      updateTeamLogoPreview(m, 1);
+      // updateTeamLogoPreview(m, 1); // Превью лого пока не используется в HTML
       updateWinnerButtonLabels(m);
     });
     sel2.addEventListener("change", () => {
-      updateTeamLogoPreview(m, 2);
+      // updateTeamLogoPreview(m, 2); // Превью лого пока не используется в HTML
       updateWinnerButtonLabels(m);
     });
 
-    // Начальное заполнение превью
-    updateTeamLogoPreview(m, 1);
-    updateTeamLogoPreview(m, 2);
+    // Начальное обновление лейблов (вызывается в initMatches)
+    // updateWinnerButtonLabels(m);
   }
 }
 
+// Обновление превью лого (если оно будет добавлено в HTML)
+/*
 export function updateTeamLogoPreview(matchIndex, teamIndex) {
   const sel = document.getElementById(`team${teamIndex}Select${matchIndex}`);
-  const preview = document.getElementById(`team${teamIndex}LogoPreview${matchIndex}`);
+  const preview = document.getElementById(`team${teamIndex}LogoPreview${matchIndex}`); // Нужен img элемент с таким ID
   if (!sel || !preview) return;
-  const logo = sel.options[sel.selectedIndex].dataset.logo || "";
-  preview.src = logo;
+  const selectedOption = sel.options[sel.selectedIndex];
+  const logoPath = selectedOption ? selectedOption.dataset.logo : "C:\\projects\\vMix_score\\public\\logos\\none.png";
+  // Важно: Браузер не может напрямую отображать локальные пути C:\...
+  // Для отображения логотипа нужно использовать относительные URL (/logos/...)
+  // Этот код останется для логики, но превью в браузере работать не будет с C:\ путями.
+  // preview.src = logoPath; // Это не сработает в браузере
+  console.log(`Логотип для Team ${teamIndex} Матч ${matchIndex}: ${logoPath}`);
 }
+*/
 
 // ----------------------
 // Кнопки Winner и подсветка
@@ -96,37 +127,47 @@ export function attachWinnerButtons() {
   document.querySelectorAll(".winner-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const matchColumn = btn.closest(".match-column");
-      const team = btn.getAttribute("data-team"); // "TEAM1" или "TEAM2"
+      if (!matchColumn) return;
+      const teamKey = btn.getAttribute("data-team"); // "TEAM1" или "TEAM2"
       const matchIndex = parseInt(matchColumn.dataset.match, 10);
+      const currentWinner = matchColumn.getAttribute("data-winner");
 
-      // Сохраняем выбранного победителя
-      matchColumn.setAttribute("data-winner", team);
+      // Если кликнули по уже выбранной кнопке - снимаем выбор
+      if (currentWinner === teamKey) {
+          matchColumn.removeAttribute("data-winner");
+      } else {
+          // Устанавливаем нового победителя
+          matchColumn.setAttribute("data-winner", teamKey);
+      }
 
-      // Обновляем лейблы и подсветку
-      updateWinnerButtonLabels(matchIndex);
+      // Обновляем подсветку
       refreshWinnerHighlight(matchIndex);
+      // Лейблы обновлять не нужно при клике, они зависят от селектов команд
     });
   });
 }
 
-function updateWinnerButtonLabels(matchIndex) {
+// Обновляет текст кнопок победителя в соответствии с выбранными командами
+export function updateWinnerButtonLabels(matchIndex) {
   const sel1 = document.getElementById(`team1Select${matchIndex}`);
   const sel2 = document.getElementById(`team2Select${matchIndex}`);
-  const name1 = sel1 ? sel1.value : "Team1";
-  const name2 = sel2 ? sel2.value : "Team2";
+  // Получаем текст выбранной опции или дефолтное имя
+  const name1 = sel1 && sel1.value ? sel1.value : "Team 1";
+  const name2 = sel2 && sel2.value ? sel2.value : "Team 2";
 
   const matchColumn = document.querySelector(`.match-column[data-match="${matchIndex}"]`);
   if (!matchColumn) return;
   const btn1 = matchColumn.querySelector('.winner-btn[data-team="TEAM1"]');
   const btn2 = matchColumn.querySelector('.winner-btn[data-team="TEAM2"]');
-  if (btn1) btn1.textContent = `Winner: ${name1}`;
-  if (btn2) btn2.textContent = `Winner: ${name2}`;
+  if (btn1) btn1.textContent = `Победитель: ${name1}`;
+  if (btn2) btn2.textContent = `Победитель: ${name2}`;
 }
 
-function refreshWinnerHighlight(matchIndex) {
+// Обновляет класс 'winner-selected' на кнопках победителя
+export function refreshWinnerHighlight(matchIndex) {
   const matchColumn = document.querySelector(`.match-column[data-match="${matchIndex}"]`);
   if (!matchColumn) return;
-  const winner = matchColumn.getAttribute("data-winner");
+  const winner = matchColumn.getAttribute("data-winner"); // "TEAM1", "TEAM2" или null
   matchColumn.querySelectorAll(".winner-btn").forEach(b => {
     b.classList.toggle("winner-selected", b.getAttribute("data-team") === winner);
   });
@@ -135,27 +176,40 @@ function refreshWinnerHighlight(matchIndex) {
 // ----------------------
 // Окраска селекта статуса
 // ----------------------
-function attachStatusColorUpdates() {
+export function attachStatusColorUpdates() {
   for (let m = 1; m <= 4; m++) {
     const sel = document.getElementById("statusSelect" + m);
     if (!sel) continue;
-    sel.addEventListener("change", () => updateStatusColor(sel));
-    updateStatusColor(sel);
+    sel.addEventListener("change", () => {
+        updateStatusColor(sel);
+        // Также обновляем класс у родителя .match-column
+        const matchColumn = sel.closest('.match-column');
+        if (matchColumn) {
+            matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
+            matchColumn.classList.add(`status-${sel.value.toLowerCase()}`);
+        }
+    });
+    // updateStatusColor(sel); // Первоначальная окраска происходит в initMatches
   }
 }
 
-function updateStatusColor(sel) {
-  const v = sel.value.toUpperCase();
-  let color;
-  switch (v) {
-    case "UPCOM":    color = "#746EC8"; break;
-    case "LIVE":     color = "#C45052"; break;
-    case "FINISHED": color = "#535353"; break;
-    default:         color = "";
-  }
-  sel.style.backgroundColor = color;
-  sel.style.color = "#fff";
+// Функция окраски селекта статуса (доступна глобально в модуле)
+export function updateStatusColor(sel) {
+    if (!sel) return;
+    const v = sel.value.toUpperCase();
+    let color;
+    // Используем CSS переменные для цветов
+    switch (v) {
+        case "UPCOM":    color = "var(--color-upcom)"; break;
+        case "LIVE":     color = "var(--color-live)"; break;
+        case "FINISHED": color = "var(--color-text-muted)"; break; // Можно использовать цвет для finished
+        default:         color = "var(--color-surface-light)"; // Цвет по умолчанию
+    }
+    sel.style.backgroundColor = color;
+    sel.style.color = '#fff'; // Всегда белый текст для лучшей читаемости на цветном фоне
+    sel.style.borderColor = color; // Можно и рамку окрасить
 }
+
 
 // ----------------------
 // Сбор данных матчей
@@ -163,67 +217,65 @@ function updateStatusColor(sel) {
 export function gatherMatchesData() {
   const defaultLogo = "C:\\projects\\vMix_score\\public\\logos\\none.png";
   const matches = [];
-  // Регекс для проверки формата "число:число"
   const SCORE_REGEX = /^\d+:\d+$/;
 
   for (let m = 1; m <= 4; m++) {
-    const column      = document.querySelector(`.match-column[data-match="${m}"]`);
-    const statusSelect= document.getElementById("statusSelect" + m);
-    const statusText  = statusSelect ? statusSelect.value.toUpperCase() : "";
-    const timeVal     = document.getElementById("timeInput" + m).value.trim();
-    const selTeam1    = document.getElementById("team1Select" + m);
-    const selTeam2    = document.getElementById("team2Select" + m);
-    const team1Name   = selTeam1 ? selTeam1.value : "";
-    const team2Name   = selTeam2 ? selTeam2.value : "";
-    const team1Logo   = selTeam1
-      ? selTeam1.options[selTeam1.selectedIndex].dataset.logo
-      : defaultLogo;
-    const team2Logo   = selTeam2
-      ? selTeam2.options[selTeam2.selectedIndex].dataset.logo
-      : defaultLogo;
+    const column = document.querySelector(`.match-column[data-match="${m}"]`);
+    if (!column) {
+        console.warn(`Match column ${m} not found during data gathering.`);
+        continue; // Пропускаем итерацию, если колонка не найдена
+    }
+    const statusSelect = document.getElementById("statusSelect" + m);
+    const statusText = statusSelect ? statusSelect.value.toUpperCase() : "";
+    const timeInput = document.getElementById("timeInput" + m);
+    const timeVal = timeInput ? timeInput.value.trim() : "";
 
-    // Сбор "сырых" данных по картам
+    const selTeam1 = document.getElementById("team1Select" + m);
+    const selTeam2 = document.getElementById("team2Select" + m);
+    const team1Name = selTeam1 ? selTeam1.value : "";
+    const team2Name = selTeam2 ? selTeam2.value : "";
+
+    // Получаем лого из dataset ВЫБРАННОЙ опции
+    const team1Logo = selTeam1 && selTeam1.selectedIndex >= 0
+        ? selTeam1.options[selTeam1.selectedIndex].dataset.logo || defaultLogo
+        : defaultLogo;
+    const team2Logo = selTeam2 && selTeam2.selectedIndex >= 0
+        ? selTeam2.options[selTeam2.selectedIndex].dataset.logo || defaultLogo
+        : defaultLogo;
+
+    // Сбор данных по картам
     const maps = {};
     column.querySelectorAll(".map-row").forEach((row, i) => {
-      const mapSelect  = row.querySelector(".map-name-select");
+      const mapSelect = row.querySelector(".map-name-select");
       const scoreInput = row.querySelector(".map-score-input");
-      maps[`MAP${i+1}`]       = mapSelect  ? mapSelect.value       : "";
-      maps[`MAP${i+1}_SCORE`] = scoreInput ? scoreInput.value.trim(): "";
+      maps[`MAP${i + 1}`] = mapSelect ? mapSelect.value : "";
+      maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
+
+    // Автозаполнение счета "NEXT" / "DECIDER" / "MATCH X" (логика сохранена)
     if (statusText === "LIVE") {
-      const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-      if (s1 && !s2) {
-        maps.MAP2_SCORE = "NEXT";
-        maps.MAP3_SCORE = "DECIDER";
-      } else if (s1 && s2 && !s3) {
-        maps.MAP3_SCORE = "NEXT";
-      }
-    }
-    if (statusText === "FINISHED") {
-      const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-      if (s1 && s2 && !s3) {
-        maps.MAP3_SCORE = "DECIDER";
-      }
-    }
-    if (statusText === "UPCOM") {
-      if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
-      if (maps.MAP1_SCORE !== "NEXT" && !maps.MAP2_SCORE) maps.MAP2_SCORE = "NEXT";
-      maps.MAP3_SCORE = `MATCH ${m}`;
+        const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
+        if (s1 && SCORE_REGEX.test(s1) && !s2) { // Если первая карта сыграна, а вторая нет
+            maps.MAP2_SCORE = "NEXT";
+            maps.MAP3_SCORE = "DECIDER";
+        } else if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && !s3) { // Если две карты сыграны, а третья нет
+            maps.MAP3_SCORE = "NEXT";
+        }
+    } else if (statusText === "FINISHED") {
+        const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
+        // Если две карты сыграны и третья пустая или не числовая, ставим DECIDER
+        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || !SCORE_REGEX.test(s3))) {
+            maps.MAP3_SCORE = "DECIDER";
+        }
+    } else if (statusText === "UPCOM") {
+        if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
+        // Убрано автозаполнение NEXT для второй карты, если первая не NEXT
+        // if (maps.MAP1_SCORE !== "NEXT" && !maps.MAP2_SCORE) maps.MAP2_SCORE = "NEXT";
+        maps.MAP3_SCORE = `MATCH ${m}`; // Оставляем только для третьей карты
     }
 
-    // Дополнительные поля из формы
-    function getVal(id) {
-      const el = document.getElementById(id + m);
-      return el ? el.value.trim() : "";
-    }
-    const upcomCest         = getVal("upcomCest");
-    const upcomRectangleUp  = getVal("upcomRectangleUp")  || "C:\\projects\\NewTimer\\files\\rectUp.png";
-    const upcomRectangleLow = getVal("upcomRectangleLow") || "C:\\projects\\NewTimer\\files\\rectLow.png";
-    const upcomVsMini       = getVal("upcomVsMini")       || "vs";
-    const upcomVsBig        = getVal("upcomVsBig")        || "vs";
-    const upcomNext         = getVal("upcomNext");
-    const upcomNextPhoto    = getVal("upcomNextPhoto")    || "C:\\projects\\NewTimer\\files\\bg_next_upcom.png";
 
+    // Определение иконок счета MP*_FIN/LIVE/UPC (логика сохранена)
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
@@ -240,111 +292,131 @@ export function gatherMatchesData() {
       MP3_FIN = getScoreIcon(maps.MAP3_SCORE);
     }
 
-    let finCest="", finResult="", finVictory="";
+    // Определение полей FIN_* (логика сохранена)
+    let finCest = "", finResult = "", finVictory = "";
     if (statusText === "FINISHED") {
-      finCest    = "cest";
-      finResult  = "Result";
+      finCest = "cest";
+      finResult = "Result";
       finVictory = "VICTORY";
     }
 
-    const winner = column.getAttribute("data-winner") || "";
-    let teamWinner="", teamWinnerLogo=defaultLogo;
-    if (statusText === "FINISHED") {
-      if (winner==="TEAM1") {
-        teamWinner     = team1Name;
+    // Определение победителя TEAMWINNER (используем data-winner)
+    const winnerKey = column.getAttribute("data-winner") || ""; // "TEAM1" или "TEAM2" или ""
+    let teamWinner = "";
+    let teamWinnerLogo = defaultLogo;
+    if (statusText === "FINISHED" && winnerKey) {
+      if (winnerKey === "TEAM1") {
+        teamWinner = team1Name;
         teamWinnerLogo = team1Logo;
-      }
-      else if (winner==="TEAM2") {
-        teamWinner     = team2Name;
+      } else if (winnerKey === "TEAM2") {
+        teamWinner = team2Name;
         teamWinnerLogo = team2Logo;
       }
     }
 
-    const liveStatusValue = statusText === "LIVE"
-      ? "C:\\projects\\NewTimer\\files\\live.png"
-      : defaultLogo;
-    const liveBgValue = statusText === "LIVE"
-      ? "C:\\projects\\NewTimer\\files\\LIVEBG.png"
-      : defaultLogo;
+    // Определение LIVE_* полей (логика сохранена)
+    const liveStatusValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live.png" : defaultLogo;
+    const liveBgValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\LIVEBG.png" : defaultLogo;
     const liveVs = statusText === "LIVE" ? "vs" : "";
+    const liveCestValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\ongoing.png" : defaultLogo;
+    const liveRectUp = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectUp.png" : "C:\\projects\\NewTimer\\files\\none.png";
+    const liveRectLow = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png";
 
+    // Определение UPCOM_* полей (логика сохранена)
+    const upcomCestValue = statusText === "UPCOM" ? "cest" : "";
+    const upcomRectUp = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectUp.png" : defaultLogo;
+    const upcomRectLow = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectLow.png" : defaultLogo;
+    const upcomVsMiniValue = statusText === "UPCOM" ? "vs" : "";
+    const upcomVsBigValue = statusText === "UPCOM" ? "vs" : "";
+    const upcomNextPhotoValue = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\bg_next_upcom.png" : "";
+
+    // Определение FINISHED_* полей (логика сохранена)
+    const finRectUp = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectUp.png" : "C:\\projects\\NewTimer\\files\\none.png";
+    const finRectLow = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png";
+
+    // Формирование объектов для каждого статуса
     const upcomObj = {
       UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "",
-      UPCOM_TIME:         statusText === "UPCOM" ? timeVal : "",
-      UPCOM_TEAM1:        statusText === "UPCOM" ? team1Name : "",
-      UPCOM_TEAM2:        statusText === "UPCOM" ? team2Name : "",
-      UPCOM_TEAM1_LOGO:   statusText === "UPCOM" ? team1Logo : defaultLogo,
-      UPCOM_TEAM2_LOGO:   statusText === "UPCOM" ? team2Logo : defaultLogo,
-      UPCOM_MAP1:         statusText === "UPCOM" ? maps.MAP1 : "",
-      UPCOM_MAP1_SCORE:   statusText === "UPCOM" ? maps.MAP1_SCORE : "",
-      UPCOM_MAP2:         statusText === "UPCOM" ? maps.MAP2 : "",
-      UPCOM_MAP2_SCORE:   statusText === "UPCOM" ? maps.MAP2_SCORE : "",
-      UPCOM_MAP3:         statusText === "UPCOM" ? maps.MAP3 : "",
-      UPCOM_MAP3_SCORE:   statusText === "UPCOM" ? maps.MAP3_SCORE : "",
-      UPCOM_Cest: statusText === "UPCOM" ? "cest" : "",
-      UPCOM_RectangleUP:  statusText === "UPCOM" ? upcomRectangleUp : defaultLogo,
-      UPCOM_RectangleLOW: statusText === "UPCOM" ? upcomRectangleLow : defaultLogo,
-      UPCOM_vs_mini:      statusText === "UPCOM" ? upcomVsMini : "",
-      UPCOM_vs_big:       statusText === "UPCOM" ? upcomVsBig : "",
-      UPCOM_next:         statusText === "UPCOM" ? upcomNext : "",
-      UPCOM_next_photo:   statusText === "UPCOM" ? upcomNextPhoto : ""
+      UPCOM_TIME: statusText === "UPCOM" ? (timeVal + (timeVal ? " CEST" : "")) : "", // Добавляем CEST если есть время
+      UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "",
+      UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
+      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogo,
+      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogo,
+      UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "",
+      UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
+      UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
+      UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "",
+      UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "",
+      UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "",
+      UPCOM_Cest: statusText === "UPCOM" ? upcomCestValue : "",
+      UPCOM_RectangleUP: statusText === "UPCOM" ? upcomRectUp : defaultLogo,
+      UPCOM_RectangleLOW: statusText === "UPCOM" ? upcomRectLow : defaultLogo,
+      UPCOM_vs_mini: statusText === "UPCOM" ? upcomVsMiniValue : "",
+      UPCOM_vs_big: statusText === "UPCOM" ? upcomVsBigValue : "",
+      UPCOM_next: "", // Поле UPCOM_next больше не используется напрямую?
+      UPCOM_next_photo: statusText === "UPCOM" ? upcomNextPhotoValue : ""
     };
 
     const liveObj = {
       LIVE_MATCH_STATUS: statusText === "LIVE" ? statusText : "",
-      LIVE_TIME:         statusText === "LIVE" ? timeVal : "",
-      LIVE_TEAM1:        statusText === "LIVE" ? team1Name : "",
-      LIVE_TEAM2:        statusText === "LIVE" ? team2Name : "",
-      LIVE_TEAM1_LOGO:   statusText === "LIVE" ? team1Logo : defaultLogo,
-      LIVE_TEAM2_LOGO:   statusText === "LIVE" ? team2Logo : defaultLogo,
-      LIVE_MAP1:         statusText === "LIVE" ? maps.MAP1 : "",
-      LIVE_MAP1_SCORE:   statusText === "LIVE" ? maps.MAP1_SCORE : "",
-      LIVE_MAP2:         statusText === "LIVE" ? maps.MAP2 : "",
-      LIVE_MAP2_SCORE:   statusText === "LIVE" ? maps.MAP2_SCORE : "",
-      LIVE_MAP3:         statusText === "LIVE" ? maps.MAP3 : "",
-      LIVE_MAP3_SCORE:   statusText === "LIVE" ? maps.MAP3_SCORE : "",
-      LIVE_Cest:         statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\ongoing.png" : defaultLogo,
-      LIVE_VS:           statusText === "LIVE" ? "vs" : "",
-      LIVE_STATUS:       statusText === "LIVE" ? liveStatusValue : defaultLogo,
-      LIVE_BG:           statusText === "LIVE" ? liveBgValue : defaultLogo,
-      LIVE_RectangleUP:  statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectUp.png" : "C:\\projects\\NewTimer\\files\\none.png",
-      LIVE_RectangleLOW: statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png"
+      LIVE_TIME: statusText === "LIVE" ? timeVal : "", // Время без CEST для LIVE
+      LIVE_TEAM1: statusText === "LIVE" ? team1Name : "",
+      LIVE_TEAM2: statusText === "LIVE" ? team2Name : "",
+      LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogo,
+      LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogo,
+      LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "",
+      LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "",
+      LIVE_MAP2: statusText === "LIVE" ? maps.MAP2 : "",
+      LIVE_MAP2_SCORE: statusText === "LIVE" ? maps.MAP2_SCORE : "",
+      LIVE_MAP3: statusText === "LIVE" ? maps.MAP3 : "",
+      LIVE_MAP3_SCORE: statusText === "LIVE" ? maps.MAP3_SCORE : "",
+      LIVE_Cest: statusText === "LIVE" ? liveCestValue : defaultLogo, // Используем ongoing.png
+      LIVE_VS: statusText === "LIVE" ? liveVs : "",
+      LIVE_STATUS: statusText === "LIVE" ? liveStatusValue : defaultLogo,
+      LIVE_BG: statusText === "LIVE" ? liveBgValue : defaultLogo,
+      LIVE_RectangleUP: statusText === "LIVE" ? liveRectUp : "C:\\projects\\NewTimer\\files\\none.png",
+      LIVE_RectangleLOW: statusText === "LIVE" ? liveRectLow : "C:\\projects\\NewTimer\\files\\none.png"
     };
 
     const finishedObj = {
       FINISHED_MATCH_STATUS: statusText === "FINISHED" ? statusText : "",
-      FINISHED_TIME:         statusText === "FINISHED" ? timeVal : "",
-      FINISHED_TEAM1:        statusText === "FINISHED" ? team1Name : "",
-      FINISHED_TEAM2:        statusText === "FINISHED" ? team2Name : "",
-      FINISHED_TEAM1_LOGO:   statusText === "FINISHED" ? team1Logo : defaultLogo,
-      FINISHED_TEAM2_LOGO:   statusText === "FINISHED" ? team2Logo : defaultLogo,
-      FINISHED_MAP1:         statusText === "FINISHED" ? maps.MAP1 : "",
-      FINISHED_MAP1_SCORE:   statusText === "FINISHED" ? maps.MAP1_SCORE : "",
-      FINISHED_MAP2:         statusText === "FINISHED" ? maps.MAP2 : "",
-      FINISHED_MAP2_SCORE:   statusText === "FINISHED" ? maps.MAP2_SCORE : "",
-      FINISHED_MAP3:         statusText === "FINISHED" ? maps.MAP3 : "",
-      FINISHED_MAP3_SCORE:   statusText === "FINISHED" ? maps.MAP3_SCORE : "",
-      FIN_RectangleUP:       statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectUp.png" : "C:\\projects\\NewTimer\\files\\none.png",
-      FIN_RectangleLOW:      statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png"
+      FINISHED_TIME: statusText === "FINISHED" ? (timeVal + (timeVal ? " CEST" : "")) : "", // Добавляем CEST если есть время
+      FINISHED_TEAM1: statusText === "FINISHED" ? team1Name : "",
+      FINISHED_TEAM2: statusText === "FINISHED" ? team2Name : "",
+      FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogo,
+      FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogo,
+      FINISHED_MAP1: statusText === "FINISHED" ? maps.MAP1 : "",
+      FINISHED_MAP1_SCORE: statusText === "FINISHED" ? maps.MAP1_SCORE : "",
+      FINISHED_MAP2: statusText === "FINISHED" ? maps.MAP2 : "",
+      FINISHED_MAP2_SCORE: statusText === "FINISHED" ? maps.MAP2_SCORE : "",
+      FINISHED_MAP3: statusText === "FINISHED" ? maps.MAP3 : "",
+      FINISHED_MAP3_SCORE: statusText === "FINISHED" ? maps.MAP3_SCORE : "",
+      FIN_RectangleUP: statusText === "FINISHED" ? finRectUp : "C:\\projects\\NewTimer\\files\\none.png",
+      FIN_RectangleLOW: statusText === "FINISHED" ? finRectLow : "C:\\projects\\NewTimer\\files\\none.png"
     };
 
-    const finishedLogo1 = SCORE_REGEX.test(maps.MAP1_SCORE) ? team1Logo : defaultLogo;
-    const finishedLogo2 = SCORE_REGEX.test(maps.MAP1_SCORE) ? team2Logo : defaultLogo;
-    const liveLogo1     = (statusText==="LIVE" && SCORE_REGEX.test(maps.MAP1_SCORE)) ? team1Logo : defaultLogo;
-    const liveLogo2     = (statusText==="LIVE" && SCORE_REGEX.test(maps.MAP1_SCORE)) ? team2Logo : defaultLogo;
-
-    // 9) Динамические лого уровня карт: показываем только если LIVE или FINISHED + числовой счёт
+    // Динамические лого уровня карт
     const perMapLogos = {};
-    [1,2,3].forEach(i => {
-      const sc = maps[`MAP${i}_SCORE`];
-      const isNum = SCORE_REGEX.test(sc);
-      // true только в LIVE или FINISHED и если sc соответствует "число:число"
-      const show = (statusText === "LIVE" || statusText === "FINISHED") && isNum;
-      perMapLogos[`MAP${i}_TEAM1_LOGO_MATCH${m}`] = show ? team1Logo : defaultLogo;
-      perMapLogos[`MAP${i}_TEAM2_LOGO_MATCH${m}`] = show ? team2Logo : defaultLogo;
-    });
+     [1, 2, 3].forEach(i => {
+         const sc = maps[`MAP${i}_SCORE`];
+         const isNum = SCORE_REGEX.test(sc);
+         const show = (statusText === "LIVE" || statusText === "FINISHED") && isNum;
+         // Используем имя поля как в db.json для консистентности
+         perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogo;
+         perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogo;
+     });
+
+    // Динамические лого уровня матча
+    const matchLogos = {};
+    const showFinishedLogos = statusText === "FINISHED"; // Показываем всегда для FINISHED
+    const showLiveLogos = statusText === "LIVE"; // Показываем всегда для LIVE
+    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogo;
+    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogo;
+    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogo;
+    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogo;
 
 
+    // Собираем итоговый объект матча
     const matchObj = {
       ...upcomObj,
       ...liveObj,
@@ -355,25 +427,12 @@ export function gatherMatchesData() {
       Fin_cest: finCest,
       FIN_Result: finResult,
       FIN_VICTORY: finVictory,
-      TEAMWINNER: teamWinner,
-      TEAMWINNER_LOGO: teamWinnerLogo
+      TEAMWINNER: teamWinner, // Сохраняем победителя, определенного на клиенте
+      TEAMWINNER_LOGO: teamWinnerLogo,
+      ...matchLogos, // Добавляем лого уровня матча
+      ...perMapLogos // Добавляем лого уровня карт
     };
 
-    // --- 10) Вставьте сразу перед matches.push(matchObj) ---
-    // матчные лого
-    matchObj[`FINISHED_TEAM1_LOGO_MATCH${m}`] = finishedLogo1;
-    matchObj[`FINISHED_TEAM2_LOGO_MATCH${m}`] = finishedLogo2;
-    matchObj[`LIVE_TEAM1_LOGO_MATCH${m}`]     = liveLogo1;
-    matchObj[`LIVE_TEAM2_LOGO_MATCH${m}`]     = liveLogo2;
-
-    // картовые лого в формате MAPn_TEAMxlogo
-    matchObj.MAP1_TEAM1logo = perMapLogos[`MAP1_TEAM1_LOGO_MATCH${m}`];
-    matchObj.MAP2_TEAM1logo = perMapLogos[`MAP2_TEAM1_LOGO_MATCH${m}`];
-    matchObj.MAP3_TEAM1logo = perMapLogos[`MAP3_TEAM1_LOGO_MATCH${m}`];
-    matchObj.MAP1_TEAM2logo = perMapLogos[`MAP1_TEAM2_LOGO_MATCH${m}`];
-    matchObj.MAP2_TEAM2logo = perMapLogos[`MAP2_TEAM2_LOGO_MATCH${m}`];
-    matchObj.MAP3_TEAM2logo = perMapLogos[`MAP3_TEAM2_LOGO_MATCH${m}`];
-    
     matches.push(matchObj);
   }
 
@@ -381,9 +440,10 @@ export function gatherMatchesData() {
 }
 
 // ----------------------
-// Помощник для иконок счета
+// Помощник для иконок счета (без изменений)
 // ----------------------
 function getScoreIcon(scoreStr) {
+  if (typeof scoreStr !== 'string') return "C:\\projects\\NewTimer\\files\\none.png"; // Добавим проверку типа
   const parts = scoreStr.split(":");
   if (parts.length !== 2) return "C:\\projects\\NewTimer\\files\\mp_none.png";
   const left = parseFloat(parts[0]);
@@ -391,37 +451,8 @@ function getScoreIcon(scoreStr) {
   if (isNaN(left) || isNaN(right)) return "C:\\projects\\NewTimer\\files\\mp_none.png";
   if (right > left) return "C:\\projects\\NewTimer\\files\\mp_R.png";
   if (left > right) return "C:\\projects\\NewTimer\\files\\mp_L.png";
-  return "C:\\projects\\NewTimer\\files\\mp_none.png";
+  return "C:\\projects\\NewTimer\\files\\mp_none.png"; // Ничья или 0:0
 }
 
-// ----------------------
-// 1) Сохраняем состояние всего интерфейса
-// ----------------------
-// function saveState() { ... }
-
-
-// ----------------------
-// 2) Загружаем сохранённое
-// ----------------------
-// function loadState() { ... }
-
-// ----------------------
-// 3) Привязываем автосохранение ко всем изменениям
-// ----------------------
-function bindSaveListeners() {
-  // любое изменение селектов/инпутов
-  document.querySelectorAll("select, input").forEach(el => {
-    el.addEventListener("change", saveState);
-  });
-  // клик по кнопкам‑winner
-  document.querySelectorAll(".winner-btn").forEach(btn => {
-    btn.addEventListener("click", saveState);
-  });
-  // VRS‑инпуты
-  document.querySelectorAll(".vrs-input").forEach(i => {
-    i.addEventListener("change", saveState);
-  });
-  // veto‑селекты
-  document.querySelectorAll(".veto-action, .veto-map, .veto-team, .veto-side")
-    .forEach(s => s.addEventListener("change", saveState));
-}
+// Функции saveState, loadState, bindSaveListeners удалены,
+// так как сохранение теперь происходит только по кнопке APPLY.
