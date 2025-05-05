@@ -20,10 +20,12 @@
                     <label for="newTeamName">Название команды:</label>
                     <input type="text" id="newTeamName" name="name" required class="team-input">
                 </div>
+                {/* --- ИЗМЕНЕННОЕ ПОЛЕ ЛОГО --- */}
                 <div class="form-group form-group-logo">
-                    <label for="newTeamLogo">Имя файла лого (напр. /logos/team_logo.png):</label>
-                    <input type="text" id="newTeamLogo" name="logo" placeholder="/logos/filename.png" class="team-input">
+                    <label for="newTeamLogo">Имя файла лого (без .png и /logos/):</label>
+                    <input type="text" id="newTeamLogo" name="logoFilename" placeholder="например, navi или g2" class="team-input"> {/* Изменен name и placeholder */}
                 </div>
+                {/* --- КОНЕЦ ИЗМЕНЕННОГО ПОЛЯ --- */}
                 <button type="submit" class="team-button add-button">Добавить команду</button>
             </form>
         </section>
@@ -34,13 +36,17 @@
                 <table id="teamsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>                 <th>Название команды</th>   <th>Имя файла лого</th>    <th>Действия</th>           </tr>
+                            <th>ID</th>
+                            <th>Название команды</th>
+                            <th>Имя файла лого</th>
+                            <th>Действия</th>
+                        </tr>
                     </thead>
                     <tbody>
                         <tr>
                             <td colspan="4">Загрузка команд...</td>
                         </tr>
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
         </section>
