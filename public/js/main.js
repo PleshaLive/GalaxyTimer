@@ -6,7 +6,7 @@ import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 
 // ========== Инициализация модулей ==========
-// Начинаем инициализацию команд и сохраняем промис для ожидания
+// Начинаем инициализацию команд и сохраняем промис, чтобы дождаться его позже
 const initPromise = initMatches();
 // Инициализируем остальные модули (они не требуют ожидания)
 initMapVeto();
@@ -583,8 +583,7 @@ async function saveMatchData(matchIndex, buttonElement) {
         await saveData(`/api/vrs/${matchIndex}`, vrsData, 'PUT');
         console.log(`[Save] Match ${matchIndex} VRS data saved successfully.`);
 
-        // 5. Сохранение Custom Fields (верхний блок) - ОПЦИОНАЛЬНО
-        // Если нужно сохранять верхний блок при каждом сохранении матча:
+        // 5. Опционально: Сохранение Custom Fields (верхний блок)
         // const customData = gatherCustomFieldsData();
         // await saveData("/api/customfields", customData, 'POST');
         // console.log("[Save] Custom Fields data saved.");

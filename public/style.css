@@ -638,9 +638,9 @@ label {
 .save-veto-button,
 .save-header-button { /* Добавляем кнопку хедера */
   display: block;
-  width: auto; /* Автоматическая ширина */
-  min-width: 150px; /* Минимальная ширина */
-  margin: var(--spacing-lg) auto 0; /* Отступ сверху, центрирование по умолчанию */
+  width: auto; /* Автоматическая ширина по контенту */
+  min-width: 150px; /* Минимальная ширина для читаемости */
+  margin: var(--spacing-lg) auto 0; /* Отступ сверху, авто по бокам для центрирования по умолчанию */
   padding: var(--spacing-sm) var(--spacing-lg);
   background: linear-gradient(100deg, var(--color-secondary) 0%, var(--color-primary) 100%);
   border: none;
@@ -654,18 +654,18 @@ label {
   letter-spacing: 0.05em;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease;
+  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease; /* Добавляем transition для фона */
   text-align: center;
 }
 
 /* Позиционирование кнопки сохранения матча внизу карточки */
 .save-match-button {
-    position: absolute;
-    bottom: var(--spacing-lg);
-    left: var(--spacing-lg);
-    right: var(--spacing-lg);
-    width: calc(100% - var(--spacing-lg) * 2);
-    margin: 0; /* Убираем авто-margin */
+    position: absolute; /* Позиционируем относительно .match-column */
+    bottom: var(--spacing-lg); /* Отступ снизу */
+    left: var(--spacing-lg); /* Отступ слева */
+    right: var(--spacing-lg); /* Отступ справа */
+    width: calc(100% - var(--spacing-lg) * 2); /* Ширина с учетом паддингов родителя */
+    margin: 0; /* Убираем авто-margin для абсолютного позиционирования */
 }
 
 /* Кнопка сохранения Veto */
@@ -686,9 +686,9 @@ label {
 .save-match-button:hover,
 .save-veto-button:hover,
 .save-header-button:hover {
-  filter: brightness(1.1);
-  transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4);
+  filter: brightness(1.1); /* Немного ярче при наведении */
+  transform: scale(1.02); /* Небольшое увеличение */
+  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4); /* Тень при наведении */
 }
 .save-header-button:hover {
     box-shadow: 0 0 10px rgba(255, 106, 136, 0.5); /* Розовая тень для хедера */
@@ -698,8 +698,8 @@ label {
 .save-match-button:active,
 .save-veto-button:active,
 .save-header-button:active {
-  transform: scale(0.99);
-  filter: brightness(0.95);
+  transform: scale(0.99); /* Небольшое уменьшение при клике */
+  filter: brightness(0.95); /* Немного темнее при клике */
 }
 
 /* Стили для состояния сохранения/ошибки/блокировки */
@@ -709,19 +709,19 @@ label {
 .save-match-button:disabled,
 .save-veto-button:disabled,
 .save-header-button:disabled {
-    background: var(--color-text-muted);
-    cursor: wait;
-    filter: brightness(0.8);
-    transform: scale(1);
-    box-shadow: var(--shadow-sm);
+    background: var(--color-text-muted); /* Серый фон */
+    cursor: wait; /* Курсор ожидания */
+    filter: brightness(0.8); /* Приглушаем цвет */
+    transform: scale(1); /* Убираем hover эффект */
+    box-shadow: var(--shadow-sm); /* Убираем hover тень */
 }
 .save-match-button.saved,
 .save-veto-button.saved,
 .save-header-button.saved {
-    background: var(--color-success);
+    background: var(--color-success); /* Зеленый фон при успехе */
 }
 .save-match-button.error,
 .save-veto-button.error,
 .save-header-button.error {
-    background: var(--color-error);
+    background: var(--color-error); /* Красный фон при ошибке */
 }
