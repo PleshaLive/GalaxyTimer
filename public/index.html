@@ -3,7 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Интерфейс матчей v2.2</title> <link rel="stylesheet" href="style.css" />
+  <title>Интерфейс матчей v2.2</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .teams-link {
+        color: var(--color-primary-light);
+        text-decoration: none;
+        padding: var(--spacing-sm) var(--spacing-md);
+        border: 1px solid var(--color-primary-light);
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition-base);
+        margin-left: var(--spacing-lg); /* Отступ слева */
+        align-self: center; /* Выравнивание по центру */
+    }
+    .teams-link:hover {
+        background-color: var(--color-primary-light);
+        color: var(--color-surface);
+    }
+    .page-title-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+        position: relative; /* Для позиционирования ссылки */
+    }
+    .page-title-container h1 {
+        margin-bottom: 0; /* Убираем отступ у h1 */
+    }
+    .page-title-container .teams-link {
+       /* Можно позиционировать абсолютно, если нужно точное место */
+       /* position: absolute; right: 0; */
+       margin-left: var(--spacing-xl); /* Или просто отступ */
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -18,31 +50,30 @@
         <input type="date" id="tournamentStart" class="header-input date-input">
         <label for="tournamentEnd">Конец:</label>
         <input type="date" id="tournamentEnd" class="header-input date-input">
-        <span id="tournamentDayDisplay" class="tournament-day"></span> </div>
+        <span id="tournamentDayDisplay" class="tournament-day"></span>
+      </div>
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
       <button id="saveHeaderButton" class="save-header-button">Save Header</button>
     </header>
 
-    <h1>Интерфейс матчей</h1>
+    <div class="page-title-container">
+        <h1>Интерфейс матчей</h1>
+        <a href="/teams" class="teams-link">Управление командами</a>
+    </div>
+
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Инициализация Socket.IO клиента
       const socket = io();
-
-      // Обработчик для обновления блока JSON (если он используется для отладки)
       socket.on("jsonUpdate", data => {
         console.log("[SOCKET] Received jsonUpdate for debug display:", data);
         const jsonOutput = document.getElementById("jsonOutput");
         if (jsonOutput) {
-          // Отображаем полученные данные в формате JSON с отступами
           jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
       });
-
-      // Остальные обработчики Socket.IO событий находятся в main.js
     </script>
 
     <div class="dashboard">
@@ -62,13 +93,15 @@
             <div class="team-block">
               <label for="team1Select1">Team 1</label>
               <select class="team-select" id="team1Select1">
-                <option value="">-</option> </select>
+                <option value="">-</option>
+              </select>
             </div>
             <div class="vs-indicator">VS</div>
             <div class="team-block">
               <label for="team2Select1">Team 2</label>
               <select class="team-select" id="team2Select1">
-                 <option value="">-</option> </select>
+                 <option value="">-</option>
+              </select>
             </div>
           </div>
           <div class="winner-buttons">
@@ -122,7 +155,7 @@
           </div>
           <div class="vrs-block-wrapper">
             <div class="vrs-block" id="vrsBlock1">
-              </div>
+            </div>
           </div>
           <button class="save-match-button" data-match-index="1">Save Match 1</button>
         </div> <div class="match-column" data-match="2" data-winner="">
