@@ -167,11 +167,10 @@ async function saveDbDataAsync() {
 /** Асинхронно сохраняет данные в data.json */
 async function saveDataJsonAsync() {
   try {
-    // Перед сохранением убедимся, что все логотипы имеют правильный формат пути (относительный)
+    // Перед сохранением убедимся, что logo - это относительный путь
     const teamsToSave = dataJsonContent.teams.map(team => ({
         ...team,
-        // Используем ?? '' для обработки случая, если logo = null/undefined
-        logo: makeRelativePath(team.logo ?? '')
+        logo: makeRelativePath(team.logo) // Преобразуем путь логотипа
     }));
     const dataToSave = {
         ...dataJsonContent,
@@ -197,16 +196,12 @@ function formatWinPoints(value) {
 /** Добавляет "pt" к числовому значению, если оно не пустое. */
 function formatPointsWithPt(value) {
     if (value === "" || value === null || value === undefined) return "";
-    // Проверяем, является ли значение числом или строкой, представляющей число
     const num = Number(value);
     if (isNaN(num)) {
-        // Если это не число (например, уже содержит "pt"), возвращаем как есть
-        return value;
+        return value; // Возвращаем как есть, если не число
     }
-    // Иначе добавляем "pt"
-    return `${value}pt`;
+    return `${value}pt`; // Добавляем "pt"
 }
-
 
 /** Получает путь к логотипу команды в зависимости от статуса матча. */
 function getTeamLogoPath(match, teamKey) {
@@ -394,58 +389,37 @@ app.post("/api/customfields", async (req, res) => {
 
 // GET /api/teams - Получить список команд (и игроков) из data.json
 app.get("/api/teams", (req, res) => {
-  // Возвращаем содержимое dataJsonContent, логотипы уже должны быть относительными
   res.json(dataJsonContent);
 });
 
 // POST /api/teams - Добавить новую команду в data.json
 app.post("/api/teams", async (req, res) => {
     const newName = req.body.name?.trim();
-    const newLogoRaw = req.body.logo?.trim() ?? ""; // Получаем путь логотипа
-    const newLogoRelative = makeRelativePath(newLogoRaw); // Преобразуем в относительный путь
-
     if (!newName) return res.status(400).json({ message: "Название команды не может быть пустым." });
-
     const newId = Date.now().toString();
-    const newTeam = { id: newId, name: newName, logo: newLogoRelative, score: 0 }; // Сохраняем относительный путь
-
+    const newTeam = { id: newId, name: newName, logo: "", score: 0 };
     if (!Array.isArray(dataJsonContent.teams)) dataJsonContent.teams = [];
     dataJsonContent.teams.push(newTeam);
-    console.log(`[API] Added new team: ${newName} (ID: ${newId}, Logo: ${newLogoRelative})`);
-
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем всех клиентов об обновлении списка команд (с относительными путями)
+    console.log(`[API] Added new team: ${newName} (ID: ${newId})`);
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after adding team.");
-
-    res.status(201).json(newTeam); // Возвращаем созданную команду
+    res.status(201).json(newTeam);
 });
 
-// PUT /api/teams/:id - Обновить имя и/или логотип существующей команды в data.json
+// PUT /api/teams/:id - Обновить имя существующей команды в data.json
 app.put("/api/teams/:id", async (req, res) => {
     const teamId = req.params.id;
     const newName = req.body.name?.trim();
-    const newLogoRaw = req.body.logo?.trim() ?? "";
-    const newLogoRelative = makeRelativePath(newLogoRaw);
-
     if (!newName) return res.status(400).json({ message: "Новое название команды не может быть пустым." });
-
     const teamIndex = dataJsonContent.teams.findIndex(t => t.id === teamId);
     if (teamIndex === -1) return res.status(404).json({ message: `Команда с ID ${teamId} не найдена.` });
-
-    // Обновляем имя и логотип команды
     dataJsonContent.teams[teamIndex].name = newName;
-    dataJsonContent.teams[teamIndex].logo = newLogoRelative; // Сохраняем относительный путь
-    console.log(`[API] Updated team ${teamId} name to: ${newName}, logo to: ${newLogoRelative}`);
-
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем клиентов
+    console.log(`[API] Updated team ${teamId} name to: ${newName}`);
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after updating team.");
-
-    res.status(200).json(dataJsonContent.teams[teamIndex]); // Возвращаем обновленную команду
+    res.status(200).json(dataJsonContent.teams[teamIndex]);
 });
 
 // DELETE /api/teams/:id - Удалить команду из data.json
@@ -453,17 +427,12 @@ app.delete("/api/teams/:id", async (req, res) => {
     const teamId = req.params.id;
     const initialLength = dataJsonContent.teams.length;
     dataJsonContent.teams = dataJsonContent.teams.filter(t => t.id !== teamId);
-
     if (dataJsonContent.teams.length === initialLength) return res.status(404).json({ message: `Команда с ID ${teamId} не найдена.` });
-
     console.log(`[API] Deleted team ${teamId}`);
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем клиентов
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after deleting team.");
-
-    res.status(204).send(); // Успех без содержимого
+    res.status(204).send();
 });
 
 
