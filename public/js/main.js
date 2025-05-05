@@ -1,13 +1,11 @@
 // public/js/main.js
-// Импортируем нужные функции, включая функции для обновления кнопок победителя
-// Добавляем импорт areTeamsInitialized
-import { initMatches, gatherMatchesData, updateWinnerButtonLabels, refreshWinnerHighlight, areTeamsInitialized } from "./matches.js";
+// Импортируем нужные функции, включая updateStatusColor
+import { initMatches, gatherMatchesData, updateWinnerButtonLabels, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor } from "./matches.js"; // <--- ДОБАВЛЕНО updateStatusColor
 import { initMapVeto, gatherMapVetoData } from "./mapVeto.js";
 import { initVRS, gatherVRSData } from "./vrs.js";
 import { saveData } from "./api.js";
 
 // ========== Инициализация модулей ==========
-// Вызываем initMatches, но не ждем его здесь, а ждем в DOMContentLoaded
 initMatches(); // Начинает загрузку списка команд
 initMapVeto();
 initVRS();
@@ -16,11 +14,13 @@ initVRS();
 
 socket.on("jsonUpdate", (matches) => {
   console.log("[SOCKET] Received jsonUpdate:", matches);
-  if (areTeamsInitialized()) { // Обновляем UI только если команды уже загружены
+  // Ждем инициализации команд перед обновлением UI
+  if (areTeamsInitialized()) {
       updateMatchesUI(matches);
   } else {
       console.log("[SOCKET] Teams not initialized yet, delaying matches UI update.");
-      // Можно добавить логику ожидания или повторной попытки позже
+      // Можно дождаться промиса инициализации, если нужно гарантировать обновление
+      initMatches().then(() => updateMatchesUI(matches));
   }
   const jsonOutput = document.getElementById("jsonOutput");
   if (jsonOutput) {
@@ -68,9 +68,8 @@ function updateMatchesUI(matches) {
     // Обновляем время
     const timeInput = document.getElementById(`timeInput${matchIndex}`);
     if (timeInput) {
-      // Отображаем время без CEST, так как CEST добавляется при сохранении
       let timeValue = match.UPCOM_TIME || match.LIVE_TIME || match.FINISHED_TIME || "";
-      timeValue = timeValue.replace(/ CEST$/i, '').trim(); // Убираем CEST
+      timeValue = timeValue.replace(/ CEST$/i, '').trim();
       timeInput.value = timeValue;
     }
 
@@ -82,41 +81,49 @@ function updateMatchesUI(matches) {
         else if (match.LIVE_MATCH_STATUS === "LIVE") newStatus = "LIVE";
         else if (match.UPCOM_MATCH_STATUS === "UPCOM") newStatus = "UPCOM";
 
-        if (newStatus && statusSelect.value !== newStatus) { // Обновляем только если статус изменился
+        if (newStatus && statusSelect.value !== newStatus) {
             statusSelect.value = newStatus;
-            // Обновляем классы и цвет фона
+            // Обновляем классы и цвет фона - ТЕПЕРЬ updateStatusColor ДОСТУПНА
              if (typeof updateStatusColor === 'function') {
-                 updateStatusColor(statusSelect);
+                 updateStatusColor(statusSelect); // Вызов функции из matches.js
              } else {
-                 console.warn("updateStatusColor function not found");
+                 // Эта ветка больше не должна выполняться, но оставим для отладки
+                 console.error("updateStatusColor function is still not found!");
              }
              matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
              matchColumn.classList.add(`status-${newStatus.toLowerCase()}`);
-        } else if (!newStatus) {
-            // Если статус не определен, можно сбросить на дефолтное значение
-            // statusSelect.value = statusSelect.options[0].value;
-            // updateStatusColor(statusSelect);
-            // matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
+        } else if (!newStatus && statusSelect.value !== statusSelect.options[0].value) {
+             // Если статус не определен, сбрасываем на дефолтное значение
+             statusSelect.value = statusSelect.options[0].value;
+             if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
+             matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
         }
     }
 
     // Обновляем команды
     const team1Select = document.getElementById(`team1Select${matchIndex}`);
     const team1Name = match.UPCOM_TEAM1 || match.LIVE_TEAM1 || match.FINISHED_TEAM1 || "";
-    // Устанавливаем значение, только если оно не пустое и опция существует
-    if (team1Select && team1Name && team1Select.querySelector(`option[value="${CSS.escape(team1Name)}"]`)) {
-       if (team1Select.value !== team1Name) team1Select.value = team1Name;
-    } else if (team1Select && team1Select.value !== "") {
-        team1Select.value = ""; // Сброс на дефолтное значение "-", если имя не найдено или пустое
+    if (team1Select) { // Проверяем наличие селекта
+        // Ищем опцию по значению
+        const optionExists = team1Select.querySelector(`option[value="${CSS.escape(team1Name)}"]`);
+        if (team1Name && optionExists) {
+            if (team1Select.value !== team1Name) team1Select.value = team1Name;
+        } else if (team1Select.value !== "") {
+            team1Select.value = ""; // Сброс на "-"
+        }
     }
 
     const team2Select = document.getElementById(`team2Select${matchIndex}`);
     const team2Name = match.UPCOM_TEAM2 || match.LIVE_TEAM2 || match.FINISHED_TEAM2 || "";
-    if (team2Select && team2Name && team2Select.querySelector(`option[value="${CSS.escape(team2Name)}"]`)) {
-       if (team2Select.value !== team2Name) team2Select.value = team2Name;
-    } else if (team2Select && team2Select.value !== "") {
-        team2Select.value = ""; // Сброс на дефолтное значение "-"
+     if (team2Select) { // Проверяем наличие селекта
+        const optionExists = team2Select.querySelector(`option[value="${CSS.escape(team2Name)}"]`);
+        if (team2Name && optionExists) {
+            if (team2Select.value !== team2Name) team2Select.value = team2Name;
+        } else if (team2Select.value !== "") {
+            team2Select.value = ""; // Сброс на "-"
+        }
     }
+
 
     // Обновляем данные по картам и счёту
     let prefix = "";
@@ -133,32 +140,29 @@ function updateMatchesUI(matches) {
 
       const mapValue = match[mapKey];
       if (mapSelect && mapValue !== undefined) {
-          // Проверяем, существует ли такая опция
-          if (mapSelect.querySelector(`option[value="${CSS.escape(mapValue)}"]`)) {
+          const optionExists = mapSelect.querySelector(`option[value="${CSS.escape(mapValue)}"]`);
+          if (optionExists) {
               if (mapSelect.value !== mapValue) mapSelect.value = mapValue;
           } else if (mapSelect.value !== mapSelect.options[0].value) {
-              // Если опции нет, сбрасываем на дефолтную
               mapSelect.value = mapSelect.options[0].value;
           }
       } else if (mapSelect && mapSelect.value !== mapSelect.options[0].value) {
-          mapSelect.value = mapSelect.options[0].value; // Сброс на дефолтное значение
+          mapSelect.value = mapSelect.options[0].value;
       }
 
       const scoreValue = match[scoreKey];
       if (scoreInput && scoreValue !== undefined) {
          if (scoreInput.value !== scoreValue) scoreInput.value = scoreValue;
       } else if (scoreInput && scoreInput.value !== "") {
-        scoreInput.value = ""; // Очищаем поле
+        scoreInput.value = "";
       }
     });
 
     // --- Восстановление состояния победителя ---
     let winnerTeamKey = "";
-    const currentTeam1Name = team1Select ? team1Select.value : ""; // Берем текущее значение из селекта
+    const currentTeam1Name = team1Select ? team1Select.value : "";
     const currentTeam2Name = team2Select ? team2Select.value : "";
-    // Победитель определяется только для FINISHED матчей по полю TEAMWINNER
     if (match.FINISHED_MATCH_STATUS === "FINISHED" && match.TEAMWINNER) {
-       // Сравниваем с текущими именами в селектах
        if (currentTeam1Name && match.TEAMWINNER === currentTeam1Name) {
            winnerTeamKey = "TEAM1";
        } else if (currentTeam2Name && match.TEAMWINNER === currentTeam2Name) {
@@ -191,19 +195,91 @@ function updateMatchesUI(matches) {
 }
 
 
-// Обновление Map Veto UI (без изменений)
+// Обновление Map Veto UI
 function updateMapVetoUI(mapVetoData) {
-  // ... (код остался прежним)
+  if (!mapVetoData || !mapVetoData.veto || !Array.isArray(mapVetoData.veto)) {
+      console.warn("[UI] Получены некорректные данные для updateMapVetoUI:", mapVetoData);
+      return;
+  }
+  const matchSelect = document.getElementById("matchSelect");
+  if (matchSelect && mapVetoData.matchIndex && matchSelect.value != mapVetoData.matchIndex) { // Обновляем только если значение отличается
+      matchSelect.value = mapVetoData.matchIndex;
+  }
+
+  mapVetoData.veto.forEach((vetoItem, idx) => {
+    const row = document.querySelector(`#vetoTable tr[data-index="${idx + 1}"]`);
+    if (row) {
+      const actionSelect = row.querySelector(".veto-action");
+      const mapSelect = row.querySelector(".veto-map");
+      const teamSelect = row.querySelector(".veto-team");
+      const sideSelect = row.querySelector(".veto-side");
+
+      if (actionSelect && actionSelect.value !== (vetoItem.action || 'BAN')) actionSelect.value = vetoItem.action || 'BAN';
+      if (mapSelect && mapSelect.value !== (vetoItem.map || mapSelect.options[0].value)) mapSelect.value = vetoItem.map || mapSelect.options[0].value;
+      if (teamSelect && teamSelect.value !== (vetoItem.team || 'TEAM1')) teamSelect.value = vetoItem.team || 'TEAM1';
+      if (sideSelect && sideSelect.value !== (vetoItem.side || '-')) sideSelect.value = vetoItem.side || '-';
+    }
+  });
+   console.log("[UI] Map Veto UI updated for match", mapVetoData.matchIndex);
 }
 
-// Обновление VRS UI (без изменений)
+// Обновление VRS UI
 function updateVRSUI(rawVrsData) {
-  // ... (код остался прежним)
+  if (!rawVrsData) {
+      console.warn("[UI] Получены пустые данные для updateVRSUI");
+      return;
+  }
+  console.log("[UI] Updating VRS UI...");
+  for (let i = 1; i <= 4; i++) {
+    const matchVrs = rawVrsData[i];
+    if (matchVrs && matchVrs.TEAM1 && matchVrs.TEAM2) {
+      const team1Win = document.getElementById(`team1WinPoints${i}`);
+      if (team1Win && team1Win.value !== (matchVrs.TEAM1.winPoints || '')) team1Win.value = matchVrs.TEAM1.winPoints ?? ''; // Используем ?? для null/undefined
+      const team1Lose = document.getElementById(`team1LosePoints${i}`);
+      if (team1Lose && team1Lose.value !== (matchVrs.TEAM1.losePoints || '')) team1Lose.value = matchVrs.TEAM1.losePoints ?? '';
+      const team1Rank = document.getElementById(`team1Rank${i}`);
+      if (team1Rank && team1Rank.value !== (matchVrs.TEAM1.rank || '')) team1Rank.value = matchVrs.TEAM1.rank ?? '';
+      const team1Current = document.getElementById(`team1CurrentPoints${i}`);
+      if (team1Current && team1Current.value !== (matchVrs.TEAM1.currentPoints || '')) team1Current.value = matchVrs.TEAM1.currentPoints ?? '';
+
+      const team2Win = document.getElementById(`team2WinPoints${i}`);
+      if (team2Win && team2Win.value !== (matchVrs.TEAM2.winPoints || '')) team2Win.value = matchVrs.TEAM2.winPoints ?? '';
+      const team2Lose = document.getElementById(`team2LosePoints${i}`);
+      if (team2Lose && team2Lose.value !== (matchVrs.TEAM2.losePoints || '')) team2Lose.value = matchVrs.TEAM2.losePoints ?? '';
+      const team2Rank = document.getElementById(`team2Rank${i}`);
+      if (team2Rank && team2Rank.value !== (matchVrs.TEAM2.rank || '')) team2Rank.value = matchVrs.TEAM2.rank ?? '';
+      const team2Current = document.getElementById(`team2CurrentPoints${i}`);
+      if (team2Current && team2Current.value !== (matchVrs.TEAM2.currentPoints || '')) team2Current.value = matchVrs.TEAM2.currentPoints ?? '';
+    } else {
+        // Можно добавить логику очистки полей, если данных для матча нет
+        // console.warn(`[UI] No VRS data for match ${i}`);
+    }
+  }
+   console.log("[UI] VRS UI update finished.");
 }
 
-// Обновление верхнего блока (custom fields) (без изменений)
+// Обновление верхнего блока (custom fields)
 function updateCustomFieldsUI(fields) {
- // ... (код остался прежним)
+  if (!fields) return;
+  console.log("[UI] Updating custom fields UI...");
+  const upcoming = document.getElementById("upcomingMatchesInput");
+  if (upcoming && upcoming.value !== (fields.upcomingMatches || "")) upcoming.value = fields.upcomingMatches || "";
+
+  const galaxy = document.getElementById("galaxyBattleInput");
+  if (galaxy && galaxy.value !== (fields.galaxyBattle || "")) galaxy.value = fields.galaxyBattle || "";
+
+  const startDate = document.getElementById("tournamentStart");
+  if (startDate && startDate.value !== (fields.tournamentStart || "")) startDate.value = fields.tournamentStart || "";
+
+  const endDate = document.getElementById("tournamentEnd");
+  if (endDate && endDate.value !== (fields.tournamentEnd || "")) endDate.value = fields.tournamentEnd || "";
+
+  const groupStage = document.getElementById("groupStageInput");
+  if (groupStage && groupStage.value !== (fields.groupStage || "")) groupStage.value = fields.groupStage || "";
+
+  // Обновляем день турнира после установки дат
+  updateTournamentDay();
+  console.log("[UI] Custom fields UI update finished.");
 }
 
 // ========== Загрузка данных с сервера ==========
@@ -215,14 +291,13 @@ async function loadMatchesFromServer() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const matches = await response.json();
     console.log("[Data] Matches data loaded:", matches);
-    // Обновляем UI только после инициализации команд
     if (areTeamsInitialized()) {
         updateMatchesUI(matches);
     } else {
         console.log("[Data] Teams not ready yet, match UI update deferred.");
-        // Промис initMatches разрешится, и тогда можно будет обновить UI
-        // Или можно дождаться здесь: await initMatches(); updateMatchesUI(matches);
-        // Но лучше обновлять по событию jsonUpdate после инициализации
+        // Ждем инициализации и обновляем
+        await initMatches();
+        updateMatchesUI(matches);
     }
   } catch (error) {
     console.error("[Data] Ошибка загрузки matchdata:", error);
@@ -273,48 +348,164 @@ async function loadCustomFieldsFromServer() {
   }
 }
 
-// Функция вычисления текущего дня турнира (без изменений)
+// Функция вычисления текущего дня турнира
 function calculateTournamentDay() {
- // ... (код остался прежним)
+  const startDateValue = document.getElementById("tournamentStart")?.value; // Добавим ?. для безопасности
+  const endDateValue = document.getElementById("tournamentEnd")?.value;
+  const displaySpan = document.getElementById("tournamentDayDisplay");
+
+  if (!displaySpan) return; // Выходим, если нет элемента для отображения
+
+  if (!startDateValue) {
+      displaySpan.textContent = '';
+      return;
+  }
+
+  try {
+      const start = new Date(startDateValue);
+      const end = endDateValue ? new Date(endDateValue) : null;
+      const today = new Date();
+
+      start.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      if (end) end.setHours(0, 0, 0, 0);
+
+      if (today < start) {
+          displaySpan.textContent = 'Турнир не начался';
+      } else if (end && today > end) {
+          displaySpan.textContent = 'Турнир завершен';
+      } else {
+          const diffTime = today - start;
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+          displaySpan.textContent = `День ${diffDays}`;
+      }
+  } catch (e) {
+      console.error("Ошибка при расчете дня турнира:", e);
+      displaySpan.textContent = '';
+  }
 }
 
-// Обновляем display дня турнира (без изменений)
+
+// Обновляем display дня турнира
 function updateTournamentDay() {
- // ... (код остался прежним)
+    calculateTournamentDay();
 }
 
-// Привязка обработчиков изменения дат (без изменений)
+// Привязка обработчиков изменения дат
 const tournamentStartInput = document.getElementById("tournamentStart");
-// ... (код остался прежним)
+const tournamentEndInput = document.getElementById("tournamentEnd");
+if (tournamentStartInput) tournamentStartInput.addEventListener("change", updateTournamentDay);
+if (tournamentEndInput) tournamentEndInput.addEventListener("change", updateTournamentDay);
 
 // ========== Функции сбора данных ==========
 
 function gatherCustomFieldsData() {
- // ... (код остался прежним)
+  updateTournamentDay(); // Обновляем день перед сбором
+  return {
+    upcomingMatches: document.getElementById("upcomingMatchesInput")?.value ?? "",
+    galaxyBattle: document.getElementById("galaxyBattleInput")?.value ?? "",
+    tournamentStart: document.getElementById("tournamentStart")?.value ?? "",
+    tournamentEnd: document.getElementById("tournamentEnd")?.value ?? "",
+    tournamentDay: document.getElementById("tournamentDayDisplay")?.textContent ?? "",
+    groupStage: document.getElementById("groupStageInput")?.value ?? ""
+  };
 }
 
-// Функция applyChanges (без изменений)
+// Функция applyChanges
 async function applyChanges() {
- // ... (код остался прежним)
+  console.log("Нажата кнопка APPLY. Начинаем сбор и отправку данных...");
+  const applyButton = document.getElementById("applyButton"); // Найдем кнопку заранее
+
+  // Опционально: Блокируем кнопку на время сохранения
+  if (applyButton) {
+      applyButton.disabled = true;
+      applyButton.textContent = "SAVING...";
+      applyButton.style.cursor = "wait";
+  }
+
+  try {
+    // 1. Сбор данных Custom Fields
+    const customData = gatherCustomFieldsData();
+    console.log("Собраны Custom Fields:", customData);
+    await saveData("/api/customfields", customData);
+    console.log("Custom Fields сохранены.");
+
+    // 2. Сбор данных Matches
+    const matchesData = gatherMatchesData();
+    console.log("Собраны Matches Data:", matchesData);
+    await saveData("/api/matchdata", matchesData);
+    console.log("Matches Data сохранены.");
+
+    // 3. Сбор данных Map Veto
+    const mapVetoData = gatherMapVetoData();
+    console.log("Собраны Map Veto Data:", mapVetoData);
+    await saveData("/api/mapveto", mapVetoData);
+    console.log("Map Veto Data сохранены.");
+
+    // 4. Сбор данных VRS
+    const vrsData = gatherVRSData();
+    console.log("Собраны VRS Data:", vrsData);
+    await saveData("/api/vrs", vrsData);
+    console.log("VRS Data сохранены.");
+
+    console.log("Изменения успешно применены и отправлены на сервер.");
+
+    // Показываем подтверждение
+    if(applyButton){
+        applyButton.textContent = "SAVED!";
+        applyButton.style.backgroundColor = "var(--color-success)";
+        setTimeout(() => {
+            applyButton.textContent = "APPLY";
+            applyButton.style.backgroundColor = ""; // Возвращаем исходный стиль
+        }, 1500);
+    }
+
+  } catch (error) {
+    console.error("Ошибка при применении изменений:", error);
+    // Сообщаем об ошибке
+     if(applyButton){
+        applyButton.textContent = "ERROR!";
+        applyButton.style.backgroundColor = "var(--color-error)";
+        setTimeout(() => {
+            applyButton.textContent = "APPLY";
+            applyButton.style.backgroundColor = "";
+        }, 2500);
+    }
+  } finally {
+      // Разблокируем кнопку в любом случае
+      if (applyButton) {
+          applyButton.disabled = false;
+          applyButton.style.cursor = "pointer";
+          // Убедимся, что текст вернулся к APPLY, если не было подтверждения
+          if (applyButton.textContent !== "APPLY" && applyButton.textContent !== "SAVED!" && applyButton.textContent !== "ERROR!") {
+               applyButton.textContent = "APPLY";
+               applyButton.style.backgroundColor = "";
+          }
+      }
+  }
 }
 
-// Привязка обработчика на кнопку Apply (без изменений)
+// Привязка обработчика на кнопку Apply
 const applyBtn = document.getElementById("applyButton");
-// ... (код остался прежним)
+if (applyBtn) {
+    applyBtn.addEventListener("click", applyChanges);
+    console.log("Обработчик клика для кнопки APPLY успешно привязан.");
+} else {
+    console.error("Кнопка Apply (id='applyButton') не найдена на странице!");
+}
 
 
 // ========== Инициализация при загрузке страницы ==========
 
-// Превращаем обработчик в async функцию
 window.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded: Starting initialization...");
   try {
-      // 1. Дожидаемся завершения инициализации команд (загрузка списка и заполнение селектов)
-      await initMatches(); // Ждем разрешения промиса
+      // 1. Дожидаемся завершения инициализации команд
+      await initMatches(); // Ждет разрешения промиса из matches.js
       console.log("DOMContentLoaded: Teams initialized.");
 
-      // 2. Теперь загружаем остальные данные
-      await loadMatchesFromServer(); // Теперь updateMatchesUI внутри сработает корректно
+      // 2. Загружаем остальные данные
+      await loadMatchesFromServer();
       await loadRawVRSData();
       await loadCustomFieldsFromServer();
       await loadMapVetoFromServer();
@@ -323,10 +514,5 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   } catch (error) {
       console.error("DOMContentLoaded: Error during initialization:", error);
-      // Можно показать сообщение об ошибке пользователю
   }
 });
-
-// --- Вспомогательная функция для окраски селекта статуса ---
-// (Определена в matches.js и импортируется)
-// function updateStatusColor(sel) { ... }
