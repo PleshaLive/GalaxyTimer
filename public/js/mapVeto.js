@@ -25,8 +25,6 @@ export function initMapVeto() {
   matchSelect.value = "1";
 
   console.log("[MapVeto] Map Veto initialized.");
-  // Обработчик смены матча будет добавлен в main.js,
-  // т.к. ему нужно вызывать updateVetoTeamOptions, которая теперь здесь
 }
 
 /**
@@ -115,15 +113,20 @@ export function gatherMapVetoData() {
     const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
     const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
 
-    // Вычисляем ссылку на изображение карты (vetoIMG) - ПУТИ НУЖНО АДАПТИРОВАТЬ!
-    // const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
-    const vetoIMG = ""; // Заглушка, т.к. абсолютные пути не работают в браузере
+    // --- ИЗМЕНЕНИЕ: Восстанавливаем генерацию путей ---
+    // Вычисляем ссылку на изображение карты (vetoIMG)
+    // ВАЖНО: Убедитесь, что этот путь корректен для вашего vMix!
+    const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
 
-    // Вычисляем ссылку на изображение стороны (sideIMG) - ПУТИ НУЖНО АДАПТИРОВАТЬ!
+    // Вычисляем ссылку на изображение стороны (sideIMG)
     let sideIMG = "";
-    // if (side === "CT") sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
-    // else if (side === "T") sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\t.png";
-
+    // ВАЖНО: Убедитесь, что эти пути корректны для вашего vMix!
+    if (side === "CT") {
+      sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
+    } else if (side === "T") {
+      sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\t.png";
+    }
+    // --- КОНЕЦ ИЗМЕНЕНИЯ ---
 
     vetoArr.push({
       mapIndex: i,
@@ -133,8 +136,8 @@ export function gatherMapVetoData() {
       teamLogo: realTeamLogo, // Сохраняем актуальное лого
       map: mapName,
       side,
-      vetoIMG, // Поле для vMix (пока пустое)
-      sideIMG  // Поле для vMix (пока пустое)
+      vetoIMG, // Добавляем сгенерированный путь
+      sideIMG  // Добавляем сгенерированный путь
     });
   });
 
