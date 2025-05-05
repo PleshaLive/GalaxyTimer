@@ -21,12 +21,10 @@
   <div class="container">
 
     <header class="header-controls">
-      {/* Блок 1: Основные поля */}
       <div class="header-group">
         <input type="text" id="upcomingMatchesInput" placeholder="UPCOMING MATCHES" class="header-input">
         <input type="text" id="galaxyBattleInput" placeholder="GALAXY BATTLE" class="header-input">
       </div>
-      {/* Блок 2: Даты */}
       <div class="header-group tournament-dates">
         <label for="tournamentStart">Начало:</label>
         <input type="date" id="tournamentStart" class="header-input date-input">
@@ -34,14 +32,11 @@
         <input type="date" id="tournamentEnd" class="header-input date-input">
         <span id="tournamentDayDisplay" class="tournament-day"></span>
       </div>
-      {/* Блок 3: Стадия */}
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
-      {/* Кнопка сохранения хедера (основных полей) */}
       <button id="saveHeaderButton" class="save-header-button">Save Header</button>
 
-      {/* БЛОК ДЛЯ ПАУЗЫ */}
       <div class="header-group pause-controls">
           <label for="pauseMessageInput">Сообщение паузы:</label>
           <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
@@ -49,8 +44,6 @@
           <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
           <button id="savePauseButton" class="save-pause-button">Save Pause</button>
       </div>
-       {/* КОНЕЦ БЛОКА ПАУЗЫ */}
-
     </header>
 
     <div class="page-title-container">
@@ -61,34 +54,28 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      // Инициализация Socket.IO клиента
       const socket = io();
 
-      // Обработчик для обновления блока JSON (для отладки)
       socket.on("jsonUpdate", data => {
         console.log("[SOCKET] Received jsonUpdate for debug display:", data);
         const jsonOutput = document.getElementById("jsonOutput");
         if (jsonOutput) {
-          // Отображаем полученные данные в формате JSON с отступами
           jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
       });
 
-      // Обработчик для обновления полей паузы
       socket.on("pauseUpdate", (pauseData) => {
           console.log("[SOCKET] Received pauseUpdate:", pauseData);
           const msgInput = document.getElementById('pauseMessageInput');
           const timeInput = document.getElementById('pauseTimeInput');
-          if (pauseData) { // Обновляем, если пришли данные
+          if (pauseData) {
               if (msgInput && msgInput.value !== (pauseData.pause || "")) msgInput.value = pauseData.pause || "";
               if (timeInput && timeInput.value !== (pauseData.lastUpd || "")) timeInput.value = pauseData.lastUpd || "";
-          } else { // Очищаем, если данные пустые
+          } else {
               if (msgInput) msgInput.value = "";
               if (timeInput) timeInput.value = "";
           }
       });
-
-      // Остальные обработчики Socket.IO событий находятся в main.js
     </script>
 
     <div class="dashboard">
