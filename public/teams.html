@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление командами</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="teams.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>Управление командами</h1>
+            <a href="/" class="back-link">Назад к матчам</a>
+        </header>
+
+        <section class="add-team-section">
+            <h2>Добавить новую команду</h2>
+            <form id="addTeamForm" class="team-form">
+                <div class="form-group">
+                    <label for="newTeamName">Название команды:</label>
+                    <input type="text" id="newTeamName" name="name" required class="team-input">
+                </div>
+                <button type="submit" class="team-button add-button">Добавить команду</button>
+            </form>
+        </section>
+
+        <section class="team-list-section">
+            <h2>Список команд</h2>
+            <div class="table-wrapper">
+                <table id="teamsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Название команды</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="3">Загрузка команд...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="js/teams.js"></script>
+</body>
+</html>

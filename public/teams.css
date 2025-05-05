@@ -1,0 +1,180 @@
+/* teams.css - Стили для страницы управления командами */
+
+/* Используем переменные из основного style.css */
+:root {
+    /* ... (переменные из style.css) ... */
+     --color-edit: #f39c12; /* Оранжевый для редактирования */
+}
+
+body {
+    /* Стили тела можно наследовать или переопределить */
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-family-base);
+    padding-bottom: var(--spacing-xl);
+}
+
+.container {
+    max-width: 900px; /* Уменьшим ширину для этой страницы */
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.page-header h1 {
+    margin-bottom: 0;
+    font-size: var(--font-size-xl);
+    color: var(--color-primary-light);
+}
+
+.back-link {
+    color: var(--color-primary-light);
+    text-decoration: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--color-primary-light);
+    border-radius: var(--border-radius-sm);
+    transition: var(--transition-base);
+}
+
+.back-link:hover {
+    background-color: var(--color-primary-light);
+    color: var(--color-surface);
+}
+
+/* Секции */
+.add-team-section,
+.team-list-section {
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-md);
+}
+
+h2 {
+    color: var(--color-text);
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+    font-weight: 500;
+}
+
+/* Форма добавления */
+.team-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    align-items: flex-end;
+}
+
+.form-group {
+    flex-grow: 1; /* Поле ввода занимает доступное место */
+}
+
+.team-input {
+    width: 100%; /* На всю ширину группы */
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-surface-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    color: var(--color-text);
+    font-size: var(--font-size-base);
+    outline: none;
+    transition: var(--transition-base);
+}
+
+.team-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+}
+
+.team-button {
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-base);
+    flex-shrink: 0; /* Кнопка не сжимается */
+}
+
+.add-button {
+    background-color: var(--color-success);
+}
+.add-button:hover {
+    filter: brightness(1.1);
+}
+
+/* Таблица команд */
+.table-wrapper {
+    overflow-x: auto; /* Горизонтальная прокрутка для маленьких экранов */
+}
+
+#teamsTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-md);
+}
+
+#teamsTable th,
+#teamsTable td {
+    border: 1px solid var(--color-border);
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+}
+
+#teamsTable th {
+    background-color: var(--color-surface-light);
+    color: var(--color-text-muted);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+#teamsTable tbody tr:nth-child(even) {
+    background-color: rgba(0,0,0, 0.1);
+}
+
+#teamsTable td:last-child {
+    text-align: center; /* Центрируем кнопки действий */
+    white-space: nowrap; /* Не переносить кнопки */
+}
+
+/* Стили для инпута редактирования в таблице */
+.edit-input {
+    width: calc(100% - 16px); /* Чуть меньше ширины ячейки */
+    padding: 4px 8px;
+    background-color: var(--color-background); /* Темнее фон */
+    border: 1px solid var(--color-primary); /* Выделяем рамкой */
+}
+
+/* Кнопки действий */
+.action-button {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin: 0 var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: var(--font-size-sm);
+    transition: var(--transition-base);
+}
+
+.edit-button { background-color: var(--color-edit); }
+.delete-button { background-color: var(--color-error); }
+.save-edit-button { background-color: var(--color-success); }
+.cancel-edit-button { background-color: var(--color-text-muted); }
+
+.action-button:hover {
+    filter: brightness(1.2);
+    transform: scale(1.05);
+}
