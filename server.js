@@ -162,7 +162,7 @@ async function saveDbDataAsync() {
     const dataToSave = {
       matches: savedMatches,
       mapVeto: savedMapVeto,
-      vrs: savedVRS,
+      vrs: savedVRS, // Сохраняем сырые данные VRS
       customFields: customFieldsData,
       pauseData: savedPauseData // Добавляем данные паузы при сохранении
     };
@@ -357,14 +357,14 @@ app.put("/api/matchdata/:matchIndex", async (req, res) => {
     res.status(200).json([savedMatches[index]]); // Возвращаем в массиве
 });
 
-app.get("/api/mapveto", (req, res) => { res.json([savedMapVeto || defaultMapVetoStructure]); }); // Возвращаем в массиве
+app.get("/api/mapveto", (req, res) => { res.json(savedMapVeto || defaultMapVetoStructure); }); // Возвращаем объект
 app.post("/api/mapveto", async (req, res) => {
     if (!req.body || typeof req.body.matchIndex !== 'number' || !req.body.teams || !Array.isArray(req.body.veto)) return res.status(400).json({ message: "Некорректный формат данных Map Veto." });
     savedMapVeto = { ...defaultMapVetoStructure, ...req.body };
     console.log("[API] Received updated mapveto data via POST for match:", savedMapVeto.matchIndex);
     await saveDbDataAsync(); // Сохраняем в db.json
     io.emit("mapVetoUpdate", savedMapVeto); // Отправляем объект
-    res.status(200).json([savedMapVeto]); // Возвращаем в массиве
+    res.status(200).json(savedMapVeto); // Возвращаем объект
 });
 
 app.get("/api/vrs/:id", (req, res) => { // Обработка VRS для GET
