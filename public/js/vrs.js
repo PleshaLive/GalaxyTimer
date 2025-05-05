@@ -5,7 +5,6 @@ export function initVRS() {
   for (let i = 1; i <= 4; i++) {
     const vrsBlock = document.getElementById("vrsBlock" + i);
     if (vrsBlock) {
-      // Создаем HTML только если блок существует
       vrsBlock.innerHTML = `
         <h3>VRS</h3>
         <table class="vrs-table">
@@ -36,13 +35,12 @@ export function initVRS() {
           </tbody>
         </table>
       `;
-      // console.log(`vrsBlock${i} создан`); // Лог для подтверждения создания
     } else {
         console.warn(`Элемент vrsBlock${i} не найден.`);
     }
   }
-  // Дополнительно: Обновляем имена команд в VRS таблицах при изменении селектов матчей
-  updateVRSTeamNames(); // Вызываем сразу
+  // Обновляем имена команд при инициализации и при изменении селектов
+  updateVRSTeamNames();
   for (let m = 1; m <= 4; m++) {
       const sel1 = document.getElementById(`team1Select${m}`);
       const sel2 = document.getElementById(`team2Select${m}`);
@@ -52,53 +50,53 @@ export function initVRS() {
 }
 
 // Функция обновления имен команд в VRS таблицах
-function updateVRSTeamNames() {
+export function updateVRSTeamNames() {
     for (let i = 1; i <= 4; i++) {
         const team1Select = document.getElementById(`team1Select${i}`);
         const team2Select = document.getElementById(`team2Select${i}`);
         const vrsTeam1NameCell = document.getElementById(`vrsTeam1Name${i}`);
         const vrsTeam2NameCell = document.getElementById(`vrsTeam2Name${i}`);
 
-        if (team1Select && vrsTeam1NameCell) {
-            vrsTeam1NameCell.textContent = team1Select.value || 'TEAM1';
+        if (vrsTeam1NameCell) {
+             vrsTeam1NameCell.textContent = team1Select?.value || 'TEAM1';
         }
-        if (team2Select && vrsTeam2NameCell) {
-            vrsTeam2NameCell.textContent = team2Select.value || 'TEAM2';
+         if (vrsTeam2NameCell) {
+             vrsTeam2NameCell.textContent = team2Select?.value || 'TEAM2';
         }
     }
 }
 
-
-// Функции loadAllVRS и loadVRSData удалены,
-// так как загрузка данных теперь происходит через loadRawVRSData в main.js
-// и обновление UI через updateVRSUI в main.js
-
-// Сбор данных VRS из инпутов (без изменений, но добавлена обработка пустых полей)
-export function gatherVRSData() {
-  const vrsData = {};
-  for (let i = 1; i <= 4; i++) {
-    // Функция для безопасного получения и парсинга значения
+// --------------------------------------------------
+// Сбор данных VRS для ОДНОГО матча
+// --------------------------------------------------
+export function gatherSingleVRSData(matchIndex) {
+    const i = matchIndex;
     const getValue = (id) => {
         const element = document.getElementById(id);
         const value = element ? element.value.trim() : '';
-        // Возвращаем null, если поле пустое, иначе пытаемся спарсить число
-        return value === '' ? null : (parseInt(value, 10) || null); // Возвращаем null если парсинг неудачен
+        // Возвращаем null, если поле пустое или не число
+        const parsed = parseInt(value, 10);
+        return value === '' ? null : (Number.isNaN(parsed) ? null : parsed);
     };
 
-    vrsData[i] = {
-      TEAM1: {
-        winPoints: getValue(`team1WinPoints${i}`),
-        losePoints: getValue(`team1LosePoints${i}`),
-        rank: getValue(`team1Rank${i}`),
-        currentPoints: getValue(`team1CurrentPoints${i}`)
-      },
-      TEAM2: {
-        winPoints: getValue(`team2WinPoints${i}`),
-        losePoints: getValue(`team2LosePoints${i}`),
-        rank: getValue(`team2Rank${i}`),
-        currentPoints: getValue(`team2CurrentPoints${i}`)
-      }
+    // Проверяем, существуют ли элементы перед чтением
+    if (!document.getElementById(`team1WinPoints${i}`)) {
+        console.error(`Элементы VRS для матча ${i} не найдены.`);
+        return null;
+    }
+
+    return {
+        TEAM1: {
+            winPoints: getValue(`team1WinPoints${i}`),
+            losePoints: getValue(`team1LosePoints${i}`),
+            rank: getValue(`team1Rank${i}`),
+            currentPoints: getValue(`team1CurrentPoints${i}`)
+        },
+        TEAM2: {
+            winPoints: getValue(`team2WinPoints${i}`),
+            losePoints: getValue(`team2LosePoints${i}`),
+            rank: getValue(`team2Rank${i}`),
+            currentPoints: getValue(`team2CurrentPoints${i}`)
+        }
     };
-  }
-  return vrsData;
 }

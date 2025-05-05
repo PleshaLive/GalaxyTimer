@@ -2,9 +2,10 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Интерфейс матчей v2.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Интерфейс матчей v2.1</title>
   <link rel="stylesheet" href="style.css" />
-  </head>
+</head>
 <body>
   <div class="container">
 
@@ -23,62 +24,75 @@
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
-       <button id="applyButton" class="apply-button">APPLY</button>
-    </header>
+      </header>
 
     <h1>Интерфейс матчей</h1>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      // Инициализация Socket.IO клиента
       const socket = io();
-      // При получении события jsonUpdate обновляем блок JSON
+
+      // Обработчик для обновления блока JSON (если он используется для отладки)
       socket.on("jsonUpdate", data => {
-        console.log("Получено обновление JSON:", data);
+        console.log("[SOCKET] Received jsonUpdate for debug display:", data);
         const jsonOutput = document.getElementById("jsonOutput");
         if (jsonOutput) {
           jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
       });
+
+      // Дополнительные обработчики Socket.IO событий находятся в main.js
     </script>
 
     <div class="dashboard">
       <div class="matches">
         <div class="match-column" data-match="1" data-winner="">
           <div class="match-header">
-             <h2>Match 1</h2>
-             <select class="status-select" id="statusSelect1">
-               <option value="UPCOM">UPCOM</option>
-               <option value="LIVE">LIVE</option>
-               <option value="FINISHED" selected>FINISHED</option>
-             </select>
-             <input type="text" class="time-input" id="timeInput1" value="11:00" />
+            <h2>Match 1</h2>
+            <select class="status-select" id="statusSelect1">
+              <option value="UPCOM">UPCOM</option>
+              <option value="LIVE">LIVE</option>
+              <option value="FINISHED">FINISHED</option>
+            </select>
+            <input type="text" class="time-input" id="timeInput1" placeholder="HH:MM" />
           </div>
           <div class="match-teams">
-             <div class="team-block">
-                 <label for="team1Select1">Team 1</label>
-                 <select class="team-select" id="team1Select1">
-                   <option value="TEAM1">TEAM1</option>
-                   <option value="TEAM2">TEAM2</option>
-                 </select>
-             </div>
-             <div class="vs-indicator">VS</div>
-             <div class="team-block">
-                 <label for="team2Select1">Team 2</label>
-                 <select class="team-select" id="team2Select1">
-                   <option value="TEAM1">TEAM1</option>
-                   <option value="TEAM2" selected>TEAM2</option>
-                 </select>
-             </div>
+            <div class="team-block">
+              <label for="team1Select1">Team 1</label>
+              <select class="team-select" id="team1Select1">
+                <option value="">-</option> </select>
+            </div>
+            <div class="vs-indicator">VS</div>
+            <div class="team-block">
+              <label for="team2Select1">Team 2</label>
+              <select class="team-select" id="team2Select1">
+                 <option value="">-</option> </select>
+            </div>
           </div>
-           <div class="winner-buttons">
-             <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
-             <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
-           </div>
+          <div class="winner-buttons">
+            <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
+            <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
+          </div>
           <div class="maps">
             <h3>Карты</h3>
             <div class="map-row">
               <select class="map-name-select">
-                 <option value="inferno" selected>inferno</option>
+                <option value="inferno">inferno</option>
+                <option value="dust2">dust2</option>
+                <option value="mirage">mirage</option>
+                <option value="nuke">nuke</option>
+                <option value="ancient">ancient</option>
+                <option value="anubis">anubis</option>
+                <option value="train">train</option>
+                <option value="vertigo">vertigo</option>
+                <option value="overpass">overpass</option>
+              </select>
+              <input type="text" class="map-score-input" placeholder="0:0" />
+            </div>
+            <div class="map-row">
+              <select class="map-name-select">
+                 <option value="inferno">inferno</option>
                  <option value="dust2">dust2</option>
                  <option value="mirage">mirage</option>
                  <option value="nuke">nuke</option>
@@ -88,12 +102,12 @@
                  <option value="vertigo">vertigo</option>
                  <option value="overpass">overpass</option>
               </select>
-              <input type="text" class="map-score-input" placeholder="13:9" />
+              <input type="text" class="map-score-input" placeholder="0:0" />
             </div>
             <div class="map-row">
               <select class="map-name-select">
-                 <option value="dust2" selected>dust2</option>
                  <option value="inferno">inferno</option>
+                 <option value="dust2">dust2</option>
                  <option value="mirage">mirage</option>
                  <option value="nuke">nuke</option>
                  <option value="ancient">ancient</option>
@@ -102,174 +116,144 @@
                  <option value="vertigo">vertigo</option>
                  <option value="overpass">overpass</option>
               </select>
-              <input type="text" class="map-score-input" placeholder="16:14" />
-            </div>
-            <div class="map-row">
-              <select class="map-name-select">
-                 <option value="mirage" selected>mirage</option>
-                 <option value="inferno">inferno</option>
-                 <option value="dust2">dust2</option>
-                 <option value="nuke">nuke</option>
-                 <option value="ancient">ancient</option>
-                 <option value="anubis">anubis</option>
-                 <option value="train">train</option>
-                 <option value="vertigo">vertigo</option>
-                 <option value="overpass">overpass</option>
-              </select>
-              <input type="text" class="map-score-input" placeholder="NEXT" />
+              <input type="text" class="map-score-input" placeholder="0:0" />
             </div>
           </div>
           <div class="vrs-block-wrapper">
             <div class="vrs-block" id="vrsBlock1">
               </div>
           </div>
+          <button class="save-match-button" data-match-index="1">Save Match 1</button>
         </div>
 
         <div class="match-column" data-match="2" data-winner="">
-            <div class="match-header">
-               <h2>Match 2</h2>
-               <select class="status-select" id="statusSelect2">
-                 <option value="UPCOM">UPCOM</option>
-                 <option value="LIVE" selected>LIVE</option>
-                 <option value="FINISHED">FINISHED</option>
+          <div class="match-header">
+            <h2>Match 2</h2>
+            <select class="status-select" id="statusSelect2">
+              <option value="UPCOM">UPCOM</option>
+              <option value="LIVE">LIVE</option>
+              <option value="FINISHED">FINISHED</option>
+            </select>
+            <input type="text" class="time-input" id="timeInput2" placeholder="HH:MM" />
+          </div>
+          <div class="match-teams">
+             <div class="team-block">
+               <label for="team1Select2">Team 1</label>
+               <select class="team-select" id="team1Select2">
+                 <option value="">-</option>
                </select>
-               <input type="text" class="time-input" id="timeInput2" value="12:00" />
-            </div>
-            <div class="match-teams">
-               <div class="team-block">
-                   <label for="team1Select2">Team 1</label>
-                   <select class="team-select" id="team1Select2">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
-               <div class="vs-indicator">VS</div>
-               <div class="team-block">
-                   <label for="team2Select2">Team 2</label>
-                   <select class="team-select" id="team2Select2">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
-            </div>
-             <div class="winner-buttons">
-               <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
-               <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
              </div>
-            <div class="maps">
-              <h3>Карты</h3>
-              <div class="map-row">
-                <select class="map-name-select">
-                   <option value="dust2" selected>dust2</option>
-                   <option value="inferno">inferno</option>
-                   <option value="mirage">mirage</option>
-                   <option value="nuke">nuke</option>
-                   <option value="ancient">ancient</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                   <option value="overpass">overpass</option>
-                </select>
-                <input type="text" class="map-score-input" placeholder="16:14" />
-              </div>
-              <div class="map-row">
-                <select class="map-name-select">
-                   <option value="mirage" selected>mirage</option>
-                   <option value="inferno">inferno</option>
-                   <option value="dust2">dust2</option>
-                   <option value="nuke">nuke</option>
-                   <option value="ancient">ancient</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                   <option value="overpass">overpass</option>
-                </select>
-                <input type="text" class="map-score-input" placeholder="13:9" />
-              </div>
-              <div class="map-row">
-                <select class="map-name-select">
-                   <option value="overpass" selected>overpass</option>
-                   <option value="inferno">inferno</option>
-                   <option value="dust2">dust2</option>
-                   <option value="mirage">mirage</option>
-                   <option value="nuke">nuke</option>
-                   <option value="ancient">ancient</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                </select>
-                <input type="text" class="map-score-input" placeholder="NEXT" />
-              </div>
-            </div>
-            <div class="vrs-block-wrapper">
-              <div class="vrs-block" id="vrsBlock2"></div>
-            </div>
+             <div class="vs-indicator">VS</div>
+             <div class="team-block">
+               <label for="team2Select2">Team 2</label>
+               <select class="team-select" id="team2Select2">
+                  <option value="">-</option>
+               </select>
+             </div>
+           </div>
+           <div class="winner-buttons">
+             <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
+             <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
+           </div>
+           <div class="maps">
+             <h3>Карты</h3>
+             <div class="map-row">
+               <select class="map-name-select">
+                 <option value="inferno">inferno</option>
+                 <option value="dust2">dust2</option>
+                 <option value="mirage">mirage</option>
+                 <option value="nuke">nuke</option>
+                 <option value="ancient">ancient</option>
+                 <option value="anubis">anubis</option>
+                 <option value="train">train</option>
+                 <option value="vertigo">vertigo</option>
+                 <option value="overpass">overpass</option>
+               </select>
+               <input type="text" class="map-score-input" placeholder="0:0" />
+             </div>
+             <div class="map-row">
+               <select class="map-name-select">
+                  <option value="inferno">inferno</option>
+                  <option value="dust2">dust2</option>
+                  <option value="mirage">mirage</option>
+                  <option value="nuke">nuke</option>
+                  <option value="ancient">ancient</option>
+                  <option value="anubis">anubis</option>
+                  <option value="train">train</option>
+                  <option value="vertigo">vertigo</option>
+                  <option value="overpass">overpass</option>
+               </select>
+               <input type="text" class="map-score-input" placeholder="0:0" />
+             </div>
+             <div class="map-row">
+               <select class="map-name-select">
+                  <option value="inferno">inferno</option>
+                  <option value="dust2">dust2</option>
+                  <option value="mirage">mirage</option>
+                  <option value="nuke">nuke</option>
+                  <option value="ancient">ancient</option>
+                  <option value="anubis">anubis</option>
+                  <option value="train">train</option>
+                  <option value="vertigo">vertigo</option>
+                  <option value="overpass">overpass</option>
+               </select>
+               <input type="text" class="map-score-input" placeholder="0:0" />
+             </div>
+           </div>
+           <div class="vrs-block-wrapper">
+             <div class="vrs-block" id="vrsBlock2"></div>
+           </div>
+           <button class="save-match-button" data-match-index="2">Save Match 2</button>
         </div>
 
         <div class="match-column" data-match="3" data-winner="">
-            <div class="match-header">
-               <h2>Match 3</h2>
-               <select class="status-select" id="statusSelect3">
-                 <option value="UPCOM">UPCOM</option>
-                 <option value="LIVE">LIVE</option>
-                 <option value="FINISHED" selected>FINISHED</option>
-               </select>
-               <input type="text" class="time-input" id="timeInput3" value="13:00" />
+           <div class="match-header">
+             <h2>Match 3</h2>
+             <select class="status-select" id="statusSelect3">
+               <option value="UPCOM">UPCOM</option>
+               <option value="LIVE">LIVE</option>
+               <option value="FINISHED">FINISHED</option>
+             </select>
+             <input type="text" class="time-input" id="timeInput3" placeholder="HH:MM" />
+           </div>
+           <div class="match-teams">
+              <div class="team-block">
+                <label for="team1Select3">Team 1</label>
+                <select class="team-select" id="team1Select3">
+                  <option value="">-</option>
+                </select>
+              </div>
+              <div class="vs-indicator">VS</div>
+              <div class="team-block">
+                <label for="team2Select3">Team 2</label>
+                <select class="team-select" id="team2Select3">
+                   <option value="">-</option>
+                </select>
+              </div>
             </div>
-            <div class="match-teams">
-               <div class="team-block">
-                   <label for="team1Select3">Team 1</label>
-                   <select class="team-select" id="team1Select3">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
-               <div class="vs-indicator">VS</div>
-               <div class="team-block">
-                   <label for="team2Select3">Team 2</label>
-                   <select class="team-select" id="team2Select3">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
+            <div class="winner-buttons">
+              <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
+              <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
             </div>
-             <div class="winner-buttons">
-               <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
-               <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
-             </div>
             <div class="maps">
               <h3>Карты</h3>
               <div class="map-row">
                 <select class="map-name-select">
-                   <option value="mirage" selected>mirage</option>
-                   <option value="inferno">inferno</option>
-                   <option value="dust2">dust2</option>
-                   <option value="nuke">nuke</option>
-                   <option value="ancient">ancient</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                   <option value="overpass">overpass</option>
+                  <option value="inferno">inferno</option>
+                  <option value="dust2">dust2</option>
+                  <option value="mirage">mirage</option>
+                  <option value="nuke">nuke</option>
+                  <option value="ancient">ancient</option>
+                  <option value="anubis">anubis</option>
+                  <option value="train">train</option>
+                  <option value="vertigo">vertigo</option>
+                  <option value="overpass">overpass</option>
                 </select>
-                <input type="text" class="map-score-input" placeholder="16:14" />
+                <input type="text" class="map-score-input" placeholder="0:0" />
               </div>
               <div class="map-row">
                 <select class="map-name-select">
-                   <option value="nuke" selected>nuke</option>
                    <option value="inferno">inferno</option>
-                   <option value="dust2">dust2</option>
-                   <option value="mirage">mirage</option>
-                   <option value="ancient">ancient</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                   <option value="overpass">overpass</option>
-                </select>
-                <input type="text" class="map-score-input" placeholder="13:9" />
-              </div>
-              <div class="map-row">
-                <select class="map-name-select">
-                   <option value="inferno" selected>inferno</option>
                    <option value="dust2">dust2</option>
                    <option value="mirage">mirage</option>
                    <option value="nuke">nuke</option>
@@ -279,64 +263,76 @@
                    <option value="vertigo">vertigo</option>
                    <option value="overpass">overpass</option>
                 </select>
-                <input type="text" class="map-score-input" placeholder="11:00" />
+                <input type="text" class="map-score-input" placeholder="0:0" />
+              </div>
+              <div class="map-row">
+                <select class="map-name-select">
+                   <option value="inferno">inferno</option>
+                   <option value="dust2">dust2</option>
+                   <option value="mirage">mirage</option>
+                   <option value="nuke">nuke</option>
+                   <option value="ancient">ancient</option>
+                   <option value="anubis">anubis</option>
+                   <option value="train">train</option>
+                   <option value="vertigo">vertigo</option>
+                   <option value="overpass">overpass</option>
+                </select>
+                <input type="text" class="map-score-input" placeholder="0:0" />
               </div>
             </div>
             <div class="vrs-block-wrapper">
               <div class="vrs-block" id="vrsBlock3"></div>
             </div>
-        </div>
+            <button class="save-match-button" data-match-index="3">Save Match 3</button>
+         </div>
 
         <div class="match-column" data-match="4" data-winner="">
-            <div class="match-header">
-               <h2>Match 4</h2>
-               <select class="status-select" id="statusSelect4">
-                 <option value="UPCOM" selected>UPCOM</option>
-                 <option value="LIVE">LIVE</option>
-                 <option value="FINISHED">FINISHED</option>
-               </select>
-               <input type="text" class="time-input" id="timeInput4" value="14:00" />
+           <div class="match-header">
+             <h2>Match 4</h2>
+             <select class="status-select" id="statusSelect4">
+               <option value="UPCOM">UPCOM</option>
+               <option value="LIVE">LIVE</option>
+               <option value="FINISHED">FINISHED</option>
+             </select>
+             <input type="text" class="time-input" id="timeInput4" placeholder="HH:MM" />
+           </div>
+           <div class="match-teams">
+              <div class="team-block">
+                <label for="team1Select4">Team 1</label>
+                <select class="team-select" id="team1Select4">
+                  <option value="">-</option>
+                </select>
+              </div>
+              <div class="vs-indicator">VS</div>
+              <div class="team-block">
+                <label for="team2Select4">Team 2</label>
+                <select class="team-select" id="team2Select4">
+                   <option value="">-</option>
+                </select>
+              </div>
             </div>
-            <div class="match-teams">
-               <div class="team-block">
-                   <label for="team1Select4">Team 1</label>
-                   <select class="team-select" id="team1Select4">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
-               <div class="vs-indicator">VS</div>
-               <div class="team-block">
-                   <label for="team2Select4">Team 2</label>
-                   <select class="team-select" id="team2Select4">
-                     <option value="TEAM1">TEAM1</option>
-                     <option value="TEAM2">TEAM2</option>
-                   </select>
-               </div>
+            <div class="winner-buttons">
+              <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
+              <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
             </div>
-             <div class="winner-buttons">
-               <button class="winner-btn" data-team="TEAM1">Победитель: Team1</button>
-               <button class="winner-btn" data-team="TEAM2">Победитель: Team2</button>
-             </div>
             <div class="maps">
               <h3>Карты</h3>
               <div class="map-row">
                 <select class="map-name-select">
-                   <option value="ancient" selected>ancient</option>
-                   <option value="inferno">inferno</option>
-                   <option value="dust2">dust2</option>
-                   <option value="mirage">mirage</option>
-                   <option value="nuke">nuke</option>
-                   <option value="anubis">anubis</option>
-                   <option value="train">train</option>
-                   <option value="vertigo">vertigo</option>
-                   <option value="overpass">overpass</option>
+                  <option value="inferno">inferno</option>
+                  <option value="dust2">dust2</option>
+                  <option value="mirage">mirage</option>
+                  <option value="nuke">nuke</option>
+                  <option value="ancient">ancient</option>
+                  <option value="anubis">anubis</option>
+                  <option value="train">train</option>
+                  <option value="vertigo">vertigo</option>
+                  <option value="overpass">overpass</option>
                 </select>
-                <input type="text" class="map-score-input" placeholder="13:9" />
+                <input type="text" class="map-score-input" placeholder="0:0" />
               </div>
               <div class="map-row">
                 <select class="map-name-select">
-                   <option value="vertigo" selected>vertigo</option>
                    <option value="inferno">inferno</option>
                    <option value="dust2">dust2</option>
                    <option value="mirage">mirage</option>
@@ -344,15 +340,16 @@
                    <option value="ancient">ancient</option>
                    <option value="anubis">anubis</option>
                    <option value="train">train</option>
+                   <option value="vertigo">vertigo</option>
                    <option value="overpass">overpass</option>
                 </select>
-                <input type="text" class="map-score-input" placeholder="NEXT" />
+                <input type="text" class="map-score-input" placeholder="0:0" />
               </div>
               <div class="map-row">
                 <select class="map-name-select">
-                   <option value="mirage" selected>mirage</option>
                    <option value="inferno">inferno</option>
                    <option value="dust2">dust2</option>
+                   <option value="mirage">mirage</option>
                    <option value="nuke">nuke</option>
                    <option value="ancient">ancient</option>
                    <option value="anubis">anubis</option>
@@ -360,143 +357,165 @@
                    <option value="vertigo">vertigo</option>
                    <option value="overpass">overpass</option>
                 </select>
-                <input type="text" class="map-score-input" placeholder="13:9" />
+                <input type="text" class="map-score-input" placeholder="0:0" />
               </div>
             </div>
             <div class="vrs-block-wrapper">
               <div class="vrs-block" id="vrsBlock4"></div>
             </div>
-        </div>
-      </div><div class="map-veto-block">
-        <div class="map-veto-content"> <h1>MAP VETO</h1>
-            <div class="map-veto-header">
-              <label for="matchSelect">Выберите матч:</label>
-              <select id="matchSelect" class="control-select">
-                </select>
-            </div>
-            <div class="table-wrapper"> <table id="vetoTable">
-                <thead>
-                  <tr>
-                    <th>ACTION</th>
-                    <th>MAP NAME</th>
-                    <th>TEAM</th>
-                    <th>SIDE</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr data-index="1">
-                    <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
-                    <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
-                  </tr>
-                  <tr data-index="2">
-                    <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
-                    <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
-                  </tr>
-                  <tr data-index="3">
-                    <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
-                    <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
-                  </tr>
-                  <tr data-index="4">
-                    <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
-                    <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
-                  </tr>
-                  <tr data-index="5">
-                    <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
-                    <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
-                  </tr>
+            <button class="save-match-button" data-match-index="4">Save Match 4</button>
+         </div>
+      </div> <div class="map-veto-block">
+        <div class="map-veto-content">
+          <h1>MAP VETO</h1>
+          <div class="map-veto-header">
+            <label for="matchSelect">Выберите матч для Veto:</label>
+            <select id="matchSelect" class="control-select">
+              </select>
+          </div>
+          <div class="table-wrapper">
+            <table id="vetoTable">
+              <thead>
+                <tr>
+                  <th>ACTION</th>
+                  <th>MAP NAME</th>
+                  <th>TEAM</th>
+                  <th>SIDE</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-index="1">
+                  <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
+                  <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
+                  <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                  <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
+                </tr>
+                 <tr data-index="2">
+                   <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
+                   <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
+                   <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                   <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
+                 </tr>
+                 <tr data-index="3">
+                   <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
+                   <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
+                   <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                   <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
+                 </tr>
+                 <tr data-index="4">
+                   <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
+                   <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
+                   <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                   <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
+                 </tr>
+                 <tr data-index="5">
+                   <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
+                   <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
+                   <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                   <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
+                 </tr>
                   <tr data-index="6">
                     <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
                     <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
+                    <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                    <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
                   </tr>
                   <tr data-index="7">
                     <td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td>
                     <td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td>
-                    <td><select class="veto-team control-select"><option>TEAM1</option><option>TEAM2</option></select></td>
-                    <td><select class="veto-side control-select"><option>-</option><option>CT</option><option>T</option></select></td>
+                    <td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td>
+                    <td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
-        </div><div class="map-veto-glow"></div> </div> <div class="json-output" id="jsonOutput">
-           </div>
+              </tbody>
+            </table>
+          </div>
+          <button id="saveMapVetoButton" class="save-veto-button">Save Map Veto</button>
+        </div>
+        <div class="map-veto-glow"></div>
+      </div>
+
+      <div class="json-output" id="jsonOutput">
+        JSON data will appear here...
+      </div>
 
     </div> </div> <script type="module" src="js/main.js"></script>
-  <script type="module" src="js/vrs.js"></script>
   <script>
-     // --- Дополнительный JS для динамического добавления классов статуса ---
-     // (Это лучше делать в main.js, но для примера можно и здесь)
-     function updateStatusClasses() {
-        const statusSelects = document.querySelectorAll('.status-select');
-        statusSelects.forEach(select => {
-            const matchColumn = select.closest('.match-column');
-            if (matchColumn) {
-                 // Удаляем старые классы статусов
-                 matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-                 // Добавляем новый класс в зависимости от выбранного значения
-                 const selectedStatus = select.value.toLowerCase();
+    // --- Динамическое добавление классов статуса ---
+    function updateStatusClassesForAll() {
+      const statusSelects = document.querySelectorAll('.status-select');
+      statusSelects.forEach(select => {
+        const matchColumn = select.closest('.match-column');
+        if (matchColumn) {
+            matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
+            const selectedStatus = select.value.toLowerCase();
+            if (selectedStatus) { // Добавляем класс только если статус выбран
                  matchColumn.classList.add(`status-${selectedStatus}`);
             }
-            // Обновляем при изменении
-            select.addEventListener('change', () => {
-                 const matchColumnOnChange = select.closest('.match-column');
-                 if (matchColumnOnChange) {
-                     matchColumnOnChange.classList.remove('status-upcom', 'status-live', 'status-finished');
-                     const newStatus = select.value.toLowerCase();
-                     matchColumnOnChange.classList.add(`status-${newStatus}`);
-                 }
-            });
-        });
-     }
-     // Вызываем функцию при загрузке страницы
-     document.addEventListener('DOMContentLoaded', updateStatusClasses);
-     // --- Конец дополнительного JS ---
+            // Обновляем цвет фона селекта
+            if (typeof updateStatusColor === 'function') { // Проверяем доступность функции из main.js/matches.js
+                updateStatusColor(select);
+            }
+        }
+      });
+    }
+    // Обновляем при изменении
+    document.querySelectorAll('.status-select').forEach(select => {
+        select.addEventListener('change', updateStatusClassesForAll);
+    });
+    // Вызываем при загрузке (после того как main.js загрузит данные)
+    document.addEventListener('DOMContentLoaded', () => {
+        // Небольшая задержка, чтобы дать время main.js загрузить данные и установить значения
+        setTimeout(updateStatusClassesForAll, 600);
+    });
+    // --- Конец JS для классов статуса ---
 
-     // --- JS для дат турнира (пример расчета дня) ---
-     function calculateTournamentDay() {
-       const startDateInput = document.getElementById('tournamentStart');
-       const endDateInput = document.getElementById('tournamentEnd');
-       const displaySpan = document.getElementById('tournamentDayDisplay');
+    // --- JS для дат турнира ---
+    function calculateTournamentDay() {
+      const startDateInput = document.getElementById('tournamentStart');
+      const endDateInput = document.getElementById('tournamentEnd');
+      const displaySpan = document.getElementById('tournamentDayDisplay');
 
-       function updateDay() {
-         const startStr = startDateInput.value;
-         const endStr = endDateInput.value;
-         if (startStr && displaySpan) {
-           const start = new Date(startStr);
-           const today = new Date();
-           // Обнуляем время для корректного сравнения дат
-           start.setHours(0, 0, 0, 0);
-           today.setHours(0, 0, 0, 0);
+      function updateDay() {
+        if (!startDateInput || !displaySpan) return; // Проверка наличия элементов
 
-           if (today >= start) {
-             const diffTime = Math.abs(today - start);
-             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 т.к. первый день это день 1
-             displaySpan.textContent = `День ${diffDays}`;
-           } else {
-             displaySpan.textContent = 'Турнир не начался';
-           }
-         } else if (displaySpan) {
-            displaySpan.textContent = '';
-         }
-       }
+        const startStr = startDateInput.value;
+        const endStr = endDateInput ? endDateInput.value : null; // Проверка endDateInput
 
-       startDateInput.addEventListener('change', updateDay);
-       endDateInput.addEventListener('change', updateDay); // Хотя дата конца не влияет на номер дня, пересчитаем на всякий
-       updateDay(); // Первоначальный расчет
-     }
-     document.addEventListener('DOMContentLoaded', calculateTournamentDay);
-     // --- Конец JS для дат турнира ---
+        if (startStr) {
+          try {
+              const start = new Date(startStr);
+              const end = endStr ? new Date(endStr) : null;
+              const today = new Date();
+
+              start.setHours(0, 0, 0, 0);
+              today.setHours(0, 0, 0, 0);
+              if (end) end.setHours(0, 0, 0, 0);
+
+              if (today < start) {
+                  displaySpan.textContent = 'Турнир не начался';
+              } else if (end && today > end) {
+                  displaySpan.textContent = 'Турнир завершен';
+              } else {
+                  const diffTime = Math.abs(today - start);
+                  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                  displaySpan.textContent = `День ${diffDays}`;
+              }
+          } catch (e) {
+              console.error("Ошибка парсинга даты турнира:", e);
+              displaySpan.textContent = ''; // Очистить в случае ошибки
+          }
+        } else {
+          displaySpan.textContent = ''; // Очистить, если дата начала не введена
+        }
+      }
+
+      if (startDateInput) startDateInput.addEventListener('change', updateDay);
+      if (endDateInput) endDateInput.addEventListener('change', updateDay);
+      // Первоначальный расчет вызывается из updateCustomFieldsUI в main.js
+      // updateDay();
+    }
+    document.addEventListener('DOMContentLoaded', calculateTournamentDay);
+    // --- Конец JS для дат турнира ---
   </script>
 </body>
 </html>
