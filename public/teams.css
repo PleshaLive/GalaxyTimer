@@ -2,8 +2,43 @@
 
 /* Используем переменные из основного style.css */
 :root {
-    /* ... (переменные из style.css) ... */
-     --color-edit: #f39c12; /* Оранжевый для редактирования */
+    /* Скопируйте переменные из вашего основного style.css сюда, если teams.css не импортирует его */
+    --color-background: #1a1a2e;
+    --color-surface: #16213e;
+    --color-surface-light: #2a3b5f;
+    --color-primary: #6c5ce7;
+    --color-primary-light: #a29bfe;
+    --color-secondary: #0984e3;
+    --color-text: #e0e0e0;
+    --color-text-muted: #a0a0a0;
+    --color-border: #4a4a6a;
+    --color-success: #2ecc71;
+    --color-live: #f1c40f;
+    --color-upcom: #3498db;
+    --color-error: #e74c3c;
+    --color-edit: #f39c12; /* Оранжевый для редактирования */
+
+    --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    --font-size-base: 14px;
+    --font-size-sm: 12px;
+    --font-size-lg: 16px;
+    --font-size-xl: 24px;
+
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+
+    --transition-base: all 0.3s ease;
 }
 
 body {
@@ -12,72 +47,88 @@ body {
     color: var(--color-text);
     font-family: var(--font-family-base);
     padding-bottom: var(--spacing-xl);
+    margin: 0; /* Убедимся, что нет внешних отступов у body */
 }
 
 .container {
-    max-width: 900px; /* Уменьшим ширину для этой страницы */
-    margin: 0 auto;
-    padding: var(--spacing-lg);
+    max-width: 1100px; /* Немного увеличим ширину для доп. колонки */
+    margin: 0 auto; /* Центрирование */
+    padding: var(--spacing-lg); /* Внутренние отступы */
 }
 
 .page-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--color-border);
+    justify-content: space-between; /* Элементы по краям */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    margin-bottom: var(--spacing-xl); /* Отступ снизу */
+    padding-bottom: var(--spacing-md); /* Отступ под линией */
+    border-bottom: 1px solid var(--color-border); /* Линия-разделитель */
 }
 
 .page-header h1 {
-    margin-bottom: 0;
+    margin-bottom: 0; /* Убираем отступ у заголовка */
     font-size: var(--font-size-xl);
     color: var(--color-primary-light);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .back-link {
     color: var(--color-primary-light);
-    text-decoration: none;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-primary-light);
-    border-radius: var(--border-radius-sm);
-    transition: var(--transition-base);
+    text-decoration: none; /* Убираем подчеркивание */
+    padding: var(--spacing-sm) var(--spacing-md); /* Внутренние отступы */
+    border: 1px solid var(--color-primary-light); /* Рамка */
+    border-radius: var(--border-radius-sm); /* Скругление */
+    transition: var(--transition-base); /* Плавный переход */
 }
 
 .back-link:hover {
-    background-color: var(--color-primary-light);
-    color: var(--color-surface);
+    background-color: var(--color-primary-light); /* Фон при наведении */
+    color: var(--color-surface); /* Цвет текста при наведении */
 }
 
-/* Секции */
+/* Секции добавления и списка */
 .add-team-section,
 .team-list-section {
-    background-color: var(--color-surface);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
-    margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-md);
+    background-color: var(--color-surface); /* Фон секции */
+    padding: var(--spacing-lg); /* Внутренние отступы */
+    border-radius: var(--border-radius-lg); /* Скругление углов */
+    margin-bottom: var(--spacing-lg); /* Отступ снизу */
+    box-shadow: var(--shadow-md); /* Тень */
 }
 
 h2 {
     color: var(--color-text);
     margin-bottom: var(--spacing-lg);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border); /* Линия под заголовком */
     padding-bottom: var(--spacing-sm);
-    font-weight: 500;
+    font-weight: 500; /* Средняя жирность */
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
 }
 
 /* Форма добавления */
 .team-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    align-items: flex-end;
+    flex-wrap: wrap; /* Позволяет переносить на новую строку */
+    gap: var(--spacing-md); /* Отступы между элементами формы */
+    align-items: flex-end; /* Выравнивание по нижнему краю */
 }
 
 .form-group {
-    flex-grow: 1; /* Поле ввода занимает доступное место */
+    display: flex;
+    flex-direction: column; /* Лейбл над инпутом */
+    flex-basis: 300px; /* Базовая ширина для полей */
+    flex-grow: 1; /* Позволяет растягиваться */
 }
+
+/* Уменьшим базовую ширину для кнопки */
+.team-form button {
+    flex-basis: 150px; /* Ширина кнопки */
+    flex-grow: 0; /* Не растягивать кнопку */
+    align-self: flex-end; /* Выравниваем кнопку по нижнему краю с инпутами */
+}
+
 
 .team-input {
     width: 100%; /* На всю ширину группы */
@@ -89,6 +140,11 @@ h2 {
     font-size: var(--font-size-base);
     outline: none;
     transition: var(--transition-base);
+}
+.team-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+    font-size: var(--font-size-sm);
 }
 
 .team-input:focus {
@@ -104,7 +160,8 @@ h2 {
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition-base);
-    flex-shrink: 0; /* Кнопка не сжимается */
+    height: 40px; /* Выровняем высоту с инпутами */
+    line-height: calc(40px - var(--spacing-sm)*2); /* Корректируем line-height для вертикального центрирования текста */
 }
 
 .add-button {
@@ -121,29 +178,37 @@ h2 {
 
 #teamsTable {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: collapse; /* Убираем двойные рамки */
     margin-top: var(--spacing-md);
 }
 
 #teamsTable th,
 #teamsTable td {
-    border: 1px solid var(--color-border);
-    padding: var(--spacing-sm) var(--spacing-md);
-    text-align: left;
+    border: 1px solid var(--color-border); /* Рамка ячеек */
+    padding: var(--spacing-sm) var(--spacing-md); /* Внутренние отступы */
+    text-align: left; /* Выравнивание текста по левому краю */
+    vertical-align: middle; /* Выравнивание по центру вертикально */
 }
 
 #teamsTable th {
-    background-color: var(--color-surface-light);
-    color: var(--color-text-muted);
+    background-color: var(--color-surface-light); /* Фон заголовков */
+    color: var(--color-text-muted); /* Цвет текста заголовков */
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    text-transform: uppercase; /* Верхний регистр */
+    letter-spacing: 0.05em; /* Межбуквенный интервал */
 }
+/* Задаем ширину колонок */
+#teamsTable th:nth-child(1) { width: 15%; } /* ID */
+#teamsTable th:nth-child(2) { width: 35%; } /* Name */
+#teamsTable th:nth-child(3) { width: 30%; } /* Logo */
+#teamsTable th:nth-child(4) { width: 20%; text-align: center;} /* Actions */
+
 
 #teamsTable tbody tr:nth-child(even) {
-    background-color: rgba(0,0,0, 0.1);
+    background-color: rgba(0,0,0, 0.1); /* Зебра */
 }
 
+/* Стили для последней ячейки (Действия) */
 #teamsTable td:last-child {
     text-align: center; /* Центрируем кнопки действий */
     white-space: nowrap; /* Не переносить кнопки */
@@ -151,16 +216,25 @@ h2 {
 
 /* Стили для инпута редактирования в таблице */
 .edit-input {
-    width: calc(100% - 16px); /* Чуть меньше ширины ячейки */
+    width: calc(100% - 16px); /* Чуть меньше ширины ячейки для отступов */
     padding: 4px 8px;
     background-color: var(--color-background); /* Темнее фон */
     border: 1px solid var(--color-primary); /* Выделяем рамкой */
+    color: var(--color-text);
+    font-size: var(--font-size-base);
+    border-radius: var(--border-radius-sm);
+    box-sizing: border-box; /* Учитываем padding и border */
+}
+.edit-input::placeholder {
+    color: var(--color-text-muted);
+    opacity: 0.6;
+    font-size: var(--font-size-sm);
 }
 
-/* Кнопки действий */
+/* Кнопки действий (Edit, Delete, Save, Cancel) */
 .action-button {
     padding: var(--spacing-xs) var(--spacing-sm);
-    margin: 0 var(--spacing-xs);
+    margin: 0 var(--spacing-xs); /* Небольшие отступы между кнопками */
     border-radius: var(--border-radius-sm);
     border: none;
     color: #fff;
@@ -169,12 +243,12 @@ h2 {
     transition: var(--transition-base);
 }
 
-.edit-button { background-color: var(--color-edit); }
-.delete-button { background-color: var(--color-error); }
-.save-edit-button { background-color: var(--color-success); }
-.cancel-edit-button { background-color: var(--color-text-muted); }
+.edit-button { background-color: var(--color-edit); } /* Оранжевая */
+.delete-button { background-color: var(--color-error); } /* Красная */
+.save-edit-button { background-color: var(--color-success); } /* Зеленая */
+.cancel-edit-button { background-color: var(--color-text-muted); } /* Серая */
 
 .action-button:hover {
-    filter: brightness(1.2);
-    transform: scale(1.05);
+    filter: brightness(1.2); /* Ярче при наведении */
+    transform: scale(1.05); /* Немного увеличить */
 }

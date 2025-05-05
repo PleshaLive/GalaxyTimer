@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Управление командами</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="teams.css">
-</head>
+    <link rel="stylesheet" href="teams.css"> </head>
 <body>
     <div class="container">
         <header class="page-header">
@@ -17,9 +16,13 @@
         <section class="add-team-section">
             <h2>Добавить новую команду</h2>
             <form id="addTeamForm" class="team-form">
-                <div class="form-group">
+                <div class="form-group form-group-name">
                     <label for="newTeamName">Название команды:</label>
                     <input type="text" id="newTeamName" name="name" required class="team-input">
+                </div>
+                <div class="form-group form-group-logo">
+                    <label for="newTeamLogo">Имя файла лого (напр. /logos/team_logo.png):</label>
+                    <input type="text" id="newTeamLogo" name="logo" placeholder="/logos/filename.png" class="team-input">
                 </div>
                 <button type="submit" class="team-button add-button">Добавить команду</button>
             </form>
@@ -31,16 +34,13 @@
                 <table id="teamsTable">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Название команды</th>
-                            <th>Действия</th>
-                        </tr>
+                            <th>ID</th>                 <th>Название команды</th>   <th>Имя файла лого</th>    <th>Действия</th>           </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="3">Загрузка команд...</td>
+                            <td colspan="4">Загрузка команд...</td>
                         </tr>
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
         </section>
