@@ -357,14 +357,14 @@ app.put("/api/matchdata/:matchIndex", async (req, res) => {
     res.status(200).json([savedMatches[index]]); // Возвращаем в массиве
 });
 
-app.get("/api/mapveto", (req, res) => { res.json(savedMapVeto || defaultMapVetoStructure); });
+app.get("/api/mapveto", (req, res) => { res.json([savedMapVeto || defaultMapVetoStructure]); }); // Возвращаем в массиве
 app.post("/api/mapveto", async (req, res) => {
     if (!req.body || typeof req.body.matchIndex !== 'number' || !req.body.teams || !Array.isArray(req.body.veto)) return res.status(400).json({ message: "Некорректный формат данных Map Veto." });
     savedMapVeto = { ...defaultMapVetoStructure, ...req.body };
     console.log("[API] Received updated mapveto data via POST for match:", savedMapVeto.matchIndex);
     await saveDbDataAsync(); // Сохраняем в db.json
-    io.emit("mapVetoUpdate", savedMapVeto);
-    res.status(200).json(savedMapVeto);
+    io.emit("mapVetoUpdate", savedMapVeto); // Отправляем объект
+    res.status(200).json([savedMapVeto]); // Возвращаем в массиве
 });
 
 app.get("/api/vrs/:id", (req, res) => { // Обработка VRS для GET
@@ -393,37 +393,26 @@ app.post("/api/customfields", async (req, res) => {
     console.log("[API] Received updated custom fields data.");
     await saveDbDataAsync(); // Сохраняем в db.json
     io.emit("customFieldsUpdate", customFieldsData);
-    res.status(200).json(customFieldsData);
+    res.status(200).json(customFieldsData); // Возвращаем объект
 });
 
 // --- НОВЫЕ API для паузы (работают с db.json) ---
-// GET /api/pause - Получить текущие данные паузы
 app.get("/api/pause", (req, res) => {
     console.log("[API] Request for pause data");
-    // Возвращаем данные в формате массива с одним объектом [{...}]
-    res.json([savedPauseData || defaultPauseDataStructure]);
+    res.json([savedPauseData || defaultPauseDataStructure]); // Возвращаем в массиве
 });
-// POST /api/pause - Обновить данные паузы
 app.post("/api/pause", async (req, res) => {
-    // Простая валидация - ожидаем объект с полями pause и lastUpd
     if (!req.body || typeof req.body.pause === 'undefined' || typeof req.body.lastUpd === 'undefined') {
-         console.warn("[API] Received invalid data for POST /api/pause:", req.body);
          return res.status(400).json({ message: "Некорректный формат данных паузы." });
     }
-    // Обновляем данные в памяти
-    savedPauseData = {
-        pause: req.body.pause ?? "", // Используем ?? для обработки null/undefined
-        lastUpd: req.body.lastUpd ?? ""
-    };
+    savedPauseData = { pause: req.body.pause ?? "", lastUpd: req.body.lastUpd ?? "" };
     console.log("[API] Received updated pause data:", savedPauseData);
-    // Сохраняем все данные db.json (включая обновленные данные паузы)
-    await saveDbDataAsync();
-    // Оповещаем всех клиентов об обновлении данных паузы
-    io.emit("pauseUpdate", savedPauseData);
+    await saveDbDataAsync(); // Сохраняем в db.json
+    io.emit("pauseUpdate", savedPauseData); // Отправляем объект
     console.log("[SOCKET] Emitted pauseUpdate.");
-    // Возвращаем обновленные данные (не в массиве)
-    res.status(200).json(savedPauseData);
+    res.status(200).json(savedPauseData); // Возвращаем объект
 });
+
 
 // --- API для команд (работают с data.json) ---
 app.get("/api/teams", (req, res) => { res.json(dataJsonContent); });
@@ -482,7 +471,7 @@ io.on("connection", (socket) => {
   socket.emit("jsonUpdate", savedMatches);
   socket.emit("customFieldsUpdate", customFieldsData);
   socket.emit("vrsUpdate", savedVRS); // Отправляем "сырые" VRS данные
-  socket.emit("mapVetoUpdate", savedMapVeto);
+  socket.emit("mapVetoUpdate", savedMapVeto); // Отправляем объект
   socket.emit("teamsUpdate", dataJsonContent.teams); // Отправляем список команд
   socket.emit("pauseUpdate", savedPauseData); // Отправляем данные паузы
 
