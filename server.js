@@ -1,4 +1,4 @@
-// server.js (Версия без аутентификации, с CRUD для команд и обработкой VRS)
+// server.js (Версия без аутентификации, с CRUD для команд, обработкой VRS и API паузы)
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -64,6 +64,7 @@ const defaultMapVetoStructure = { matchIndex: 1, teams: { TEAM1: {name: "", logo
 const defaultCustomFieldsStructure = { upcomingMatches: "", galaxyBattle: "", tournamentStart: "", tournamentEnd: "", tournamentDay: "", groupStage: "" };
 const defaultTeamStructure = { id: "", name: "", logo: "", score: 0 };
 const defaultDataJsonStructure = { teams: [], players: [] };
+const defaultPauseDataStructure = { pause: "", lastUpd: "" };
 
 // Переменные для хранения данных в памяти сервера
 let savedMatches = [];
@@ -71,6 +72,7 @@ let savedMapVeto = {};
 let savedVRS = {};
 let customFieldsData = {};
 let dataJsonContent = { teams: [], players: [] }; // Данные из data.json
+let savedPauseData = {}; // Данные паузы
 
 // Пути к файлам данных
 const dbFilePath = path.join(__dirname, "db.json");
@@ -84,7 +86,8 @@ function loadDbData() {
             matches: Array(4).fill(null).map(() => ({ ...defaultMatchStructure })),
             mapVeto: { ...defaultMapVetoStructure },
             vrs: { "1": { ...defaultVrsStructure }, "2": { ...defaultVrsStructure }, "3": { ...defaultVrsStructure }, "4": { ...defaultVrsStructure } },
-            customFields: { ...defaultCustomFieldsStructure }
+            customFields: { ...defaultCustomFieldsStructure },
+            pauseData: { ...defaultPauseDataStructure } // Добавляем дефолтные данные паузы
         };
         if (!fs.existsSync(dbFilePath)) {
             fs.writeFileSync(dbFilePath, JSON.stringify(defaultDbData, null, 2), "utf8");
@@ -93,9 +96,11 @@ function loadDbData() {
             savedMapVeto = defaultDbData.mapVeto;
             savedVRS = defaultDbData.vrs;
             customFieldsData = defaultDbData.customFields;
+            savedPauseData = defaultDbData.pauseData; // Загружаем данные паузы
         } else {
             const rawData = fs.readFileSync(dbFilePath, "utf8");
             const jsonData = JSON.parse(rawData);
+            // Загружаем все секции, объединяя с дефолтными
             savedMatches = (jsonData.matches && Array.isArray(jsonData.matches)) ? jsonData.matches.map(m => ({ ...defaultMatchStructure, ...(m || {}) })) : defaultDbData.matches;
             while (savedMatches.length < 4) savedMatches.push({ ...defaultMatchStructure });
             if (savedMatches.length > 4) savedMatches = savedMatches.slice(0, 4);
@@ -111,14 +116,17 @@ function loadDbData() {
                 }
             }
             customFieldsData = { ...defaultCustomFieldsStructure, ...(jsonData.customFields || {}) };
+            savedPauseData = { ...defaultPauseDataStructure, ...(jsonData.pauseData || {}) }; // Загружаем данные паузы
             console.log("[DATA] Data loaded successfully from db.json");
         }
     } catch (error) {
         console.error("[DATA] Error loading data from db.json:", error);
+        // Используем дефолтные данные при ошибке
         savedMatches = Array(4).fill(null).map(() => ({ ...defaultMatchStructure }));
         savedMapVeto = { ...defaultMapVetoStructure };
         savedVRS = { "1": { ...defaultVrsStructure }, "2": { ...defaultVrsStructure }, "3": { ...defaultVrsStructure }, "4": { ...defaultVrsStructure } };
         customFieldsData = { ...defaultCustomFieldsStructure };
+        savedPauseData = { ...defaultPauseDataStructure }; // Используем дефолтные данные паузы
     }
 }
 
@@ -148,14 +156,15 @@ function loadDataJson() {
 loadDbData();
 loadDataJson();
 
-/** Асинхронно сохраняет данные в db.json. */
+/** Асинхронно сохраняет данные в db.json (включая данные паузы) */
 async function saveDbDataAsync() {
   try {
     const dataToSave = {
       matches: savedMatches,
       mapVeto: savedMapVeto,
-      vrs: savedVRS, // Сохраняем сырые данные VRS
-      customFields: customFieldsData
+      vrs: savedVRS,
+      customFields: customFieldsData,
+      pauseData: savedPauseData // Добавляем данные паузы при сохранении
     };
     await fs.promises.writeFile(dbFilePath, JSON.stringify(dataToSave, null, 2), "utf8");
     console.log("[DATA] Data saved successfully to db.json (async)");
@@ -387,80 +396,76 @@ app.post("/api/customfields", async (req, res) => {
     res.status(200).json(customFieldsData);
 });
 
-// --- API для команд (работают с data.json) ---
-
-// GET /api/teams - Получить список команд (и игроков) из data.json
-app.get("/api/teams", (req, res) => {
-  // Возвращаем содержимое dataJsonContent, логотипы уже должны быть относительными
-  res.json(dataJsonContent);
+// --- НОВЫЕ API для паузы (работают с db.json) ---
+// GET /api/pause - Получить текущие данные паузы
+app.get("/api/pause", (req, res) => {
+    console.log("[API] Request for pause data");
+    // Возвращаем данные в формате массива с одним объектом [{...}]
+    res.json([savedPauseData || defaultPauseDataStructure]);
+});
+// POST /api/pause - Обновить данные паузы
+app.post("/api/pause", async (req, res) => {
+    // Простая валидация - ожидаем объект с полями pause и lastUpd
+    if (!req.body || typeof req.body.pause === 'undefined' || typeof req.body.lastUpd === 'undefined') {
+         console.warn("[API] Received invalid data for POST /api/pause:", req.body);
+         return res.status(400).json({ message: "Некорректный формат данных паузы." });
+    }
+    // Обновляем данные в памяти
+    savedPauseData = {
+        pause: req.body.pause ?? "", // Используем ?? для обработки null/undefined
+        lastUpd: req.body.lastUpd ?? ""
+    };
+    console.log("[API] Received updated pause data:", savedPauseData);
+    // Сохраняем все данные db.json (включая обновленные данные паузы)
+    await saveDbDataAsync();
+    // Оповещаем всех клиентов об обновлении данных паузы
+    io.emit("pauseUpdate", savedPauseData);
+    console.log("[SOCKET] Emitted pauseUpdate.");
+    // Возвращаем обновленные данные (не в массиве)
+    res.status(200).json(savedPauseData);
 });
 
-// POST /api/teams - Добавить новую команду в data.json
+// --- API для команд (работают с data.json) ---
+app.get("/api/teams", (req, res) => { res.json(dataJsonContent); });
 app.post("/api/teams", async (req, res) => {
     const newName = req.body.name?.trim();
-    const newLogoRaw = req.body.logo?.trim() ?? ""; // Получаем путь логотипа
-    const newLogoRelative = makeRelativePath(newLogoRaw); // Преобразуем в относительный путь
-
+    const newLogoRelative = makeRelativePath(req.body.logo?.trim() ?? "");
     if (!newName) return res.status(400).json({ message: "Название команды не может быть пустым." });
-
     const newId = Date.now().toString();
-    const newTeam = { id: newId, name: newName, logo: newLogoRelative, score: 0 }; // Сохраняем относительный путь
-
+    const newTeam = { id: newId, name: newName, logo: newLogoRelative, score: 0 };
     if (!Array.isArray(dataJsonContent.teams)) dataJsonContent.teams = [];
     dataJsonContent.teams.push(newTeam);
     console.log(`[API] Added new team: ${newName} (ID: ${newId}, Logo: ${newLogoRelative})`);
-
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем всех клиентов об обновлении списка команд (с относительными путями)
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after adding team.");
-
-    res.status(201).json(newTeam); // Возвращаем созданную команду
+    res.status(201).json(newTeam);
 });
-
-// PUT /api/teams/:id - Обновить имя и/или логотип существующей команды в data.json
 app.put("/api/teams/:id", async (req, res) => {
     const teamId = req.params.id;
     const newName = req.body.name?.trim();
-    const newLogoRaw = req.body.logo?.trim() ?? "";
-    const newLogoRelative = makeRelativePath(newLogoRaw);
-
+    const newLogoRelative = makeRelativePath(req.body.logo?.trim() ?? "");
     if (!newName) return res.status(400).json({ message: "Новое название команды не может быть пустым." });
-
     const teamIndex = dataJsonContent.teams.findIndex(t => t.id === teamId);
     if (teamIndex === -1) return res.status(404).json({ message: `Команда с ID ${teamId} не найдена.` });
-
-    // Обновляем имя и логотип команды
     dataJsonContent.teams[teamIndex].name = newName;
-    dataJsonContent.teams[teamIndex].logo = newLogoRelative; // Сохраняем относительный путь
+    dataJsonContent.teams[teamIndex].logo = newLogoRelative;
     console.log(`[API] Updated team ${teamId} name to: ${newName}, logo to: ${newLogoRelative}`);
-
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем клиентов
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after updating team.");
-
-    res.status(200).json(dataJsonContent.teams[teamIndex]); // Возвращаем обновленную команду
+    res.status(200).json(dataJsonContent.teams[teamIndex]);
 });
-
-// DELETE /api/teams/:id - Удалить команду из data.json
 app.delete("/api/teams/:id", async (req, res) => {
     const teamId = req.params.id;
     const initialLength = dataJsonContent.teams.length;
     dataJsonContent.teams = dataJsonContent.teams.filter(t => t.id !== teamId);
-
     if (dataJsonContent.teams.length === initialLength) return res.status(404).json({ message: `Команда с ID ${teamId} не найдена.` });
-
     console.log(`[API] Deleted team ${teamId}`);
-    await saveDataJsonAsync(); // Сохраняем обновленный data.json
-
-    // Оповещаем клиентов
+    await saveDataJsonAsync();
     io.emit('teamsUpdate', dataJsonContent.teams);
     console.log("[SOCKET] Emitted teamsUpdate after deleting team.");
-
-    res.status(204).send(); // Успех без содержимого
+    res.status(204).send();
 });
 
 
@@ -479,6 +484,7 @@ io.on("connection", (socket) => {
   socket.emit("vrsUpdate", savedVRS); // Отправляем "сырые" VRS данные
   socket.emit("mapVetoUpdate", savedMapVeto);
   socket.emit("teamsUpdate", dataJsonContent.teams); // Отправляем список команд
+  socket.emit("pauseUpdate", savedPauseData); // Отправляем данные паузы
 
   socket.on("disconnect", (reason) => { console.log(`[SOCKET] Client disconnected: ${socket.id}, Reason: ${reason}`); });
   socket.on('error', (error) => { console.error(`[SOCKET] Socket error for ${socket.id}:`, error); });

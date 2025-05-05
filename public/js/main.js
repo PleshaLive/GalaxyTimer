@@ -64,6 +64,21 @@ socket.on("customFieldsUpdate", (newFields) => {
   }
 });
 
+// Обработчик для обновления полей паузы
+socket.on("pauseUpdate", (pauseData) => {
+    console.log("[SOCKET] Received pauseUpdate:", pauseData);
+    const msgInput = document.getElementById('pauseMessageInput');
+    const timeInput = document.getElementById('pauseTimeInput');
+    // Обновляем поля, только если данные существуют
+    if (pauseData) {
+        if (msgInput && msgInput.value !== (pauseData.pause || "")) msgInput.value = pauseData.pause || "";
+        if (timeInput && timeInput.value !== (pauseData.lastUpd || "")) timeInput.value = pauseData.lastUpd || "";
+    } else { // Очищаем поля, если пришли пустые данные
+        if (msgInput) msgInput.value = "";
+        if (timeInput) timeInput.value = "";
+    }
+});
+
 // ========== Функции обновления UI ==========
 
 /**
@@ -427,6 +442,33 @@ async function loadCustomFieldsFromServer() {
     }
 }
 
+/** Загружает данные паузы с сервера и обновляет UI. */
+async function loadPauseDataFromServer() {
+     console.log("[Data] Loading pause data...");
+    try {
+        const response = await fetch("/api/pause"); // Запрос к эндпоинту паузы
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const dataArray = await response.json(); // Ожидаем массив [{...}]
+        console.log("[Data] Pause data loaded:", dataArray);
+        const pauseData = (dataArray && dataArray.length > 0) ? dataArray[0] : {}; // Берем первый элемент или пустой объект
+
+        // Обновляем поля ввода
+        const msgInput = document.getElementById('pauseMessageInput');
+        const timeInput = document.getElementById('pauseTimeInput');
+        if (msgInput) msgInput.value = pauseData.pause || "";
+        if (timeInput) timeInput.value = pauseData.lastUpd || "";
+
+    } catch (err) {
+        console.error("[Data] Ошибка загрузки данных паузы:", err);
+        // Можно очистить поля при ошибке
+         const msgInput = document.getElementById('pauseMessageInput');
+         const timeInput = document.getElementById('pauseTimeInput');
+         if (msgInput) msgInput.value = "";
+         if (timeInput) timeInput.value = "";
+    }
+}
+
+
 // ========== Вспомогательные функции ==========
 
 /** Вычисляет и отображает текущий день турнира. */
@@ -498,6 +540,17 @@ function gatherCustomFieldsData() {
     };
 }
 
+/** Собирает данные из полей паузы. */
+function gatherPauseData() {
+    const message = document.getElementById("pauseMessageInput")?.value ?? "";
+    const time = document.getElementById("pauseTimeInput")?.value ?? "";
+    return {
+        pause: message,
+        lastUpd: time // Используем ключ как в JSON примере
+    };
+}
+
+
 // ========== Функции сохранения данных ==========
 
 /**
@@ -509,7 +562,7 @@ function gatherCustomFieldsData() {
 function setButtonState(button, state, message = null) {
     if (!button) return; // Проверка на существование кнопки
     // Сохраняем или получаем исходный текст кнопки из data-атрибута
-    const originalText = button.dataset.originalText || 'SAVE';
+    const originalText = button.dataset.originalText || 'SAVE'; // Используем SAVE как дефолт
     button.disabled = (state === 'saving'); // Блокируем кнопку в состоянии 'saving'
     // Сначала убираем все классы состояний
     button.classList.remove('saving', 'saved', 'error');
@@ -659,6 +712,33 @@ async function saveHeaderData(buttonElement) {
     }
 }
 
+/**
+ * Собирает и отправляет данные паузы на сервер.
+ * @param {HTMLButtonElement} buttonElement - Кнопка сохранения паузы.
+ */
+async function savePauseData(buttonElement) {
+    console.log(`[Save] Saving Pause data...`);
+    setButtonState(buttonElement, 'saving'); // Устанавливаем состояние "сохранение"
+    try {
+        const pauseData = gatherPauseData(); // Собираем данные паузы
+        console.log(`[Save] Pause Data:`, pauseData);
+        // Отправляем POST запрос на новый эндпоинт /api/pause
+        await saveData('/api/pause', pauseData, 'POST');
+        console.log(`[Save] Pause data saved successfully.`);
+        // Устанавливаем состояние "сохранено"
+        setButtonState(buttonElement, 'saved');
+    } catch (error) {
+        // В случае ошибки выводим сообщение и устанавливаем состояние "ошибка"
+        console.error(`[Save] Error saving Pause data:`, error);
+        setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    } finally {
+         // Гарантируем, что кнопка разблокирована
+         if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
+             setButtonState(buttonElement, 'idle');
+         }
+    }
+}
+
 
 // ========== Привязка обработчиков к кнопкам ==========
 
@@ -703,6 +783,18 @@ function setupSaveButtonListeners() {
         // Предупреждение, если кнопка не найдена по ID
         console.warn("[Init] Save Header button (id='saveHeaderButton') not found.");
     }
+
+    // Обработчик для кнопки сохранения паузы
+    const savePauseButton = document.getElementById('savePauseButton');
+    if (savePauseButton) {
+        savePauseButton.dataset.originalText = savePauseButton.textContent; // Сохраняем исходный текст
+        // Привязываем обработчик клика, передавая кнопку
+        savePauseButton.addEventListener('click', () => savePauseData(savePauseButton));
+        console.log("[Init] Save listener attached for Pause.");
+    } else {
+        // Предупреждение, если кнопка не найдена по ID
+        console.warn("[Init] Save Pause button (id='savePauseButton') not found.");
+    }
 }
 
 
@@ -721,8 +813,9 @@ window.addEventListener("DOMContentLoaded", async () => {
       await loadRawVRSData(); // Загружаем сырые данные VRS
       await loadCustomFieldsFromServer(); // Загружаем данные хедера
       await loadMapVetoFromServer();
+      await loadPauseDataFromServer(); // Загружаем данные паузы
 
-      // 3. Привязываем обработчики к кнопкам сохранения (теперь, когда все загружено)
+      // 3. Привязываем обработчики ко ВСЕМ кнопкам сохранения (теперь, когда все загружено)
       setupSaveButtonListeners();
 
       console.log("DOMContentLoaded: Initial data loading and listener setup complete.");

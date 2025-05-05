@@ -13,6 +13,8 @@
   --color-live: #f1c40f;   /* Статус LIVE */
   --color-upcom: #3498db;  /* Статус UPCOM */
   --color-error: #e74c3c;   /* Ошибка / Бан */
+  --color-edit: #f39c12; /* Оранжевый для редактирования */
+
 
   --font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   --font-size-base: 14px;
@@ -636,7 +638,8 @@ label {
 /* ========== Кнопки сохранения ========== */
 .save-match-button,
 .save-veto-button,
-.save-header-button { /* Добавляем кнопку хедера */
+.save-header-button,
+.save-pause-button { /* Добавляем кнопку паузы */
   display: block;
   width: auto; /* Автоматическая ширина по контенту */
   min-width: 150px; /* Минимальная ширина для читаемости */
@@ -682,10 +685,22 @@ label {
   background: linear-gradient(100deg, #ff9a8b 0%, #ff6a88 100%); /* Другой градиент */
 }
 
+/* Кнопка сохранения паузы */
+.save-pause-button {
+  margin: 0; /* Убираем авто-margin */
+  margin-left: var(--spacing-md); /* Отступ слева от поля времени */
+  align-self: flex-end; /* Выравниваем по нижнему краю */
+  background: linear-gradient(100deg, #fbc2eb 0%, #a6c1ee 100%); /* Другой градиент */
+  color: #333; /* Темный текст для светлого фона */
+  height: 40px; /* Выровняем высоту с инпутами */
+  line-height: calc(40px - var(--spacing-sm)*2); /* Корректируем line-height */
+}
+
 
 .save-match-button:hover,
 .save-veto-button:hover,
-.save-header-button:hover {
+.save-header-button:hover,
+.save-pause-button:hover {
   filter: brightness(1.1); /* Немного ярче при наведении */
   transform: scale(1.02); /* Небольшое увеличение */
   box-shadow: 0 0 10px rgba(9, 132, 227, 0.4); /* Тень при наведении */
@@ -693,11 +708,15 @@ label {
 .save-header-button:hover {
     box-shadow: 0 0 10px rgba(255, 106, 136, 0.5); /* Розовая тень для хедера */
 }
+.save-pause-button:hover {
+    box-shadow: 0 0 10px rgba(166, 193, 238, 0.5); /* Светлая тень для паузы */
+}
 
 
 .save-match-button:active,
 .save-veto-button:active,
-.save-header-button:active {
+.save-header-button:active,
+.save-pause-button:active {
   transform: scale(0.99); /* Небольшое уменьшение при клике */
   filter: brightness(0.95); /* Немного темнее при клике */
 }
@@ -706,22 +725,61 @@ label {
 .save-match-button.saving,
 .save-veto-button.saving,
 .save-header-button.saving,
+.save-pause-button.saving,
 .save-match-button:disabled,
 .save-veto-button:disabled,
-.save-header-button:disabled {
+.save-header-button:disabled,
+.save-pause-button:disabled {
     background: var(--color-text-muted); /* Серый фон */
     cursor: wait; /* Курсор ожидания */
     filter: brightness(0.8); /* Приглушаем цвет */
     transform: scale(1); /* Убираем hover эффект */
     box-shadow: var(--shadow-sm); /* Убираем hover тень */
+    color: #fff; /* Белый текст на сером фоне */
 }
 .save-match-button.saved,
 .save-veto-button.saved,
-.save-header-button.saved {
+.save-header-button.saved,
+.save-pause-button.saved {
     background: var(--color-success); /* Зеленый фон при успехе */
+    color: #fff;
 }
 .save-match-button.error,
 .save-veto-button.error,
-.save-header-button.error {
+.save-header-button.error,
+.save-pause-button.error {
     background: var(--color-error); /* Красный фон при ошибке */
+    color: #fff;
+}
+
+/* ========== Блок управления паузой в хедере ========== */
+.pause-controls {
+    width: 100%; /* Занимает всю ширину для переноса */
+    border-top: 1px solid var(--color-border); /* Линия сверху для отделения */
+    padding-top: var(--spacing-md); /* Отступ сверху */
+    margin-top: var(--spacing-md); /* Отступ от предыдущих блоков */
+    gap: var(--spacing-sm) var(--spacing-md); /* Отступы между элементами */
+    align-items: flex-end; /* Выравнивание по низу */
+    /* Используем flex для расположения элементов */
+    display: flex;
+    flex-wrap: wrap; /* Разрешаем перенос */
+}
+
+.pause-controls label {
+    margin-bottom: 0; /* Убираем отступ у лейблов */
+    white-space: nowrap;
+    align-self: center; /* Центрируем лейблы по вертикали */
+    margin-right: var(--spacing-xs); /* Небольшой отступ справа от лейбла */
+}
+
+.pause-controls .pause-message {
+    flex-grow: 3; /* Делаем поле сообщения шире */
+    min-width: 250px; /* Минимальная ширина */
+}
+
+.pause-controls .pause-time {
+    flex-grow: 1;
+    min-width: 80px; /* Меньшая ширина для времени */
+    max-width: 100px;
+    text-align: center;
 }
