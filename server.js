@@ -1,4 +1,4 @@
-// server.js (Версия без аутентификации, с обновленной обработкой VRS для GET /api/vrs/:id)
+// server.js (Версия без аутентификации, с обработкой VRS и добавлением 'pt')
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
@@ -7,6 +7,7 @@ const { Server: SocketIOServer } = require("socket.io");
 
 // Создаем приложение Express
 const app = express();
+// Используем переменную окружения для порта или 3000 по умолчанию
 const port = process.env.PORT || 3000;
 
 // Логирование входящих запросов
@@ -21,8 +22,8 @@ app.get("/health", (req, res) => {
 });
 
 // Middleware для обработки данных форм и JSON
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: false })); // Для application/x-www-form-urlencoded
+app.use(express.json()); // Для обработки application/json
 
 // Middleware для раздачи статических файлов из папки 'public'
 app.use(express.static(path.join(__dirname, "public")));
@@ -127,7 +128,7 @@ async function saveDataToFileAsync() {
     const dataToSave = {
       matches: savedMatches,
       mapVeto: savedMapVeto,
-      vrs: savedVRS,
+      vrs: savedVRS, // Сохраняем "сырые" данные VRS
       customFields: customFieldsData
     };
     await fs.promises.writeFile(dbFilePath, JSON.stringify(dataToSave, null, 2), "utf8");
@@ -146,6 +147,20 @@ function formatWinPoints(value) {
   if (isNaN(num)) return value;
   return (num >= 0 ? "+" : "") + num;
 }
+
+/** Добавляет "pt" к числовому значению, если оно не пустое. */
+function formatPointsWithPt(value) {
+    if (value === "" || value === null || value === undefined) return "";
+    // Проверяем, является ли значение числом или строкой, представляющей число
+    const num = Number(value);
+    if (isNaN(num)) {
+        // Если это не число (например, уже содержит "pt"), возвращаем как есть
+        return value;
+    }
+    // Иначе добавляем "pt"
+    return `${value}pt`;
+}
+
 
 /** Получает путь к логотипу команды в зависимости от статуса матча. */
 function getTeamLogoPath(match, teamKey) {
@@ -175,7 +190,7 @@ function getVRSResponse(matchId) {
     const team1Logo = getTeamLogoPath(match, 'TEAM1');
     const team2Logo = getTeamLogoPath(match, 'TEAM2');
 
-    // Структура для пустого ответа (используется в разных местах)
+    // Структура для пустого ответа
     const emptyBlock = {
         TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", currentPoints: "", logo: team1Logo },
         TEAM2: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", currentPoints: "", logo: team2Logo }
@@ -186,18 +201,17 @@ function getVRSResponse(matchId) {
     let winBgTeam1 = "C:\\projects\\NewTimer\\files\\idle.png";
     let winBgTeam2 = "C:\\projects\\NewTimer\\files\\idle.png";
 
-    // Определяем, какой статус у матча
     const isFinished = match.FINISHED_MATCH_STATUS === "FINISHED";
 
     if (isFinished) {
         // --- Если матч ЗАВЕРШЕН ---
-        // Блок UPCOM должен быть пустым (кроме лого)
+        // Блок UPCOM делаем пустым (кроме лого)
         upcomData = {
-             TEAM1: { ...emptyBlock.TEAM1, logo: team1Logo }, // Сохраняем лого
+             TEAM1: { ...emptyBlock.TEAM1, logo: team1Logo },
              TEAM2: { ...emptyBlock.TEAM2, logo: team2Logo }
         };
 
-        // Блок FINISHED заполняется в зависимости от победителя
+        // Блок FINISHED заполняется
         const winnerName = match.TEAMWINNER;
         const team1Name = match.FINISHED_TEAM1;
         const team2Name = match.FINISHED_TEAM2;
@@ -210,7 +224,8 @@ function getVRSResponse(matchId) {
                     winPoints: formatWinPoints(rawVrsData.TEAM1.winPoints),
                     losePoints: "",
                     rank: rawVrsData.TEAM1.rank ?? "",
-                    currentPoints_win: rawVrsData.TEAM1.currentPoints ?? "",
+                    // ИЗМЕНЕНИЕ: Добавляем "pt"
+                    currentPoints_win: formatPointsWithPt(rawVrsData.TEAM1.currentPoints),
                     currentPoints_lose: "",
                     logo: team1Logo
                 },
@@ -219,7 +234,8 @@ function getVRSResponse(matchId) {
                     losePoints: rawVrsData.TEAM2.losePoints !== null ? -Math.abs(rawVrsData.TEAM2.losePoints) : "",
                     rank: rawVrsData.TEAM2.rank ?? "",
                     currentPoints_win: "",
-                    currentPoints_lose: rawVrsData.TEAM2.currentPoints ?? "",
+                    // ИЗМЕНЕНИЕ: Добавляем "pt"
+                    currentPoints_lose: formatPointsWithPt(rawVrsData.TEAM2.currentPoints),
                     logo: team2Logo
                 }
             };
@@ -232,44 +248,47 @@ function getVRSResponse(matchId) {
                     losePoints: rawVrsData.TEAM1.losePoints !== null ? -Math.abs(rawVrsData.TEAM1.losePoints) : "",
                     rank: rawVrsData.TEAM1.rank ?? "",
                     currentPoints_win: "",
-                    currentPoints_lose: rawVrsData.TEAM1.currentPoints ?? "",
+                    // ИЗМЕНЕНИЕ: Добавляем "pt"
+                    currentPoints_lose: formatPointsWithPt(rawVrsData.TEAM1.currentPoints),
                     logo: team1Logo
                 },
                 TEAM2: {
                     winPoints: formatWinPoints(rawVrsData.TEAM2.winPoints),
                     losePoints: "",
                     rank: rawVrsData.TEAM2.rank ?? "",
-                    currentPoints_win: rawVrsData.TEAM2.currentPoints ?? "",
+                    // ИЗМЕНЕНИЕ: Добавляем "pt"
+                    currentPoints_win: formatPointsWithPt(rawVrsData.TEAM2.currentPoints),
                     currentPoints_lose: "",
                     logo: team2Logo
                 }
             };
-        } else { // Победитель не определен или не совпадает
-             finishedData = emptyBlock; // Возвращаем пустой блок FINISHED
+        } else { // Победитель не определен
+             finishedData = emptyBlock;
         }
 
     } else {
         // --- Если матч НЕ ЗАВЕРШЕН (UPCOM или LIVE) ---
-        // Блок UPCOM заполняется данными
+        // Блок UPCOM заполняется
         upcomData = {
             TEAM1: {
                 winPoints: formatWinPoints(rawVrsData.TEAM1.winPoints),
                 losePoints: rawVrsData.TEAM1.losePoints !== null ? -Math.abs(rawVrsData.TEAM1.losePoints) : "",
                 rank: rawVrsData.TEAM1.rank ?? "",
-                currentPoints: rawVrsData.TEAM1.currentPoints ?? "", // Используем поле currentPoints
+                // ИЗМЕНЕНИЕ: Добавляем "pt" и к currentPoints в UPCOM блоке
+                currentPoints: formatPointsWithPt(rawVrsData.TEAM1.currentPoints),
                 logo: team1Logo
             },
             TEAM2: {
                 winPoints: formatWinPoints(rawVrsData.TEAM2.winPoints),
                 losePoints: rawVrsData.TEAM2.losePoints !== null ? -Math.abs(rawVrsData.TEAM2.losePoints) : "",
                 rank: rawVrsData.TEAM2.rank ?? "",
-                currentPoints: rawVrsData.TEAM2.currentPoints ?? "",
+                 // ИЗМЕНЕНИЕ: Добавляем "pt" и к currentPoints в UPCOM блоке
+                currentPoints: formatPointsWithPt(rawVrsData.TEAM2.currentPoints),
                 logo: team2Logo
             }
         };
         // Блок FINISHED остается пустым
         finishedData = emptyBlock;
-        // Фоны остаются дефолтными (idle)
     }
 
     // Возвращаем итоговую структуру
