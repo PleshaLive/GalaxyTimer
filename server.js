@@ -1,9 +1,10 @@
-// server.js
+// server.js (Версия без аутентификации)
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
+// Убираем cookieParser и session, так как они больше не нужны
+// const cookieParser = require("cookie-parser");
+// const session = require("express-session");
 const http = require("http");
 const { Server: SocketIOServer } = require("socket.io");
 
@@ -25,99 +26,13 @@ app.get("/health", (req, res) => {
 
 // Middleware для обработки данных форм и JSON
 app.use(express.urlencoded({ extended: false })); // Для application/x-www-form-urlencoded
-app.use(cookieParser()); // Для работы с cookies
 app.use(express.json()); // Для обработки application/json
 
-// Настройка сессий
-const sessionMiddleware = session({
-  // Секрет лучше хранить в переменных окружения и сделать его сложнее
-  secret: process.env.SESSION_SECRET || "your_very_strong_and_secret_session_key", // !!! ЗАМЕНИТЕ ЭТОТ СЕКРЕТ !!!
-  resave: false, // Не пересохранять сессию, если она не изменилась
-  saveUninitialized: false, // Не сохранять пустые сессии
-  cookie: {
-      secure: process.env.NODE_ENV === 'production', // Использовать secure cookies (HTTPS) в продакшене
-      httpOnly: true, // Защита от XSS: cookie недоступны из JavaScript на клиенте
-      maxAge: 24 * 60 * 60 * 1000 // Время жизни сессии (например, 1 день)
-  }
-});
-app.use(sessionMiddleware); // Применяем middleware сессий
-
-// Роуты для аутентификации (логин/выход)
-app.get("/login", (req, res) => {
-  // Если пользователь уже аутентифицирован, перенаправляем на главную
-  if (req.session.authenticated) return res.redirect("/");
-  // Отдаем страницу логина
-  res.sendFile(path.join(__dirname, "public", "login.html"));
-});
-
-app.post("/login", (req, res) => {
-  const { username, password } = req.body;
-  // Получаем учетные данные администратора из переменных окружения или используем дефолтные
-  const adminUser = process.env.ADMIN_USER || "StarGalaxy";
-  const adminPass = process.env.ADMIN_PASS || "FuckTheWorld1996"; // !!! Настоятельно рекомендуется сменить пароль
-
-  // Проверяем учетные данные
-  if (username === adminUser && password === adminPass) {
-    // Успешный вход: устанавливаем флаг в сессии и сохраняем имя пользователя
-    req.session.authenticated = true;
-    req.session.username = username;
-    console.log(`[AUTH] User ${username} logged in successfully.`);
-    // Перенаправляем на главную страницу
-    return res.redirect("/");
-  }
-  // Неудачный вход: логируем попытку и перенаправляем обратно на логин с флагом ошибки
-  console.log(`[AUTH] Failed login attempt for username: ${username}`);
-  res.redirect("/login?error=1");
-});
-
-app.get('/logout', (req, res) => {
-    const username = req.session.username || 'unknown user';
-    // Уничтожаем сессию
-    req.session.destroy(err => {
-        if (err) {
-            console.error("[AUTH] Error destroying session:", err);
-        }
-        console.log(`[AUTH] User ${username} logged out.`);
-        // Очищаем cookie сессии у клиента
-        res.clearCookie('connect.sid'); // Имя cookie по умолчанию для express-session
-        // Перенаправляем на страницу логина
-        res.redirect('/login');
-    });
-});
-
-
-// Middleware для проверки авторизации для всех последующих роутов
-app.use((req, res, next) => {
-  // Список путей, доступных без авторизации
-  const allowedPaths = ["/login", "/logout", "/health", "/login.css"];
-  // Проверка, является ли запрос запросом к API или Socket.IO
-  const isApiOrSocket = req.path.startsWith('/api/') || req.path.startsWith('/socket.io/');
-  // Упрощенная проверка статических файлов (все GET, кроме / и .html)
-  const isStaticAsset = req.method === 'GET' && req.path !== '/' && !req.path.endsWith('.html');
-  // Разрешаем доступ к логотипам
-  const isLogoRequest = req.path.startsWith('/logos/');
-
-  // Если путь разрешен, или это API/Socket.IO, или статика, или логотип, или пользователь авторизован - пропускаем дальше
-  if (allowedPaths.includes(req.path) || isApiOrSocket || isStaticAsset || isLogoRequest || req.session.authenticated) {
-    return next();
-  }
-
-  // Если доступ запрещен - перенаправляем на логин
-  console.log(`[AUTH] Unauthorized access attempt to ${req.path} by ${req.ip}, redirecting to login.`);
-  res.redirect("/login");
-});
-
-
 // Middleware для раздачи статических файлов из папки 'public'
-// Должен быть ПОСЛЕ middleware авторизации, чтобы защитить index.html
 app.use(express.static(path.join(__dirname, "public")));
 
-// Роут для корневой страницы '/'
+// Роут для корневой страницы '/' - теперь всегда отдает index.html
 app.get("/", (req, res) => {
-  if (!req.session.authenticated) { // Дополнительная проверка на всякий случай
-      return res.redirect('/login');
-  }
-  // Отдаем главный HTML файл
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
@@ -131,77 +46,87 @@ const defaultTeam1LogoPath = "/logos/default1.png";
 const defaultTeam2LogoPath = "/logos/default2.png";
 
 // Дефолтные структуры данных (для инициализации и слияния при загрузке)
+// Полная структура для одного матча
 const defaultMatchStructure = {
     UPCOM_MATCH_STATUS: "UPCOM", UPCOM_TIME: "", UPCOM_TEAM1: "", UPCOM_TEAM2: "", UPCOM_TEAM1_LOGO: defaultTeam1LogoPath, UPCOM_TEAM2_LOGO: defaultTeam2LogoPath, UPCOM_MAP1: "inferno", UPCOM_MAP1_SCORE: "", UPCOM_MAP2: "mirage", UPCOM_MAP2_SCORE: "", UPCOM_MAP3: "nuke", UPCOM_MAP3_SCORE: "", UPCOM_Cest: "", UPCOM_RectangleUP: "", UPCOM_RectangleLOW: "", UPCOM_vs_mini: "", UPCOM_vs_big: "", UPCOM_next: "", UPCOM_next_photo: "",
     LIVE_MATCH_STATUS: "", LIVE_TIME: "", LIVE_TEAM1: "", LIVE_TEAM2: "", LIVE_TEAM1_LOGO: defaultTeam1LogoPath, LIVE_TEAM2_LOGO: defaultTeam2LogoPath, LIVE_MAP1: "", LIVE_MAP1_SCORE: "", LIVE_MAP2: "", LIVE_MAP2_SCORE: "", LIVE_MAP3: "", LIVE_MAP3_SCORE: "", LIVE_Cest: "", LIVE_VS: "", LIVE_STATUS: "", LIVE_BG: "", LIVE_RectangleUP: "", LIVE_RectangleLOW: "",
     FINISHED_MATCH_STATUS: "", FINISHED_TIME: "", FINISHED_TEAM1: "", FINISHED_TEAM2: "", FINISHED_TEAM1_LOGO: defaultTeam1LogoPath, FINISHED_TEAM2_LOGO: defaultTeam2LogoPath, FINISHED_MAP1: "", FINISHED_MAP1_SCORE: "", FINISHED_MAP2: "", FINISHED_MAP2_SCORE: "", FINISHED_MAP3: "", FINISHED_MAP3_SCORE: "", FIN_RectangleUP: "", FIN_RectangleLOW: "",
     MP1_UPC: "", MP2_UPC: "", MP3_UPC: "", MP1_LIVE: "", MP2_LIVE: "", MP3_LIVE: "", MP1_FIN: "", MP2_FIN: "", MP3_FIN: "", Fin_cest: "", FIN_Result: "", FIN_VICTORY: "", TEAMWINNER: "", TEAMWINNER_LOGO: defaultTeam1LogoPath,
-    // Добавляем ключи для логотипов матчей и карт с дефолтными значениями
+    // Ключи для логотипов матчей и карт
     FINISHED_TEAM1_LOGO_MATCH1: defaultTeam1LogoPath, FINISHED_TEAM2_LOGO_MATCH1: defaultTeam2LogoPath, LIVE_TEAM1_LOGO_MATCH1: defaultTeam1LogoPath, LIVE_TEAM2_LOGO_MATCH1: defaultTeam2LogoPath,
     FINISHED_TEAM1_LOGO_MATCH2: defaultTeam1LogoPath, FINISHED_TEAM2_LOGO_MATCH2: defaultTeam2LogoPath, LIVE_TEAM1_LOGO_MATCH2: defaultTeam1LogoPath, LIVE_TEAM2_LOGO_MATCH2: defaultTeam2LogoPath,
     FINISHED_TEAM1_LOGO_MATCH3: defaultTeam1LogoPath, FINISHED_TEAM2_LOGO_MATCH3: defaultTeam2LogoPath, LIVE_TEAM1_LOGO_MATCH3: defaultTeam1LogoPath, LIVE_TEAM2_LOGO_MATCH3: defaultTeam2LogoPath,
     FINISHED_TEAM1_LOGO_MATCH4: defaultTeam1LogoPath, FINISHED_TEAM2_LOGO_MATCH4: defaultTeam2LogoPath, LIVE_TEAM1_LOGO_MATCH4: defaultTeam1LogoPath, LIVE_TEAM2_LOGO_MATCH4: defaultTeam2LogoPath,
     MAP1_TEAM1logo: defaultTeam1LogoPath, MAP2_TEAM1logo: defaultTeam1LogoPath, MAP3_TEAM1logo: defaultTeam1LogoPath, MAP1_TEAM2logo: defaultTeam2LogoPath, MAP2_TEAM2logo: defaultTeam2LogoPath, MAP3_TEAM2logo: defaultTeam2LogoPath
 };
+// Дефолтная структура VRS для одного матча
 const defaultVrsStructure = { TEAM1: { winPoints: null, losePoints: null, rank: null, currentPoints: null }, TEAM2: { winPoints: null, losePoints: null, rank: null, currentPoints: null } };
+// Дефолтная структура Map Veto
 const defaultMapVetoStructure = { matchIndex: 1, teams: { TEAM1: {name: "", logo: ""}, TEAM2: {name: "", logo: ""} }, veto: Array(7).fill({action: "BAN", map: "inferno", team: "TEAM1", side: "-"}) };
+// Дефолтная структура Custom Fields
 const defaultCustomFieldsStructure = { upcomingMatches: "", galaxyBattle: "", tournamentStart: "", tournamentEnd: "", tournamentDay: "", groupStage: "" };
 
-// Переменные для хранения данных в памяти
+// Переменные для хранения данных в памяти сервера
 let savedMatches = [];
 let savedMapVeto = {};
 let savedVRS = {};
 let customFieldsData = {};
 
-// Путь к файлу базы данных
+// Путь к файлу базы данных JSON
 const dbFilePath = path.join(__dirname, "db.json");
 
 // --- Функции работы с файлом ---
-/** Загружает данные из db.json или создает файл с дефолтными данными. */
+/**
+ * Загружает данные из db.json. Если файл не существует, создает его с дефолтными данными.
+ * Гарантирует, что загруженные данные имеют правильную структуру.
+ */
 function loadDataFromFile() {
   try {
-    // Создаем объект с полной дефолтной структурой
+    // Создаем объект с полной дефолтной структурой данных
     const defaultData = {
-        matches: Array(4).fill(null).map(() => ({ ...defaultMatchStructure })),
-        mapVeto: { ...defaultMapVetoStructure },
-        vrs: {
+        matches: Array(4).fill(null).map(() => ({ ...defaultMatchStructure })), // Массив из 4 копий дефолтной структуры матча
+        mapVeto: { ...defaultMapVetoStructure }, // Копия дефолтной структуры Map Veto
+        vrs: { // Объект с дефолтной структурой VRS для каждого из 4 матчей
             "1": { ...defaultVrsStructure }, "2": { ...defaultVrsStructure },
             "3": { ...defaultVrsStructure }, "4": { ...defaultVrsStructure }
         },
-        customFields: { ...defaultCustomFieldsStructure }
+        customFields: { ...defaultCustomFieldsStructure } // Копия дефолтной структуры Custom Fields
     };
 
-    // Если файл не существует, создаем его с дефолтными данными
+    // Проверяем, существует ли файл db.json
     if (!fs.existsSync(dbFilePath)) {
+      // Если файл не существует, создаем его и записываем дефолтные данные
       fs.writeFileSync(dbFilePath, JSON.stringify(defaultData, null, 2), "utf8");
       console.log(`[DATA] Created default db file at ${dbFilePath}`);
-      // Загружаем дефолтные данные в переменные
+      // Загружаем дефолтные данные в переменные в памяти
       savedMatches = defaultData.matches;
       savedMapVeto = defaultData.mapVeto;
       savedVRS = defaultData.vrs;
       customFieldsData = defaultData.customFields;
     } else {
-      // Если файл существует, читаем его
+      // Если файл существует, читаем его содержимое
       const rawData = fs.readFileSync(dbFilePath, "utf8");
-      const jsonData = JSON.parse(rawData); // Парсим JSON
+      const jsonData = JSON.parse(rawData); // Парсим JSON из файла
 
-      // Загружаем данные, объединяя с дефолтной структурой для гарантии наличия всех полей
-      // Используем || [], чтобы избежать ошибок, если jsonData.matches не массив
+      // Загружаем данные из файла, объединяя их с дефолтной структурой.
+      // Это гарантирует, что все необходимые поля будут присутствовать, даже если их нет в файле.
       savedMatches = (jsonData.matches && Array.isArray(jsonData.matches))
-          ? jsonData.matches.map(m => ({ ...defaultMatchStructure, ...(m || {}) })) // Объединяем каждый матч
-          : defaultData.matches;
-      // Гарантируем, что у нас ровно 4 матча
+          ? jsonData.matches.map(m => ({ ...defaultMatchStructure, ...(m || {}) })) // Объединяем каждый объект матча
+          : defaultData.matches; // Если в файле нет matches, используем дефолтный массив
+      // Гарантируем, что у нас всегда ровно 4 матча
       while (savedMatches.length < 4) savedMatches.push({ ...defaultMatchStructure });
-      if (savedMatches.length > 4) savedMatches = savedMatches.slice(0, 4);
+      if (savedMatches.length > 4) savedMatches = savedMatches.slice(0, 4); // Обрезаем, если больше 4
 
-      // Загружаем Map Veto, объединяя с дефолтной структурой
+      // Загружаем Map Veto
       savedMapVeto = { ...defaultMapVetoStructure, ...(jsonData.mapVeto || {}) };
-      // Загружаем VRS, гарантируя наличие ключей 1-4 и структуру TEAM1/TEAM2
-      savedVRS = { ...defaultData.vrs }; // Начинаем с дефолтной
+      // Загружаем VRS
+      savedVRS = { ...defaultData.vrs }; // Начинаем с дефолтной структуры
       if (jsonData.vrs && typeof jsonData.vrs === 'object') {
-          for (const key in savedVRS) { // Обновляем только существующие ключи (1-4)
+          // Обновляем только существующие ключи (1-4), объединяя с дефолтной структурой
+          for (const key in savedVRS) {
               if (jsonData.vrs[key]) {
                   savedVRS[key] = { ...defaultVrsStructure, ...(jsonData.vrs[key] || {}) };
+                  // Глубокое объединение для TEAM1 и TEAM2
                   savedVRS[key].TEAM1 = { ...defaultVrsStructure.TEAM1, ...(jsonData.vrs[key].TEAM1 || {}) };
                   savedVRS[key].TEAM2 = { ...defaultVrsStructure.TEAM2, ...(jsonData.vrs[key].TEAM2 || {}) };
               }
@@ -215,6 +140,7 @@ function loadDataFromFile() {
       // Обработка ошибок чтения файла или парсинга JSON
       console.error("[DATA] Error loading data from db.json:", error);
       // В случае ошибки используем дефолтные данные, чтобы сервер мог продолжить работу
+      // Инициализируем переменные дефолтными структурами
       savedMatches = Array(4).fill(null).map(() => ({ ...defaultMatchStructure }));
       savedMapVeto = { ...defaultMapVetoStructure };
       savedVRS = { "1": { ...defaultVrsStructure }, "2": { ...defaultVrsStructure }, "3": { ...defaultVrsStructure }, "4": { ...defaultVrsStructure } };
@@ -225,17 +151,21 @@ function loadDataFromFile() {
 // Вызываем загрузку данных при старте сервера
 loadDataFromFile();
 
-/** Асинхронно сохраняет текущие данные (savedMatches, savedMapVeto и т.д.) в db.json. */
+/**
+ * Асинхронно сохраняет текущие данные (savedMatches, savedMapVeto и т.д.)
+ * в файл db.json. Использует асинхронную запись для предотвращения блокировки.
+ */
 async function saveDataToFileAsync() {
   try {
-    // Создаем объект для сохранения
+    // Создаем объект для сохранения с текущими данными из памяти
     const dataToSave = {
       matches: savedMatches,
       mapVeto: savedMapVeto,
       vrs: savedVRS,
       customFields: customFieldsData
     };
-    // Асинхронно записываем данные в файл
+    // Асинхронно записываем данные в файл db.json, преобразуя объект в JSON строку
+    // null, 2 используется для форматирования JSON с отступами для читаемости
     await fs.promises.writeFile(dbFilePath, JSON.stringify(dataToSave, null, 2), "utf8");
     console.log("[DATA] Data saved successfully to db.json (async)");
   } catch (error) {
@@ -251,73 +181,76 @@ async function saveDataToFileAsync() {
 // --- API для матчей ---
 // GET /api/matchdata - Получить данные всех матчей
 app.get("/api/matchdata", (req, res) => {
-  res.json(savedMatches);
+  res.json(savedMatches); // Возвращаем массив данных всех матчей
 });
 
-// GET /api/matchdata/:matchIndex - Получить данные одного матча
+// GET /api/matchdata/:matchIndex - Получить данные одного конкретного матча
 app.get("/api/matchdata/:matchIndex", (req, res) => {
-  const index = parseInt(req.params.matchIndex, 10) - 1;
+  const index = parseInt(req.params.matchIndex, 10) - 1; // Преобразуем индекс из строки в число (0-3)
+  // Проверяем корректность индекса
   if (isNaN(index) || index < 0 || index >= savedMatches.length) {
     return res.status(404).json({ message: `Матч с индексом ${req.params.matchIndex} не найден.` });
   }
   res.json(savedMatches[index]); // Возвращаем объект одного матча
 });
 
-// PUT /api/matchdata/:matchIndex - Обновить данные одного матча
-app.put("/api/matchdata/:matchIndex", async (req, res) => { // Делаем async
-    const index = parseInt(req.params.matchIndex, 10) - 1;
+// PUT /api/matchdata/:matchIndex - Обновить данные одного конкретного матча
+app.put("/api/matchdata/:matchIndex", async (req, res) => { // Делаем обработчик асинхронным
+    const index = parseInt(req.params.matchIndex, 10) - 1; // Получаем индекс матча из URL
     // Проверка корректности индекса
     if (isNaN(index) || index < 0 || index >= savedMatches.length) {
         console.warn(`[API] Invalid match index for PUT /api/matchdata: ${req.params.matchIndex}`);
         return res.status(404).json({ message: `Матч с индексом ${req.params.matchIndex} не найден.` });
     }
-    // Проверка тела запроса
+    // Проверка тела запроса (должен быть объект)
     if (!req.body || typeof req.body !== 'object') {
         console.warn(`[API] Invalid data for PUT /api/matchdata/${req.params.matchIndex}:`, req.body);
         return res.status(400).json({ message: "Некорректный формат данных матча." });
     }
 
-    // Обновляем данные матча в массиве, объединяя с дефолтной структурой для полноты
+    // Обновляем данные матча в массиве savedMatches.
+    // Используем spread-оператор для объединения дефолтной структуры с полученными данными,
+    // чтобы гарантировать наличие всех полей.
     savedMatches[index] = { ...defaultMatchStructure, ...req.body };
     console.log(`[API] Updated match data for index ${index}.`);
 
-    // Асинхронно сохраняем все данные в файл
+    // Асинхронно сохраняем все данные (включая обновленный матч) в файл db.json
     await saveDataToFileAsync();
 
-    // Отправляем всем клиентам ПОЛНЫЙ обновленный массив матчей
+    // Отправляем всем подключенным клиентам через Socket.IO ПОЛНЫЙ обновленный массив матчей
     io.emit("jsonUpdate", savedMatches);
     console.log("[SOCKET] Emitted jsonUpdate after single match update.");
 
-    // Возвращаем обновленный объект матча клиенту
+    // Возвращаем обновленный объект матча клиенту в качестве ответа
     res.status(200).json(savedMatches[index]);
 });
 
 
 // --- API для Map Veto ---
-// GET /api/mapveto - Получить данные Map Veto
+// GET /api/mapveto - Получить текущие данные Map Veto
 app.get("/api/mapveto", (req, res) => {
-    // Возвращаем сохраненные данные или дефолтную структуру
+    // Возвращаем сохраненные данные или дефолтную структуру, если данных нет
     res.json(savedMapVeto || defaultMapVetoStructure);
 });
 
 // POST /api/mapveto - Обновить данные Map Veto
-app.post("/api/mapveto", async (req, res) => { // Делаем async
+app.post("/api/mapveto", async (req, res) => { // Делаем обработчик асинхронным
   // Валидация входящих данных
   if (!req.body || typeof req.body.matchIndex !== 'number' || !req.body.teams || !Array.isArray(req.body.veto)) {
       console.warn("[API] Received invalid data for POST /api/mapveto:", req.body);
       return res.status(400).json({ message: "Некорректный формат данных Map Veto." });
   }
-  // Обновляем данные, объединяя с дефолтной структурой
+  // Обновляем данные Map Veto в памяти, объединяя с дефолтной структурой
   savedMapVeto = { ...defaultMapVetoStructure, ...req.body };
   console.log("[API] Received updated mapveto data via POST for match:", savedMapVeto.matchIndex);
 
-  // Сохраняем в файл
+  // Сохраняем все данные в файл
   await saveDataToFileAsync();
 
-  // Отправляем обновление клиентам
+  // Отправляем обновление всем клиентам через Socket.IO
   io.emit("mapVetoUpdate", savedMapVeto);
   console.log("[SOCKET] Emitted mapVetoUpdate");
-  // Возвращаем сохраненные данные
+  // Возвращаем сохраненные данные клиенту
   res.status(200).json(savedMapVeto);
 });
 
@@ -329,14 +262,14 @@ app.get("/api/vrs-raw", (req, res) => {
 });
 
 // PUT /api/vrs/:id - Обновить данные VRS для одного матча
-app.put("/api/vrs/:id", async (req, res) => { // Делаем async
+app.put("/api/vrs/:id", async (req, res) => { // Делаем обработчик асинхронным
     const matchId = req.params.id; // ID матча (строка "1", "2", ...)
-    // Проверяем, существует ли ключ для этого матча
+    // Проверяем, существует ли ключ (ID матча) в объекте savedVRS
     if (!savedVRS.hasOwnProperty(matchId)) {
          console.warn(`[API] Invalid match ID for PUT /api/vrs: ${matchId}`);
          return res.status(404).json({ message: `VRS данные для матча ${matchId} не найдены.` });
     }
-    // Проверяем тело запроса
+    // Проверяем тело запроса (должен быть объект с TEAM1 и TEAM2)
      if (!req.body || typeof req.body !== 'object' || !req.body.TEAM1 || !req.body.TEAM2) {
         console.warn(`[API] Invalid data for PUT /api/vrs/${matchId}:`, req.body);
         return res.status(400).json({ message: "Некорректный формат данных VRS." });
@@ -344,55 +277,55 @@ app.put("/api/vrs/:id", async (req, res) => { // Делаем async
 
     // Обновляем данные VRS для конкретного матча, объединяя с дефолтной структурой
     savedVRS[matchId] = { ...defaultVrsStructure, ...req.body };
-    // Дополнительно объединяем данные для TEAM1 и TEAM2
+    // Дополнительно глубоко объединяем данные для TEAM1 и TEAM2
     savedVRS[matchId].TEAM1 = { ...defaultVrsStructure.TEAM1, ...(req.body.TEAM1 || {}) };
     savedVRS[matchId].TEAM2 = { ...defaultVrsStructure.TEAM2, ...(req.body.TEAM2 || {}) };
 
     console.log(`[API] Updated VRS data for match ${matchId}.`);
 
-    // Сохраняем в файл
+    // Сохраняем все данные в файл
     await saveDataToFileAsync();
 
     // Отправляем всем клиентам ПОЛНЫЙ обновленный объект VRS
     io.emit("vrsUpdate", savedVRS);
     console.log("[SOCKET] Emitted vrsUpdate after single VRS update.");
 
-    // Возвращаем обновленные данные для этого матча
+    // Возвращаем обновленные данные для этого матча клиенту
     res.status(200).json(savedVRS[matchId]);
 });
 
 
-// --- API для custom fields ---
+// --- API для custom fields (верхний блок) ---
 // GET /api/customfields - Получить данные Custom Fields
 app.get("/api/customfields", (req, res) => {
-  // Возвращаем объект в массиве, как ожидает старый клиентский код
+  // Возвращаем объект в массиве для совместимости со старым кодом клиента
   res.json([customFieldsData || defaultCustomFieldsStructure]);
 });
 
 // POST /api/customfields - Обновить данные Custom Fields
-app.post("/api/customfields", async (req, res) => { // Делаем async
-  // Валидация
+app.post("/api/customfields", async (req, res) => { // Делаем обработчик асинхронным
+  // Валидация тела запроса
   if (!req.body || typeof req.body !== 'object') {
       console.warn("[API] Received invalid data for /api/customfields:", req.body);
       return res.status(400).json({ message: "Некорректный формат данных Custom Fields." });
   }
   // Обновляем данные, объединяя с дефолтной структурой
-  // Обрабатываем случай, когда клиент может прислать массив
+  // Обрабатываем случай, когда клиент может прислать массив (берем первый элемент)
   customFieldsData = { ...defaultCustomFieldsStructure, ...(Array.isArray(req.body) ? req.body[0] : req.body) };
   console.log("[API] Received updated custom fields data.");
 
-  // Сохраняем в файл
+  // Сохраняем все данные в файл
   await saveDataToFileAsync();
 
-  // Отправляем обновление клиентам (отправляем объект, не массив)
+  // Отправляем обновление всем клиентам (отправляем сам объект, не массив)
   io.emit("customFieldsUpdate", customFieldsData);
   console.log("[SOCKET] Emitted customFieldsUpdate");
-  // Возвращаем обновленный объект
+  // Возвращаем обновленный объект клиенту
   res.status(200).json(customFieldsData);
 });
 
 // --- API для списка команд из файла data.json ---
-const teamsDataFile = path.join(__dirname, "data.json"); // Убедитесь, что файл data.json существует и доступен
+const teamsDataFile = path.join(__dirname, "data.json"); // Убедитесь, что файл data.json существует
 app.get("/api/teams", (req, res) => {
   fs.readFile(teamsDataFile, "utf8", (err, data) => {
     // Обработка ошибки чтения файла
@@ -426,28 +359,17 @@ const server = http.createServer(app);
 // Создаем Socket.IO сервер, привязанный к HTTP серверу
 const io = new SocketIOServer(server);
 
-// Используем middleware сессий для Socket.IO, чтобы иметь доступ к сессии в обработчиках сокетов
+// Убираем middleware для сессий из Socket.IO, т.к. аутентификации нет
+/*
 io.use((socket, next) => {
   sessionMiddleware(socket.request, {}, next);
 });
+*/
 
 // Обработчик подключения нового клиента Socket.IO
 io.on("connection", (socket) => {
-  // Получаем доступ к сессии из запроса сокета
-  const session = socket.request.session;
-  // Получаем имя пользователя из сессии или используем 'anonymous'
-  const username = session?.username || 'anonymous';
-
-  // Проверяем, аутентифицирован ли пользователь в сессии
-  if (!session?.authenticated) {
-      // Если нет - логируем попытку и отключаем сокет
-      console.log(`[SOCKET] Unauthorized connection attempt from ${socket.id}. Disconnecting.`);
-      socket.disconnect(true);
-      return;
-  }
-
-  // Логируем успешное подключение авторизованного пользователя
-  console.log(`[SOCKET] Client connected: ${socket.id}, User: ${username}`);
+  // Логируем подключение нового клиента
+  console.log(`[SOCKET] Client connected: ${socket.id}`);
 
   // Отправляем текущие данные этому клиенту сразу при подключении
   socket.emit("jsonUpdate", savedMatches);       // Данные матчей
@@ -457,15 +379,15 @@ io.on("connection", (socket) => {
 
   // Обработчик отключения клиента
   socket.on("disconnect", (reason) => {
-    console.log(`[SOCKET] Client disconnected: ${socket.id}, User: ${username}, Reason: ${reason}`);
+    console.log(`[SOCKET] Client disconnected: ${socket.id}, Reason: ${reason}`);
   });
   // Обработчик ошибок сокета
   socket.on('error', (error) => {
-    console.error(`[SOCKET] Socket error for ${socket.id}, User: ${username}:`, error);
+    console.error(`[SOCKET] Socket error for ${socket.id}:`, error);
   });
 });
 
-// Запускаем HTTP сервер на прослушивание указанного порта и адреса
+// Запускаем HTTP сервер на прослушивание указанного порта и адреса 0.0.0.0 (все доступные интерфейсы)
 server.listen(port, "0.0.0.0", () => {
   console.log(`[SERVER] Сервер запущен на http://0.0.0.0:${port}`);
 });
