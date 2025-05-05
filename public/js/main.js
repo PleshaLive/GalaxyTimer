@@ -6,7 +6,7 @@ import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 
 // ========== Инициализация модулей ==========
-// Начинаем инициализацию команд и сохраняем промис, чтобы дождаться его позже
+// Начинаем инициализацию команд и сохраняем промис для ожидания
 const initPromise = initMatches();
 // Инициализируем остальные модули (они не требуют ожидания)
 initMapVeto();
@@ -576,12 +576,10 @@ async function saveMatchData(matchIndex, buttonElement) {
         console.log(`[Save] Match ${matchIndex} VRS Data:`, vrsData);
 
         // 3. Отправка данных матча на сервер методом PUT
-        // Передаем только данные этого матча
         await saveData(`/api/matchdata/${matchIndex}`, matchData, 'PUT');
         console.log(`[Save] Match ${matchIndex} data saved successfully.`);
 
         // 4. Отправка данных VRS на сервер методом PUT
-        // Передаем только данные VRS этого матча
         await saveData(`/api/vrs/${matchIndex}`, vrsData, 'PUT');
         console.log(`[Save] Match ${matchIndex} VRS data saved successfully.`);
 
@@ -641,7 +639,7 @@ async function saveMapVetoData(buttonElement) {
 function setupSaveButtonListeners() {
     // Обработчики для кнопок сохранения матчей
     document.querySelectorAll('.save-match-button').forEach(button => {
-        // Сохраняем исходный текст кнопки в data-атрибут для восстановления
+        // Сохраняем исходный текст кнопки в data-атрибут
         button.dataset.originalText = button.textContent;
         // Получаем индекс матча из data-атрибута кнопки
         const matchIndex = button.dataset.matchIndex;
