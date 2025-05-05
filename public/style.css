@@ -67,7 +67,7 @@ body::before {
     background:
         radial-gradient(circle at 10% 20%, rgba(108, 92, 231, 0.1), transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(9, 132, 227, 0.1), transparent 50%);
-    z-index: -1;
+    z-index: -1; /* Позади всего контента */
     animation: subtle-float 15s ease-in-out infinite alternate;
 }
 
@@ -78,9 +78,9 @@ body::before {
 
 
 .container {
-  max-width: 1800px;
-  margin: 0 auto;
-  padding: var(--spacing-lg);
+  max-width: 1800px; /* Максимальная ширина контента */
+  margin: 0 auto; /* Центрирование */
+  padding: var(--spacing-lg); /* Внутренние отступы */
 }
 
 h1 {
@@ -124,22 +124,22 @@ label {
     margin-bottom: var(--spacing-lg);
     box-shadow: var(--shadow-md);
     display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    align-items: flex-end;
-    position: relative;
+    flex-wrap: wrap; /* Перенос элементов при нехватке места */
+    gap: var(--spacing-md); /* Отступы между группами */
+    align-items: flex-end; /* Выравнивание по нижнему краю */
+    position: relative; /* Для позиционирования кнопки сохранения хедера */
 }
 
 .header-group {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm) var(--spacing-md);
-    align-items: flex-end;
+    gap: var(--spacing-sm) var(--spacing-md); /* Отступы внутри группы */
+    align-items: flex-end; /* Выравнивание по нижнему краю */
 }
 
 .header-controls label {
-    margin-bottom: 0;
-    white-space: nowrap;
+    margin-bottom: 0; /* Убираем отступ у лейблов */
+    white-space: nowrap; /* Предотвращаем перенос текста лейбла */
 }
 
 .header-input,
@@ -152,8 +152,8 @@ label {
   font-size: var(--font-size-base);
   transition: var(--transition-base);
   outline: none;
-  flex-grow: 1;
-  min-width: 150px;
+  flex-grow: 1; /* Позволяем растягиваться */
+  min-width: 150px; /* Минимальная ширина */
 }
 
 .header-input::placeholder {
@@ -164,7 +164,7 @@ label {
 .header-input:focus,
 .control-select:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3); /* Эффект фокуса */
 }
 
 .date-input {
@@ -173,7 +173,7 @@ label {
 }
 
 .tournament-dates {
-    align-items: center;
+    align-items: center; /* Центрируем элементы по вертикали */
     gap: var(--spacing-sm);
 }
 
@@ -182,7 +182,7 @@ label {
     color: var(--color-primary-light);
     margin-left: var(--spacing-sm);
     font-size: var(--font-size-lg);
-    white-space: nowrap;
+    white-space: nowrap; /* Не переносить текст */
 }
 
 /* ========== DASHBOARD GRID ========== */
@@ -212,12 +212,13 @@ label {
   transition: var(--transition-base);
   border-left: 5px solid transparent; /* Полоска для статуса */
   position: relative; /* Для абсолютного позиционирования кнопки сохранения */
-  padding-bottom: calc(var(--spacing-lg) + 50px + var(--spacing-md)); /* Добавляем место для кнопки + отступ */
+  /* Добавляем место снизу для кнопки сохранения */
+  padding-bottom: calc(var(--spacing-lg) + 50px + var(--spacing-md));
 }
 
 .match-column:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px); /* Легкий подъем при наведении */
+  box-shadow: var(--shadow-lg); /* Увеличение тени */
 }
 
 /* Стилизация по статусу (JS добавляет классы status-live, status-finished, status-upcom) */
@@ -227,15 +228,15 @@ label {
 
 .match-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-md);
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: var(--spacing-md);
+    justify-content: space-between; /* Распределяем элементы по краям */
+    align-items: center; /* Выравнивание по центру по вертикали */
+    gap: var(--spacing-md); /* Отступ между элементами */
+    border-bottom: 1px solid var(--color-border); /* Нижняя граница */
+    padding-bottom: var(--spacing-md); /* Отступ снизу */
 }
 
 .match-header h2 {
-    margin-bottom: 0;
+    margin-bottom: 0; /* Убираем стандартный отступ заголовка */
     flex-grow: 1; /* Занимает доступное место */
     white-space: nowrap; /* Не переносить текст */
     overflow: hidden; /* Скрыть выходящий текст */
@@ -244,14 +245,14 @@ label {
 
 .status-select,
 .time-input {
-    flex-shrink: 0; /* Не сжиматься */
-    width: auto; /* Автоматическая ширина */
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-sm);
+    flex-shrink: 0; /* Не сжиматься при нехватке места */
+    width: auto; /* Автоматическая ширина по контенту */
+    padding: var(--spacing-xs) var(--spacing-sm); /* Внутренние отступы */
+    font-size: var(--font-size-sm); /* Маленький шрифт */
     margin-bottom: 0; /* Убираем лишний отступ */
-    min-width: 0; /* Убираем ограничение */
-    background-color: var(--color-surface-light);
-    border: 1px solid var(--color-border); /* Добавим рамку */
+    min-width: 0; /* Убираем ограничение минимальной ширины */
+    background-color: var(--color-surface-light); /* Фон */
+    border: 1px solid var(--color-border); /* Рамка */
     border-radius: var(--border-radius-sm); /* Скругление */
     color: var(--color-text); /* Цвет текста */
     outline: none; /* Убираем стандартный контур */
@@ -264,14 +265,14 @@ label {
 }
 
 .time-input {
-    text-align: center;
-    width: 70px; /* Немного шире для HH:MM */
+    text-align: center; /* Текст по центру */
+    width: 70px; /* Фиксированная ширина для HH:MM */
 }
 
 /* Статус - визуальные подсказки */
 .status-select {
-    font-weight: 500;
-    text-transform: uppercase;
+    font-weight: 500; /* Полужирный шрифт */
+    text-transform: uppercase; /* Верхний регистр */
     /* Окраска фона управляется JS через updateStatusColor */
 }
 /* Стилизация опций селекта ограничена, но можно задать фон и цвет */
@@ -287,17 +288,17 @@ label {
 
 .match-teams {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--spacing-sm);
+    align-items: center; /* Выравнивание по центру по вертикали */
+    justify-content: space-between; /* Распределение по краям */
+    gap: var(--spacing-sm); /* Отступ между блоками */
 }
 
 .team-block {
-    flex: 1; /* Занимает равное пространство */
+    flex: 1; /* Занимает равное доступное пространство */
 }
 
 .team-select {
-    width: 100%;
+    width: 100%; /* На всю ширину родительского блока */
     padding: var(--spacing-sm);
     font-size: var(--font-size-base);
     background-color: var(--color-surface-light);
@@ -327,13 +328,13 @@ label {
 /* ========== КНОПКИ ПОБЕДИТЕЛЯ ========== */
 .winner-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Две колонки */
-  gap: var(--spacing-sm);
+  grid-template-columns: 1fr 1fr; /* Две равные колонки */
+  gap: var(--spacing-sm); /* Отступ между кнопками */
 }
 
 .winner-btn {
   font-size: var(--font-size-sm);
-  padding: var(--spacing-sm) var(--spacing-xs); /* Меньше горизонтальный паддинг */
+  padding: var(--spacing-sm) var(--spacing-xs); /* Маленькие отступы */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
@@ -341,23 +342,24 @@ label {
   cursor: pointer;
   transition: var(--transition-base);
   text-align: center;
-  white-space: nowrap; /* Предотвратить перенос текста */
-  overflow: hidden;
-  text-overflow: ellipsis; /* Добавить троеточие, если не влезает */
+  white-space: nowrap; /* Не переносить текст */
+  overflow: hidden; /* Скрыть выходящий текст */
+  text-overflow: ellipsis; /* Добавить троеточие, если текст не влезает */
 }
 
 .winner-btn:hover {
   background-color: var(--color-primary);
   border-color: var(--color-primary);
   color: #fff;
-  transform: translateY(-2px);
+  transform: translateY(-2px); /* Легкий подъем при наведении */
 }
 
+/* Стиль для выбранной кнопки победителя */
 .winner-btn.winner-selected {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-  color: #fff;
-  font-weight: 700;
+  background-color: var(--color-success); /* Зеленый фон */
+  border-color: var(--color-success); /* Зеленая рамка */
+  color: #fff; /* Белый текст */
+  font-weight: 700; /* Жирный шрифт */
 }
 
 /* ========== MAPS ========== */
@@ -366,15 +368,15 @@ label {
 }
 
 .maps h3 {
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border); /* Линия под заголовком */
     padding-bottom: var(--spacing-xs);
     margin-bottom: var(--spacing-md);
 }
 
 .map-row {
-  display: flex;
-  gap: var(--spacing-xs); /* Небольшой зазор */
-  margin-bottom: var(--spacing-sm);
+  display: flex; /* Элементы в строку */
+  gap: var(--spacing-xs); /* Небольшой зазор между селектом и инпутом */
+  margin-bottom: var(--spacing-sm); /* Отступ снизу */
 }
 
 .map-name-select {
@@ -398,8 +400,8 @@ label {
 }
 
 .map-score-input {
-  width: 70px; /* Чуть шире */
-  text-align: center;
+  width: 70px; /* Фиксированная ширина для счета */
+  text-align: center; /* Текст по центру */
   flex-shrink: 0; /* Не сжиматься */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
@@ -424,6 +426,7 @@ label {
     /* margin-top: auto; Убрали, чтобы кнопка была ниже */
     padding-top: var(--spacing-md); /* Отступ сверху */
     border-top: 1px solid var(--color-border); /* Разделитель */
+    margin-top: var(--spacing-lg); /* Добавим отступ сверху для отделения от карт */
 }
 
 .vrs-block {
@@ -442,17 +445,17 @@ label {
 
 .vrs-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: collapse; /* Убираем двойные рамки */
   table-layout: fixed; /* Фиксированная ширина колонок */
   font-size: var(--font-size-sm);
 }
 
 .vrs-table th,
 .vrs-table td {
-  border: 1px solid var(--color-border);
-  padding: var(--spacing-sm);
-  text-align: center;
-  background: transparent; /* Фон ячеек прозрачный, фон на .vrs-block */
+  border: 1px solid var(--color-border); /* Рамка ячеек */
+  padding: var(--spacing-sm); /* Внутренние отступы ячеек */
+  text-align: center; /* Текст по центру */
+  background: transparent; /* Фон ячеек прозрачный */
 }
 
 .vrs-table th {
@@ -465,12 +468,12 @@ label {
 
 /* Зебра для строк таблицы */
 .vrs-table tbody tr:nth-child(even) td {
-   background-color: rgba(0,0,0, 0.1);
+   background-color: rgba(0,0,0, 0.1); /* Легкий фон для четных строк */
 }
 
 .vrs-table input {
-  width: 100%;
-  padding: var(--spacing-xs);
+  width: 100%; /* На всю ширину ячейки */
+  padding: var(--spacing-xs); /* Маленькие отступы */
   font-size: var(--font-size-sm);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
@@ -615,27 +618,29 @@ label {
 
 /* ========== JSON OUTPUT ========== */
 .json-output {
-  /* display: none; */ /* Скрываем блок */
+  display: none; /* Скрываем блок вывода JSON */
+  /* Остальные стили для отладки можно оставить или удалить */
   margin-top: var(--spacing-lg);
   background: var(--color-surface);
   color: var(--color-text);
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
-  white-space: pre-wrap; /* Сохраняем форматирование JSON */
-  font-family: 'Courier New', Courier, monospace; /* Моноширинный шрифт */
+  white-space: pre-wrap;
+  font-family: 'Courier New', Courier, monospace;
   font-size: var(--font-size-sm);
   border: 1px solid var(--color-border);
-  max-height: 400px; /* Ограничение высоты */
-  overflow-y: auto; /* Прокрутка, если не влезает */
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-/* ========== Кнопки сохранения (НОВЫЕ СТИЛИ) ========== */
+/* ========== Кнопки сохранения ========== */
 .save-match-button,
-.save-veto-button {
-  display: block; /* Чтобы кнопка занимала строку */
-  width: auto; /* Автоматическая ширина по контенту */
-  min-width: 150px; /* Минимальная ширина для читаемости */
-  margin: var(--spacing-lg) auto 0; /* Отступ сверху, авто по бокам для центрирования */
+.save-veto-button,
+.save-header-button { /* Добавляем кнопку хедера */
+  display: block;
+  width: auto; /* Автоматическая ширина */
+  min-width: 150px; /* Минимальная ширина */
+  margin: var(--spacing-lg) auto 0; /* Отступ сверху, центрирование по умолчанию */
   padding: var(--spacing-sm) var(--spacing-lg);
   background: linear-gradient(100deg, var(--color-secondary) 0%, var(--color-primary) 100%);
   border: none;
@@ -649,52 +654,18 @@ label {
   letter-spacing: 0.05em;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease; /* Добавляем transition для фона */
+  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease;
   text-align: center;
 }
 
 /* Позиционирование кнопки сохранения матча внизу карточки */
 .save-match-button {
-    position: absolute; /* Позиционируем относительно .match-column */
-    bottom: var(--spacing-lg); /* Отступ снизу */
-    left: var(--spacing-lg); /* Отступ слева */
-    right: var(--spacing-lg); /* Отступ справа */
-    width: calc(100% - var(--spacing-lg) * 2); /* Ширина с учетом паддингов родителя */
-    margin: 0; /* Убираем авто-margin для абсолютного позиционирования */
-}
-
-
-.save-match-button:hover,
-.save-veto-button:hover {
-  filter: brightness(1.1); /* Немного ярче при наведении */
-  transform: scale(1.02); /* Небольшое увеличение */
-  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4); /* Тень при наведении */
-}
-
-.save-match-button:active,
-.save-veto-button:active {
-  transform: scale(0.99); /* Небольшое уменьшение при клике */
-  filter: brightness(0.95); /* Немного темнее при клике */
-}
-
-/* Стили для состояния сохранения/ошибки/блокировки */
-.save-match-button.saving,
-.save-veto-button.saving,
-.save-match-button:disabled, /* Стиль для заблокированной кнопки */
-.save-veto-button:disabled {
-    background: var(--color-text-muted); /* Серый фон */
-    cursor: wait; /* Курсор ожидания */
-    filter: brightness(0.8); /* Приглушаем цвет */
-    transform: scale(1); /* Убираем hover эффект */
-    box-shadow: var(--shadow-sm); /* Убираем hover тень */
-}
-.save-match-button.saved,
-.save-veto-button.saved {
-    background: var(--color-success); /* Зеленый фон при успехе */
-}
-.save-match-button.error,
-.save-veto-button.error {
-    background: var(--color-error); /* Красный фон при ошибке */
+    position: absolute;
+    bottom: var(--spacing-lg);
+    left: var(--spacing-lg);
+    right: var(--spacing-lg);
+    width: calc(100% - var(--spacing-lg) * 2);
+    margin: 0; /* Убираем авто-margin */
 }
 
 /* Кнопка сохранения Veto */
@@ -703,7 +674,54 @@ label {
     align-self: center; /* Центрировать кнопку внутри flex-контейнера .map-veto-content */
 }
 
-/* Скрываем блок вывода JSON по требованию пользователя */
-.json-output {
-  display: none;
+/* Кнопка сохранения хедера */
+.save-header-button {
+  margin: 0; /* Убираем авто-margin */
+  margin-left: auto; /* Прижимаем к правому краю */
+  align-self: center; /* Выравниваем по центру вертикально */
+  background: linear-gradient(100deg, #ff9a8b 0%, #ff6a88 100%); /* Другой градиент */
+}
+
+
+.save-match-button:hover,
+.save-veto-button:hover,
+.save-header-button:hover {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4);
+}
+.save-header-button:hover {
+    box-shadow: 0 0 10px rgba(255, 106, 136, 0.5); /* Розовая тень для хедера */
+}
+
+
+.save-match-button:active,
+.save-veto-button:active,
+.save-header-button:active {
+  transform: scale(0.99);
+  filter: brightness(0.95);
+}
+
+/* Стили для состояния сохранения/ошибки/блокировки */
+.save-match-button.saving,
+.save-veto-button.saving,
+.save-header-button.saving,
+.save-match-button:disabled,
+.save-veto-button:disabled,
+.save-header-button:disabled {
+    background: var(--color-text-muted);
+    cursor: wait;
+    filter: brightness(0.8);
+    transform: scale(1);
+    box-shadow: var(--shadow-sm);
+}
+.save-match-button.saved,
+.save-veto-button.saved,
+.save-header-button.saved {
+    background: var(--color-success);
+}
+.save-match-button.error,
+.save-veto-button.error,
+.save-header-button.error {
+    background: var(--color-error);
 }

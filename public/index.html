@@ -19,12 +19,12 @@
         <input type="date" id="tournamentStart" class="header-input date-input">
         <label for="tournamentEnd">Конец:</label>
         <input type="date" id="tournamentEnd" class="header-input date-input">
-        <span id="tournamentDayDisplay" class="tournament-day"></span>
-      </div>
+        <span id="tournamentDayDisplay" class="tournament-day"></span> </div>
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
-      </header>
+      <button id="saveHeaderButton" class="save-header-button">Save Header</button>
+    </header>
 
     <h1>Интерфейс матчей</h1>
 
@@ -38,15 +38,17 @@
         console.log("[SOCKET] Received jsonUpdate for debug display:", data);
         const jsonOutput = document.getElementById("jsonOutput");
         if (jsonOutput) {
+          // Отображаем полученные данные в формате JSON с отступами
           jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
       });
 
-      // Дополнительные обработчики Socket.IO событий находятся в main.js
+      // Остальные обработчики Socket.IO событий находятся в main.js
     </script>
 
     <div class="dashboard">
       <div class="matches">
+
         <div class="match-column" data-match="1" data-winner="">
           <div class="match-header">
             <h2>Match 1</h2>
@@ -124,9 +126,7 @@
               </div>
           </div>
           <button class="save-match-button" data-match-index="1">Save Match 1</button>
-        </div>
-
-        <div class="match-column" data-match="2" data-winner="">
+        </div> <div class="match-column" data-match="2" data-winner="">
           <div class="match-header">
             <h2>Match 2</h2>
             <select class="status-select" id="statusSelect2">
@@ -204,9 +204,7 @@
              <div class="vrs-block" id="vrsBlock2"></div>
            </div>
            <button class="save-match-button" data-match-index="2">Save Match 2</button>
-        </div>
-
-        <div class="match-column" data-match="3" data-winner="">
+        </div> <div class="match-column" data-match="3" data-winner="">
            <div class="match-header">
              <h2>Match 3</h2>
              <select class="status-select" id="statusSelect3">
@@ -284,9 +282,7 @@
               <div class="vrs-block" id="vrsBlock3"></div>
             </div>
             <button class="save-match-button" data-match-index="3">Save Match 3</button>
-         </div>
-
-        <div class="match-column" data-match="4" data-winner="">
+         </div> <div class="match-column" data-match="4" data-winner="">
            <div class="match-header">
              <h2>Match 4</h2>
              <select class="status-select" id="statusSelect4">
@@ -364,8 +360,7 @@
               <div class="vrs-block" id="vrsBlock4"></div>
             </div>
             <button class="save-match-button" data-match-index="4">Save Match 4</button>
-         </div>
-      </div> <div class="map-veto-block">
+         </div> </div> <div class="map-veto-block">
         <div class="map-veto-content">
           <h1>MAP VETO</h1>
           <div class="map-veto-header">
@@ -431,91 +426,10 @@
           </div>
           <button id="saveMapVetoButton" class="save-veto-button">Save Map Veto</button>
         </div>
-        <div class="map-veto-glow"></div>
-      </div>
-
-      <div class="json-output" id="jsonOutput">
+        <div class="map-veto-glow"></div> </div> <div class="json-output" id="jsonOutput">
         JSON data will appear here...
       </div>
 
     </div> </div> <script type="module" src="js/main.js"></script>
-  <script>
-    // --- Динамическое добавление классов статуса ---
-    function updateStatusClassesForAll() {
-      const statusSelects = document.querySelectorAll('.status-select');
-      statusSelects.forEach(select => {
-        const matchColumn = select.closest('.match-column');
-        if (matchColumn) {
-            matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-            const selectedStatus = select.value.toLowerCase();
-            if (selectedStatus) { // Добавляем класс только если статус выбран
-                 matchColumn.classList.add(`status-${selectedStatus}`);
-            }
-            // Обновляем цвет фона селекта
-            if (typeof updateStatusColor === 'function') { // Проверяем доступность функции из main.js/matches.js
-                updateStatusColor(select);
-            }
-        }
-      });
-    }
-    // Обновляем при изменении
-    document.querySelectorAll('.status-select').forEach(select => {
-        select.addEventListener('change', updateStatusClassesForAll);
-    });
-    // Вызываем при загрузке (после того как main.js загрузит данные)
-    document.addEventListener('DOMContentLoaded', () => {
-        // Небольшая задержка, чтобы дать время main.js загрузить данные и установить значения
-        setTimeout(updateStatusClassesForAll, 600);
-    });
-    // --- Конец JS для классов статуса ---
-
-    // --- JS для дат турнира ---
-    function calculateTournamentDay() {
-      const startDateInput = document.getElementById('tournamentStart');
-      const endDateInput = document.getElementById('tournamentEnd');
-      const displaySpan = document.getElementById('tournamentDayDisplay');
-
-      function updateDay() {
-        if (!startDateInput || !displaySpan) return; // Проверка наличия элементов
-
-        const startStr = startDateInput.value;
-        const endStr = endDateInput ? endDateInput.value : null; // Проверка endDateInput
-
-        if (startStr) {
-          try {
-              const start = new Date(startStr);
-              const end = endStr ? new Date(endStr) : null;
-              const today = new Date();
-
-              start.setHours(0, 0, 0, 0);
-              today.setHours(0, 0, 0, 0);
-              if (end) end.setHours(0, 0, 0, 0);
-
-              if (today < start) {
-                  displaySpan.textContent = 'Турнир не начался';
-              } else if (end && today > end) {
-                  displaySpan.textContent = 'Турнир завершен';
-              } else {
-                  const diffTime = Math.abs(today - start);
-                  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                  displaySpan.textContent = `День ${diffDays}`;
-              }
-          } catch (e) {
-              console.error("Ошибка парсинга даты турнира:", e);
-              displaySpan.textContent = ''; // Очистить в случае ошибки
-          }
-        } else {
-          displaySpan.textContent = ''; // Очистить, если дата начала не введена
-        }
-      }
-
-      if (startDateInput) startDateInput.addEventListener('change', updateDay);
-      if (endDateInput) endDateInput.addEventListener('change', updateDay);
-      // Первоначальный расчет вызывается из updateCustomFieldsUI в main.js
-      // updateDay();
-    }
-    document.addEventListener('DOMContentLoaded', calculateTournamentDay);
-    // --- Конец JS для дат турнира ---
-  </script>
-</body>
+  </body>
 </html>

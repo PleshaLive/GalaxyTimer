@@ -633,9 +633,37 @@ async function saveMapVetoData(buttonElement) {
     }
 }
 
-// ========== Привязка обработчиков к новым кнопкам ==========
+/**
+ * Собирает и отправляет данные из верхнего блока (Custom Fields) на сервер.
+ * @param {HTMLButtonElement} buttonElement - Кнопка сохранения хедера.
+ */
+async function saveHeaderData(buttonElement) {
+    console.log(`[Save] Saving Header data...`);
+    setButtonState(buttonElement, 'saving'); // Устанавливаем состояние "сохранение"
+    try {
+        const customData = gatherCustomFieldsData(); // Собираем данные хедера
+        console.log(`[Save] Header Data:`, customData);
+        // Отправляем данные на сервер методом POST
+        await saveData('/api/customfields', customData, 'POST');
+        console.log(`[Save] Header data saved successfully.`);
+        // Устанавливаем состояние "сохранено"
+        setButtonState(buttonElement, 'saved');
+    } catch (error) {
+        // В случае ошибки выводим сообщение и устанавливаем состояние "ошибка"
+        console.error(`[Save] Error saving Header data:`, error);
+        setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    } finally {
+         // Гарантируем, что кнопка разблокирована
+         if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
+             setButtonState(buttonElement, 'idle');
+         }
+    }
+}
 
-/** Привязывает обработчики кликов к кнопкам сохранения матчей и Map Veto. */
+
+// ========== Привязка обработчиков к кнопкам ==========
+
+/** Привязывает обработчики кликов к кнопкам сохранения. */
 function setupSaveButtonListeners() {
     // Обработчики для кнопок сохранения матчей
     document.querySelectorAll('.save-match-button').forEach(button => {
@@ -664,6 +692,18 @@ function setupSaveButtonListeners() {
         // Предупреждение, если кнопка не найдена по ID
         console.warn("[Init] Save Map Veto button (id='saveMapVetoButton') not found.");
     }
+
+    // Обработчик для кнопки сохранения хедера
+    const saveHeaderButton = document.getElementById('saveHeaderButton');
+    if (saveHeaderButton) {
+        saveHeaderButton.dataset.originalText = saveHeaderButton.textContent; // Сохраняем исходный текст
+        // Привязываем обработчик клика, передавая кнопку
+        saveHeaderButton.addEventListener('click', () => saveHeaderData(saveHeaderButton));
+        console.log("[Init] Save listener attached for Header.");
+    } else {
+        // Предупреждение, если кнопка не найдена по ID
+        console.warn("[Init] Save Header button (id='saveHeaderButton') not found.");
+    }
 }
 
 
@@ -679,8 +719,8 @@ window.addEventListener("DOMContentLoaded", async () => {
       // 2. Загружаем остальные данные с сервера
       // Порядок важен: сначала матчи, потом остальное, что может от них зависеть
       await loadMatchesFromServer();
-      await loadRawVRSData();
-      await loadCustomFieldsFromServer();
+      await loadRawVRSData(); // Загружаем сырые данные VRS
+      await loadCustomFieldsFromServer(); // Загружаем данные хедера
       await loadMapVetoFromServer();
 
       // 3. Привязываем обработчики к кнопкам сохранения (теперь, когда все загружено)
