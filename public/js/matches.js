@@ -26,7 +26,6 @@ export async function initMatches() {
       // Загружаем список команд с сервера
       const response = await fetch("/api/teams");
       if (!response.ok) {
-        // Если запрос неудачный, выбрасываем ошибку
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json(); // Парсим JSON ответ
@@ -43,8 +42,8 @@ export async function initMatches() {
       attachTeamLogoUpdates();
       // Привязываем обработчики для кнопок выбора победителя
       attachWinnerButtons();
-      // Привязываем обработчики для обновления цвета селекта статуса
-      attachStatusColorUpdates();
+      // Привязываем обработчики для обновления цвета селекта статуса и автозаполнения
+      attachStatusChangeHandlers(); // ИЗМЕНЕНО: Используем новую функцию
 
       // Первоначальное обновление UI для всех матчей после загрузки списка команд
       for (let m = 1; m <= 4; m++) {
@@ -225,27 +224,47 @@ export function refreshWinnerHighlight(matchIndex) {
 }
 
 // ----------------------
-// Окраска селекта статуса
+// Обработчики изменения статуса
 // ----------------------
 /**
  * Привязывает обработчики 'change' к селектам статуса для обновления
- * их цвета и CSS-класса родительского блока .match-column.
+ * их цвета, CSS-класса родителя и автозаполнения счета 3-й карты для UPCOM.
  */
-export function attachStatusColorUpdates() {
+export function attachStatusChangeHandlers() { // ИЗМЕНЕНО: Новое название функции
   for (let m = 1; m <= 4; m++) {
     const sel = document.getElementById("statusSelect" + m);
     if (!sel) continue;
     sel.addEventListener("change", () => {
         updateStatusColor(sel); // Обновляем цвет самого селекта
-        // Обновляем класс у родителя
         const matchColumn = sel.closest('.match-column');
         if (matchColumn) {
-            // Сначала удаляем все классы статусов
+            // Обновляем класс у родителя
             matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-            // Добавляем новый класс, если статус выбран
-            if(sel.value) {
-                matchColumn.classList.add(`status-${sel.value.toLowerCase()}`);
+            if(sel.value) matchColumn.classList.add(`status-${sel.value.toLowerCase()}`);
+
+            // ИЗМЕНЕНИЕ: Автозаполнение счета 3-й карты для UPCOM
+            if (sel.value === 'UPCOM') {
+                const mapRows = matchColumn.querySelectorAll('.map-row');
+                if (mapRows.length >= 3) { // Убедимся, что есть 3 карты
+                    const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
+                    if (thirdMapScoreInput) {
+                        thirdMapScoreInput.value = `MATCH ${m}`; // Устанавливаем текст
+                        thirdMapScoreInput.placeholder = `MATCH ${m}`; // Можно и placeholder обновить
+                    }
+                }
             }
+            // Можно добавить логику для очистки/установки NEXT для других статусов, если нужно
+            // Например, очистить счет 3 карты, если статус НЕ UPCOM
+            // else {
+            //     const mapRows = matchColumn.querySelectorAll('.map-row');
+            //     if (mapRows.length >= 3) {
+            //         const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
+            //         if (thirdMapScoreInput && thirdMapScoreInput.value === `MATCH ${m}`) {
+            //             thirdMapScoreInput.value = ""; // Очищаем, если был автозаполнен
+            //             thirdMapScoreInput.placeholder = "0:0"; // Возвращаем плейсхолдер
+            //         }
+            //     }
+            // }
         }
     });
   }
@@ -342,8 +361,8 @@ export function gatherSingleMatchData(matchIndex) {
     } else if (statusText === "UPCOM") {
         // Для предстоящих матчей, если счет первой карты не введен, ставим NEXT
         if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
-        // Если счет третьей карты не введен, ставим "MATCH X"
-        if (!maps.MAP3_SCORE) maps.MAP3_SCORE = `MATCH ${m}`;
+        // ИЗМЕНЕНИЕ: Устанавливаем счет 3 карты в "MATCH X" для UPCOM
+        maps.MAP3_SCORE = `MATCH ${m}`;
     }
 
     // Определение иконок счета для разных статусов (MP*_FIN/LIVE/UPC)
@@ -408,7 +427,7 @@ export function gatherSingleMatchData(matchIndex) {
       UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
       UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "",
       UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "",
-      UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "",
+      UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "", // Здесь будет "MATCH X"
       UPCOM_Cest: upcomCestValue,
       UPCOM_RectangleUP: upcomRectUp,
       UPCOM_RectangleLOW: upcomRectLow,
