@@ -143,7 +143,7 @@ label {
 }
 
 .header-input,
-.control-select {
+.control-select { /* Общий класс для селектов и инпутов в хедере и Veto */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
   color: var(--color-text);
@@ -169,7 +169,7 @@ label {
 
 .date-input {
     min-width: 140px;
-    flex-grow: 0;
+    flex-grow: 0; /* Не растягивать поля даты */
 }
 
 .tournament-dates {
@@ -188,12 +188,14 @@ label {
 /* ========== DASHBOARD GRID ========== */
 .dashboard {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr; /* По умолчанию одна колонка */
   gap: var(--spacing-lg);
 }
 
+/* Сетка для матчей */
 .matches {
   display: grid;
+  /* Адаптивные колонки: минимум 350px, растягиваются на доступное место */
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: var(--spacing-lg);
 }
@@ -206,11 +208,11 @@ label {
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-lg); /* Отступы между блоками внутри карточки */
   transition: var(--transition-base);
-  border-left: 5px solid transparent;
-  position: relative; /* Для позиционирования кнопки */
-  padding-bottom: calc(var(--spacing-lg) + 50px); /* Добавляем место для кнопки */
+  border-left: 5px solid transparent; /* Полоска для статуса */
+  position: relative; /* Для абсолютного позиционирования кнопки сохранения */
+  padding-bottom: calc(var(--spacing-lg) + 50px + var(--spacing-md)); /* Добавляем место для кнопки + отступ */
 }
 
 .match-column:hover {
@@ -218,6 +220,7 @@ label {
   box-shadow: var(--shadow-lg);
 }
 
+/* Стилизация по статусу (JS добавляет классы status-live, status-finished, status-upcom) */
 .match-column.status-live { border-left-color: var(--color-live); }
 .match-column.status-finished { border-left-color: var(--color-text-muted); }
 .match-column.status-upcom { border-left-color: var(--color-upcom); }
@@ -233,47 +236,53 @@ label {
 
 .match-header h2 {
     margin-bottom: 0;
-    flex-grow: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    flex-grow: 1; /* Занимает доступное место */
+    white-space: nowrap; /* Не переносить текст */
+    overflow: hidden; /* Скрыть выходящий текст */
+    text-overflow: ellipsis; /* Добавить троеточие */
 }
 
 .status-select,
 .time-input {
-    flex-shrink: 0;
-    width: auto;
+    flex-shrink: 0; /* Не сжиматься */
+    width: auto; /* Автоматическая ширина */
     padding: var(--spacing-xs) var(--spacing-sm);
     font-size: var(--font-size-sm);
-    margin-bottom: 0;
-    min-width: 0;
+    margin-bottom: 0; /* Убираем лишний отступ */
+    min-width: 0; /* Убираем ограничение */
     background-color: var(--color-surface-light);
     border: 1px solid var(--color-border); /* Добавим рамку */
     border-radius: var(--border-radius-sm); /* Скругление */
     color: var(--color-text); /* Цвет текста */
     outline: none; /* Убираем стандартный контур */
 }
+/* Стили для фокуса */
 .status-select:focus,
 .time-input:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
 }
 
-
 .time-input {
     text-align: center;
     width: 70px; /* Немного шире для HH:MM */
 }
 
+/* Статус - визуальные подсказки */
 .status-select {
     font-weight: 500;
     text-transform: uppercase;
     /* Окраска фона управляется JS через updateStatusColor */
 }
-/* Стилизация опций селекта ограничена */
-.status-select option[value="LIVE"] { color: var(--color-live); background-color: var(--color-surface-light); }
-.status-select option[value="FINISHED"] { color: var(--color-text-muted); background-color: var(--color-surface-light); }
-.status-select option[value="UPCOM"] { color: var(--color-upcom); background-color: var(--color-surface-light); }
+/* Стилизация опций селекта ограничена, но можно задать фон и цвет */
+.status-select option {
+    background-color: var(--color-surface-light);
+    color: var(--color-text); /* Стандартный цвет текста для опций */
+}
+/* Можно попытаться задать цвет для конкретных опций, но поддержка браузерами разная */
+.status-select option[value="LIVE"] { color: var(--color-live); }
+.status-select option[value="FINISHED"] { color: var(--color-text-muted); }
+.status-select option[value="UPCOM"] { color: var(--color-upcom); }
 
 
 .match-teams {
@@ -284,7 +293,7 @@ label {
 }
 
 .team-block {
-    flex: 1;
+    flex: 1; /* Занимает равное пространство */
 }
 
 .team-select {
@@ -302,6 +311,12 @@ label {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
 }
+/* Стили для опций внутри селекта команд */
+.team-select option {
+    background-color: var(--color-surface-light);
+    color: var(--color-text);
+}
+
 
 .vs-indicator {
     color: var(--color-text-muted);
@@ -312,13 +327,13 @@ label {
 /* ========== КНОПКИ ПОБЕДИТЕЛЯ ========== */
 .winner-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* Две колонки */
   gap: var(--spacing-sm);
 }
 
 .winner-btn {
   font-size: var(--font-size-sm);
-  padding: var(--spacing-sm) var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-xs); /* Меньше горизонтальный паддинг */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
@@ -326,9 +341,9 @@ label {
   cursor: pointer;
   transition: var(--transition-base);
   text-align: center;
-  white-space: nowrap;
+  white-space: nowrap; /* Предотвратить перенос текста */
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; /* Добавить троеточие, если не влезает */
 }
 
 .winner-btn:hover {
@@ -347,7 +362,7 @@ label {
 
 /* ========== MAPS ========== */
 .maps {
-  margin-top: var(--spacing-sm);
+  margin-top: var(--spacing-sm); /* Небольшой отступ сверху */
 }
 
 .maps h3 {
@@ -358,12 +373,12 @@ label {
 
 .map-row {
   display: flex;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-xs); /* Небольшой зазор */
   margin-bottom: var(--spacing-sm);
 }
 
 .map-name-select {
-  flex-grow: 1;
+  flex-grow: 1; /* Занимает доступное место */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
   color: var(--color-text);
@@ -377,11 +392,15 @@ label {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
 }
+.map-name-select option {
+    background-color: var(--color-surface-light);
+    color: var(--color-text);
+}
 
 .map-score-input {
-  width: 70px;
+  width: 70px; /* Чуть шире */
   text-align: center;
-  flex-shrink: 0;
+  flex-shrink: 0; /* Не сжиматься */
   background-color: var(--color-surface-light);
   border: 1px solid var(--color-border);
   color: var(--color-text);
@@ -403,8 +422,8 @@ label {
 /* ========== VRS ========== */
 .vrs-block-wrapper {
     /* margin-top: auto; Убрали, чтобы кнопка была ниже */
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--color-border);
+    padding-top: var(--spacing-md); /* Отступ сверху */
+    border-top: 1px solid var(--color-border); /* Разделитель */
 }
 
 .vrs-block {
@@ -413,6 +432,7 @@ label {
   border-radius: var(--border-radius-md);
 }
 
+/* Стили для таблицы VRS */
 .vrs-block h3 {
   margin-bottom: var(--spacing-sm);
   font-size: var(--font-size-base);
@@ -423,7 +443,7 @@ label {
 .vrs-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+  table-layout: fixed; /* Фиксированная ширина колонок */
   font-size: var(--font-size-sm);
 }
 
@@ -432,17 +452,18 @@ label {
   border: 1px solid var(--color-border);
   padding: var(--spacing-sm);
   text-align: center;
-  background: transparent;
+  background: transparent; /* Фон ячеек прозрачный, фон на .vrs-block */
 }
 
 .vrs-table th {
-    background-color: rgba(0,0,0, 0.2);
+    background-color: rgba(0,0,0, 0.2); /* Чуть темнее шапка */
     color: var(--color-text-muted);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
+/* Зебра для строк таблицы */
 .vrs-table tbody tr:nth-child(even) td {
    background-color: rgba(0,0,0, 0.1);
 }
@@ -454,14 +475,14 @@ label {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-sm);
   text-align: center;
-  background: var(--color-surface);
+  background: var(--color-surface); /* Фон инпутов темнее */
   color: var(--color-text);
   outline: none;
   transition: var(--transition-base);
 }
 .vrs-table input:focus {
     border-color: var(--color-primary);
-    background-color: var(--color-surface-light);
+    background-color: var(--color-surface-light); /* Фон при фокусе светлее */
 }
 .vrs-table input::placeholder {
     color: var(--color-text-muted);
@@ -471,15 +492,16 @@ label {
 
 /* ========== MAP VETO ========== */
 .map-veto-block {
-  grid-column: 1 / -1;
+  grid-column: 1 / -1; /* Занимает всю ширину грида */
   background: var(--color-surface);
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-lg);
   box-shadow: var(--shadow-md);
-  position: relative;
-  overflow: hidden;
+  position: relative; /* Для псевдо-элемента свечения */
+  overflow: hidden; /* Скрыть выходящий градиент */
 }
 
+/* Декоративный эффект свечения */
 .map-veto-glow {
   content: "";
   position: absolute;
@@ -489,8 +511,8 @@ label {
   height: 220%;
   background: radial-gradient(circle, rgba(108, 92, 231, 0.15) 0%, transparent 65%);
   animation: rotate-glow 12s linear infinite;
-  pointer-events: none;
-  z-index: 0;
+  pointer-events: none; /* Не мешает взаимодействию */
+  z-index: 0; /* Под контентом */
 }
 
 @keyframes rotate-glow {
@@ -498,11 +520,12 @@ label {
   to { transform: rotate(360deg); }
 }
 
+/* Контент Veto поверх свечения */
 .map-veto-content {
     position: relative;
     z-index: 1;
     display: flex; /* Используем flex для позиционирования кнопки */
-    flex-direction: column;
+    flex-direction: column; /* Элементы располагаются вертикально */
 }
 
 
@@ -519,18 +542,19 @@ label {
   display: flex;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-lg);
-  align-items: center;
+  align-items: center; /* Выравнивание по центру по вертикали */
 }
 
 .map-veto-header label {
-    margin-bottom: 0;
-    flex-shrink: 0;
+    margin-bottom: 0; /* Убираем отступ у лейбла */
+    flex-shrink: 0; /* Не сжимать лейбл */
 }
 
-#matchSelect {
-    min-width: 200px;
+#matchSelect { /* Используем общий класс .control-select */
+    min-width: 200px; /* Минимальная ширина для селекта матча */
 }
 
+/* Обертка для таблицы для горизонтальной прокрутки на малых экранах */
 .table-wrapper {
     overflow-x: auto;
 }
@@ -546,7 +570,7 @@ label {
   padding: var(--spacing-sm) var(--spacing-md);
   border: 1px solid var(--color-border);
   text-align: center;
-  white-space: nowrap;
+  white-space: nowrap; /* Предотвращаем перенос в ячейках */
 }
 
 #vetoTable th {
@@ -557,27 +581,33 @@ label {
   letter-spacing: 0.05em;
 }
 
+/* Стили для селектов внутри таблицы Veto */
 #vetoTable .control-select {
-    width: 100%;
+    width: 100%; /* Занимают всю ширину ячейки */
     margin-bottom: 0;
-    background-color: transparent;
-    border: none;
-    padding: var(--spacing-xs);
-    border-radius: 0;
-    /* Добавим цвет текста для селектов в таблице */
-    color: var(--color-text);
+    background-color: transparent; /* Прозрачный фон */
+    border: none; /* Убираем рамку */
+    padding: var(--spacing-xs); /* Уменьшаем паддинг */
+    border-radius: 0; /* Убираем скругление */
+    color: var(--color-text); /* Цвет текста селекта */
+    appearance: none; /* Убираем стандартный вид селекта (стрелку) */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    /* Можно добавить свою стрелку через background-image, если нужно */
 }
+/* Стили для опций селектов в таблице */
 #vetoTable .control-select option {
     background-color: var(--color-surface-light); /* Фон для опций */
     color: var(--color-text); /* Цвет текста опций */
 }
 
 #vetoTable .control-select:focus {
-    box-shadow: none;
-    background-color: rgba(108, 92, 231, 0.1);
+    box-shadow: none; /* Убираем тень фокуса внутри таблицы */
+    background-color: rgba(108, 92, 231, 0.1); /* Легкая подсветка фона при фокусе */
 }
 
-/* Выделение строк BAN/PICK */
+/* Выделение цветом опций BAN/PICK/DECIDER */
+/* Примечание: стилизация самих <option> ограничена и может не везде работать */
 #vetoTable select.veto-action option[value="BAN"] { color: var(--color-error); }
 #vetoTable select.veto-action option[value="PICK"] { color: var(--color-success); }
 #vetoTable select.veto-action option[value="DECIDER"] { color: var(--color-primary-light); }
@@ -585,26 +615,27 @@ label {
 
 /* ========== JSON OUTPUT ========== */
 .json-output {
+  /* display: none; */ /* Скрываем блок */
   margin-top: var(--spacing-lg);
   background: var(--color-surface);
   color: var(--color-text);
   padding: var(--spacing-md);
   border-radius: var(--border-radius-md);
-  white-space: pre-wrap;
-  font-family: 'Courier New', Courier, monospace;
+  white-space: pre-wrap; /* Сохраняем форматирование JSON */
+  font-family: 'Courier New', Courier, monospace; /* Моноширинный шрифт */
   font-size: var(--font-size-sm);
   border: 1px solid var(--color-border);
-  max-height: 400px;
-  overflow-y: auto;
+  max-height: 400px; /* Ограничение высоты */
+  overflow-y: auto; /* Прокрутка, если не влезает */
 }
 
 /* ========== Кнопки сохранения (НОВЫЕ СТИЛИ) ========== */
 .save-match-button,
 .save-veto-button {
-  display: block;
-  width: auto; /* Автоматическая ширина */
-  min-width: 150px; /* Минимальная ширина */
-  margin: var(--spacing-lg) auto 0; /* Отступ сверху, центрирование */
+  display: block; /* Чтобы кнопка занимала строку */
+  width: auto; /* Автоматическая ширина по контенту */
+  min-width: 150px; /* Минимальная ширина для читаемости */
+  margin: var(--spacing-lg) auto 0; /* Отступ сверху, авто по бокам для центрирования */
   padding: var(--spacing-sm) var(--spacing-lg);
   background: linear-gradient(100deg, var(--color-secondary) 0%, var(--color-primary) 100%);
   border: none;
@@ -618,7 +649,7 @@ label {
   letter-spacing: 0.05em;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease; /* Добавим transition для фона */
+  transition: var(--transition-base), transform 0.15s ease, background-color 0.3s ease; /* Добавляем transition для фона */
   text-align: center;
 }
 
@@ -628,47 +659,51 @@ label {
     bottom: var(--spacing-lg); /* Отступ снизу */
     left: var(--spacing-lg); /* Отступ слева */
     right: var(--spacing-lg); /* Отступ справа */
-    width: calc(100% - var(--spacing-lg) * 2); /* Ширина с учетом паддингов */
-    margin: 0; /* Убираем авто-margin */
+    width: calc(100% - var(--spacing-lg) * 2); /* Ширина с учетом паддингов родителя */
+    margin: 0; /* Убираем авто-margin для абсолютного позиционирования */
 }
 
 
 .save-match-button:hover,
 .save-veto-button:hover {
-  filter: brightness(1.1);
-  transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4);
+  filter: brightness(1.1); /* Немного ярче при наведении */
+  transform: scale(1.02); /* Небольшое увеличение */
+  box-shadow: 0 0 10px rgba(9, 132, 227, 0.4); /* Тень при наведении */
 }
 
 .save-match-button:active,
 .save-veto-button:active {
-  transform: scale(0.99);
-  filter: brightness(0.95);
+  transform: scale(0.99); /* Небольшое уменьшение при клике */
+  filter: brightness(0.95); /* Немного темнее при клике */
 }
 
-/* Стили для состояния сохранения/ошибки */
+/* Стили для состояния сохранения/ошибки/блокировки */
 .save-match-button.saving,
 .save-veto-button.saving,
 .save-match-button:disabled, /* Стиль для заблокированной кнопки */
 .save-veto-button:disabled {
-    background: var(--color-text-muted);
-    cursor: wait;
-    filter: brightness(0.8);
+    background: var(--color-text-muted); /* Серый фон */
+    cursor: wait; /* Курсор ожидания */
+    filter: brightness(0.8); /* Приглушаем цвет */
     transform: scale(1); /* Убираем hover эффект */
     box-shadow: var(--shadow-sm); /* Убираем hover тень */
 }
 .save-match-button.saved,
 .save-veto-button.saved {
-    background: var(--color-success);
+    background: var(--color-success); /* Зеленый фон при успехе */
 }
 .save-match-button.error,
 .save-veto-button.error {
-    background: var(--color-error);
+    background: var(--color-error); /* Красный фон при ошибке */
 }
 
 /* Кнопка сохранения Veto */
 #saveMapVetoButton {
-    margin-top: var(--spacing-lg);
-    align-self: center; /* Центрировать кнопку */
+    margin-top: var(--spacing-lg); /* Отступ от таблицы */
+    align-self: center; /* Центрировать кнопку внутри flex-контейнера .map-veto-content */
 }
 
+/* Скрываем блок вывода JSON по требованию пользователя */
+.json-output {
+  display: none;
+}
