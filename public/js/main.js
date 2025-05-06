@@ -1,25 +1,26 @@
 // public/js/main.js
 // Импортируем необходимые функции из других модулей
 import { initMatches, gatherSingleMatchData, updateWinnerButtonLabels, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor } from "./matches.js";
-// Убедимся, что updateVetoTeamOptions импортируется и используется корректно
-import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions } from "./mapVeto.js";
+// Импортируем все необходимые функции из mapVeto.js, включая styleVetoActionSelect
+import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionSelect } from "./mapVeto.js";
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 
-// Глобальная переменная для сокета, если она еще не объявлена где-то (обычно io() доступна глобально после подключения /socket.io/socket.io.js)
-// const socket = io(); // Если socket не определен глобально ранее
+// Глобальная переменная socket должна быть доступна из-за подключения /socket.io/socket.io.js в HTML
+// const socket = io(); // Если бы не было глобального, объявляли бы здесь
 
 // ========== Инициализация модулей ==========
-const initPromise = initMatches();
-initMapVeto();
-initVRS();
+const initPromise = initMatches(); // Инициализация команд и связанных элементов матчей
+initMapVeto(); // Инициализация Veto (селект матча, начальная стилизация селектов .veto-action и .veto-team)
+initVRS();     // Инициализация таблиц VRS
 
 // ========== Socket.io подписки ==========
 
+// Обработчик события 'jsonUpdate' (обновление данных всех матчей)
 socket.on("jsonUpdate", async (matches) => {
   console.log("[SOCKET] Received jsonUpdate:", matches);
   try {
-    await initPromise;
+    await initPromise; // Убедимся, что инициализация команд завершена
     updateMatchesUI(matches);
   } catch (error) {
     console.error("[SOCKET] Error updating matches UI after jsonUpdate:", error);
@@ -30,32 +31,32 @@ socket.on("jsonUpdate", async (matches) => {
   }
 });
 
-// Обработчик события 'mapVetoUpdate' - УЛУЧШЕННЫЙ
+// Обработчик события 'mapVetoUpdate' (обновление данных Map Veto)
 socket.on("mapVetoUpdate", (updatedMapVeto) => {
     console.log("[SOCKET] Received mapVetoUpdate:", updatedMapVeto);
-    // Сначала обновляем основной UI для Veto (значения в селектах и т.д.)
+    // 1. Обновляем UI для Veto (значения в селектах и т.д.)
     updateMapVetoUI(updatedMapVeto);
 
-    // Затем, если данные валидны и функция доступна, обновляем опции команд и их стили.
-    // Это важно, так как updateMapVetoUI может изменить значение matchSelect.value,
-    // и updateVetoTeamOptions должна вызываться для актуального матча.
+    // 2. После обновления UI, если данные валидны, обновляем опции команд
+    // и стили для селектов команд в Veto.
+    // updateMapVetoUI уже должна была обновить значение matchSelect.value, если необходимо.
     if (updatedMapVeto && typeof updatedMapVeto.matchIndex !== 'undefined') {
         const matchSelectElement = document.getElementById("matchSelect");
-        // Если сервер прислал matchIndex, который отличается от текущего в UI,
-        // updateMapVetoUI уже должна была обновить matchSelectElement.value.
-        // Теперь вызываем updateVetoTeamOptions для текущего значения matchSelectElement.
         if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
+            // Вызываем для текущего значения селекта матча, так как updateMapVetoUI
+            // могла его изменить или данные могли прийти для текущего матча.
             updateVetoTeamOptions(matchSelectElement.value);
         }
     }
 });
 
-
+// Обработчик события 'vrsUpdate' (обновление данных VRS)
 socket.on("vrsUpdate", (rawVrsData) => {
   console.log("[SOCKET] Received vrsUpdate (raw):", rawVrsData);
   updateVRSUI(rawVrsData);
 });
 
+// Обработчик события 'customFieldsUpdate' (обновление верхнего блока)
 socket.on("customFieldsUpdate", (newFields) => {
   console.log("[SOCKET] Received customFieldsUpdate:", newFields);
   const fieldsData = Array.isArray(newFields) ? newFields[0] : newFields;
@@ -63,10 +64,11 @@ socket.on("customFieldsUpdate", (newFields) => {
     updateCustomFieldsUI(fieldsData);
   } else {
     console.warn("[SOCKET] Received invalid customFieldsUpdate:", newFields);
-    updateCustomFieldsUI({});
+    updateCustomFieldsUI({}); // Обновляем пустыми значениями для консистентности
   }
 });
 
+// Обработчик для обновления полей паузы
 socket.on("pauseUpdate", (pauseData) => {
   console.log("[SOCKET] Received pauseUpdate:", pauseData);
   const msgInput = document.getElementById('pauseMessageInput');
@@ -112,16 +114,14 @@ function updateMatchesUI(matches) {
 
       if (newStatus && statusSelect.value !== newStatus) {
         statusSelect.value = newStatus;
-        if (typeof updateStatusColor === 'function') {
-          updateStatusColor(statusSelect);
-        } else { console.error("updateStatusColor function is not available!"); }
+        if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
         matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-        matchColumn.classList.add(`status-${newStatus.toLowerCase()}`);
-      } else if (!newStatus && statusSelect.value !== "" && statusSelect.options.length > 0 && statusSelect.value !== statusSelect.options[0].value) { // Добавил проверку на пустой value и options[0]
+        if(newStatus) matchColumn.classList.add(`status-${newStatus.toLowerCase()}`);
+      } else if (!newStatus && statusSelect.value !== "" && statusSelect.options.length > 0 && statusSelect.value !== statusSelect.options[0].value) {
         statusSelect.value = statusSelect.options[0].value;
         if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
         matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-         if (statusSelect.options[0].value) { // Если первая опция не пустая строка
+        if (statusSelect.options[0].value) {
             matchColumn.classList.add(`status-${statusSelect.options[0].value.toLowerCase()}`);
         }
       }
@@ -160,21 +160,20 @@ function updateMatchesUI(matches) {
       const scoreKey = prefix + `MAP${i + 1}_SCORE`;
       const mapSelect = row.querySelector(".map-name-select");
       const scoreInput = row.querySelector(".map-score-input");
-
       const mapValue = match[mapKey];
-      if (mapSelect && typeof mapValue !== 'undefined') { // Проверяем undefined явно
+
+      if (mapSelect && typeof mapValue !== 'undefined') {
         const optionExists = mapSelect.querySelector(`option[value="${CSS.escape(mapValue)}"]`);
-        if (mapValue && optionExists) { // Добавил проверку mapValue (не пустая строка)
+        if (mapValue && optionExists) {
           if (mapSelect.value !== mapValue) mapSelect.value = mapValue;
         } else if (mapSelect.options.length > 0 && mapSelect.value !== mapSelect.options[0].value) {
           mapSelect.value = mapSelect.options[0].value;
-        } else if (!mapValue && mapSelect.value !== "") { // Если mapValue пустой, а селект нет
-            mapSelect.value = mapSelect.options.length > 0 ? mapSelect.options[0].value : "";
+        } else if (!mapValue && mapSelect.value !== "" && mapSelect.options.length > 0) {
+            mapSelect.value = mapSelect.options[0].value;
         }
       } else if (mapSelect && mapSelect.options.length > 0 && mapSelect.value !== mapSelect.options[0].value) {
         mapSelect.value = mapSelect.options[0].value;
       }
-
 
       const scoreValue = match[scoreKey];
       if (scoreInput && typeof scoreValue !== 'undefined') {
@@ -188,36 +187,24 @@ function updateMatchesUI(matches) {
     const currentTeam1Name = team1Select ? team1Select.value : "";
     const currentTeam2Name = team2Select ? team2Select.value : "";
     if (match.FINISHED_MATCH_STATUS === "FINISHED" && match.TEAMWINNER) {
-      if (currentTeam1Name && match.TEAMWINNER === currentTeam1Name) {
-        winnerTeamKey = "TEAM1";
-      } else if (currentTeam2Name && match.TEAMWINNER === currentTeam2Name) {
-        winnerTeamKey = "TEAM2";
-      }
+      if (currentTeam1Name && match.TEAMWINNER === currentTeam1Name) winnerTeamKey = "TEAM1";
+      else if (currentTeam2Name && match.TEAMWINNER === currentTeam2Name) winnerTeamKey = "TEAM2";
     }
-    if (winnerTeamKey) {
-      matchColumn.setAttribute("data-winner", winnerTeamKey);
-    } else {
-      matchColumn.removeAttribute("data-winner");
-    }
+    if (winnerTeamKey) matchColumn.setAttribute("data-winner", winnerTeamKey);
+    else matchColumn.removeAttribute("data-winner");
 
     if (typeof updateWinnerButtonLabels === 'function') updateWinnerButtonLabels(matchIndex);
     if (typeof refreshWinnerHighlight === 'function') refreshWinnerHighlight(matchIndex);
-    else {
-      console.warn(`refreshWinnerHighlight не найдена для матча ${matchIndex}`);
-      matchColumn.querySelectorAll(".winner-btn").forEach(b => {
-        b.classList.toggle("winner-selected", b.getAttribute("data-team") === winnerTeamKey);
-      });
-    }
+
     if (typeof updateVRSTeamNames === 'function') updateVRSTeamNames();
   });
 
-  const matchSelectElement = document.getElementById("matchSelect"); // Переименовал
+  const matchSelectElement = document.getElementById("matchSelect");
   if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
     updateVetoTeamOptions(matchSelectElement.value);
   }
   console.log("[UI] Matches UI update finished.");
 }
-
 
 // Обновляет интерфейс блока Map Veto - УЛУЧШЕННЫЙ
 function updateMapVetoUI(mapVetoData) {
@@ -225,13 +212,11 @@ function updateMapVetoUI(mapVetoData) {
     console.warn("[UI] Получены некорректные данные для updateMapVetoUI:", mapVetoData);
     return;
   }
-  const matchSelectElement = document.getElementById("matchSelect"); // Переименовал
+  const matchSelectElement = document.getElementById("matchSelect");
 
   // 1. Обновляем значение селекта матча, если оно пришло и отличается
   if (matchSelectElement && typeof mapVetoData.matchIndex !== 'undefined' && matchSelectElement.value != mapVetoData.matchIndex) {
     matchSelectElement.value = mapVetoData.matchIndex;
-    // Важно: updateVetoTeamOptions будет вызван из обработчика сокета или при инициализации/смене матча вручную.
-    // Здесь мы только меняем значение селекта матча.
   }
 
   // 2. Обновляем строки таблицы Veto
@@ -240,23 +225,30 @@ function updateMapVetoUI(mapVetoData) {
     const row = document.querySelector(`#vetoTable tr[data-index="${rowIndex}"]`);
     if (row) {
       const actionSelect = row.querySelector(".veto-action");
-      const mapSelectInRow = row.querySelector(".veto-map"); // Переименовал
+      const mapSelectInRow = row.querySelector(".veto-map");
       const teamSelect = row.querySelector(".veto-team");
       const sideSelect = row.querySelector(".veto-side");
 
-      if (actionSelect && actionSelect.value !== (vetoItem.action || 'BAN')) {
-        actionSelect.value = vetoItem.action || 'BAN';
+      if (actionSelect) {
+        const actionValueFromData = vetoItem.action || 'BAN';
+        if (actionSelect.value !== actionValueFromData) {
+          actionSelect.value = actionValueFromData;
+        }
+        if (typeof styleVetoActionSelect === 'function') { // Стилизуем селект действия
+            styleVetoActionSelect(actionSelect);
+        }
       }
+
       if (mapSelectInRow && mapSelectInRow.value !== (vetoItem.map || (mapSelectInRow.options.length > 0 ? mapSelectInRow.options[0].value : ""))) {
         mapSelectInRow.value = vetoItem.map || (mapSelectInRow.options.length > 0 ? mapSelectInRow.options[0].value : "");
       }
+      
       if (teamSelect) {
-        const teamValueFromData = vetoItem.team || 'TEAM1'; // "TEAM1" или "TEAM2"
+        const teamValueFromData = vetoItem.team || 'TEAM1';
         if (teamSelect.value !== teamValueFromData) {
           teamSelect.value = teamValueFromData;
         }
-        // Стили для teamSelect будут применены через вызов updateVetoTeamOptions,
-        // который должен быть вызван после обновления всех данных для текущего матча.
+        // Стиль для teamSelect будет применен через updateVetoTeamOptions ниже
       }
       if (sideSelect && sideSelect.value !== (vetoItem.side || '-')) {
         sideSelect.value = vetoItem.side || '-';
@@ -265,20 +257,19 @@ function updateMapVetoUI(mapVetoData) {
       console.warn(`[UI] Строка ${rowIndex} в таблице Map Veto не найдена.`);
     }
   });
-
-  // 3. После обновления всех строк, если matchIndex был в данных,
-  // вызываем updateVetoTeamOptions для актуализации имен команд и стилей селектов команд в Veto.
-  // Это нужно делать здесь, чтобы гарантировать, что все селекты .veto-team уже имеют правильные значения.
+  
+  // 3. После обновления всех строк, вызываем updateVetoTeamOptions
+  // для актуализации имен команд и стилей селектов команд в Veto.
   if (matchSelectElement?.value && typeof mapVetoData.matchIndex !== 'undefined' && typeof updateVetoTeamOptions === 'function') {
-    // Вызываем для matchIndex из данных, если он совпадает с текущим, или для текущего в UI
-    const targetMatchIndex = matchSelectElement.value == mapVetoData.matchIndex ? mapVetoData.matchIndex : matchSelectElement.value;
-    updateVetoTeamOptions(targetMatchIndex);
+    // Вызываем для текущего значения селекта матча, так как оно могло измениться выше
+    // или данные могли прийти для уже выбранного матча.
+    updateVetoTeamOptions(matchSelectElement.value);
   }
   console.log("[UI] Map Veto UI updated for match", mapVetoData.matchIndex);
 }
 
-
 function updateVRSUI(rawVrsData) {
+  // ... (код без изменений, как в вашем исходном файле)
   if (!rawVrsData) {
     console.warn("[UI] Получены пустые данные для updateVRSUI");
     return;
@@ -321,6 +312,7 @@ function updateVRSUI(rawVrsData) {
 }
 
 function updateCustomFieldsUI(fields) {
+  // ... (код без изменений, как в вашем исходном файле)
   if (!fields || typeof fields !== 'object') {
     console.warn("[UI] Invalid data received for updateCustomFieldsUI:", fields);
     return;
@@ -341,8 +333,8 @@ function updateCustomFieldsUI(fields) {
 }
 
 // ========== Загрузка данных с сервера ==========
-async function loadMatchesFromServer() {
-  console.log("[Data] Loading matches data from server...");
+async function loadMatchesFromServer() { /* ... (без изменений) ... */
+    console.log("[Data] Loading matches data from server...");
   try {
     const response = await fetch("/api/matchdata");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -354,8 +346,8 @@ async function loadMatchesFromServer() {
     console.error("[Data] Ошибка загрузки matchdata:", error);
   }
 }
-async function loadRawVRSData() {
-  console.log("[Data] Loading raw VRS data...");
+async function loadRawVRSData() { /* ... (без изменений) ... */
+    console.log("[Data] Loading raw VRS data...");
   try {
     const response = await fetch("/api/vrs-raw");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -366,6 +358,8 @@ async function loadRawVRSData() {
     console.error("[Data] Ошибка загрузки raw VRS data:", error);
   }
 }
+
+// Загрузка Map Veto с последующим обновлением стилей селектов команд и действий
 async function loadMapVetoFromServer() {
   console.log("[Data] Loading map veto data...");
   try {
@@ -373,20 +367,24 @@ async function loadMapVetoFromServer() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const mapVetoData = await response.json();
     console.log("[Data] Map veto data loaded:", mapVetoData);
-    updateMapVetoUI(mapVetoData);
-    // После загрузки данных Veto, убедимся, что стили для селектов команд применились
-    if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined' && typeof updateVetoTeamOptions === 'function') {
+    updateMapVetoUI(mapVetoData); // Эта функция теперь обновляет и стили .veto-action
+
+    // После загрузки и обновления UI, вызываем updateVetoTeamOptions
+    // для обновления имен и стилей селектов команд в Veto.
+    if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined') {
         const matchSelectElement = document.getElementById("matchSelect");
-        if (matchSelectElement) { // Убедимся, что селект существует
-             updateVetoTeamOptions(matchSelectElement.value); // Обновляем для текущего выбранного матча
+        // Убедимся, что #matchSelect уже содержит правильное значение (могло быть установлено в updateMapVetoUI)
+        if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
+             updateVetoTeamOptions(matchSelectElement.value);
         }
     }
   } catch (error) {
     console.error("[Data] Ошибка загрузки map veto data:", error);
   }
 }
-async function loadCustomFieldsFromServer() {
-  console.log("[Data] Loading custom fields data...");
+
+async function loadCustomFieldsFromServer() { /* ... (без изменений) ... */
+    console.log("[Data] Loading custom fields data...");
   try {
     const response = await fetch("/api/customfields");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -402,8 +400,8 @@ async function loadCustomFieldsFromServer() {
     updateCustomFieldsUI({});
   }
 }
-async function loadPauseDataFromServer() {
-  console.log("[Data] Loading pause data...");
+async function loadPauseDataFromServer() { /* ... (без изменений) ... */
+    console.log("[Data] Loading pause data...");
   try {
     const response = await fetch("/api/pause");
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -424,8 +422,8 @@ async function loadPauseDataFromServer() {
 }
 
 // ========== Вспомогательные функции ==========
-function calculateTournamentDay() {
-  const startDateInput = document.getElementById("tournamentStart")?.value;
+function calculateTournamentDay() { /* ... (без изменений) ... */
+    const startDateInput = document.getElementById("tournamentStart")?.value;
   const endDateInput = document.getElementById("tournamentEnd")?.value;
   const displaySpan = document.getElementById("tournamentDayDisplay");
   if (!displaySpan) return;
@@ -454,8 +452,8 @@ function calculateTournamentDay() {
     displaySpan.textContent = '';
   }
 }
-function updateTournamentDay() {
-  calculateTournamentDay();
+function updateTournamentDay() { /* ... (без изменений) ... */
+    calculateTournamentDay();
 }
 const tournamentStartInput = document.getElementById("tournamentStart");
 const tournamentEndInput = document.getElementById("tournamentEnd");
@@ -463,8 +461,8 @@ if (tournamentStartInput) tournamentStartInput.addEventListener("change", update
 if (tournamentEndInput) tournamentEndInput.addEventListener("change", updateTournamentDay);
 
 // ========== Функции сбора данных ==========
-function gatherCustomFieldsData() {
-  updateTournamentDay();
+function gatherCustomFieldsData() { /* ... (без изменений) ... */
+    updateTournamentDay();
   return {
     upcomingMatches: document.getElementById("upcomingMatchesInput")?.value ?? "",
     galaxyBattle: document.getElementById("galaxyBattleInput")?.value ?? "",
@@ -474,22 +472,21 @@ function gatherCustomFieldsData() {
     groupStage: document.getElementById("groupStageInput")?.value ?? ""
   };
 }
-function gatherPauseData() {
-  const message = document.getElementById("pauseMessageInput")?.value ?? "";
+function gatherPauseData() { /* ... (без изменений) ... */
+    const message = document.getElementById("pauseMessageInput")?.value ?? "";
   const time = document.getElementById("pauseTimeInput")?.value ?? "";
   return { pause: message, lastUpd: time };
 }
 
 // ========== Функции сохранения данных ==========
-function setButtonState(button, state, message = null) {
-  if (!button) return;
-  const originalText = button.dataset.originalText || button.textContent || 'SAVE'; // Обновил получение originalText
-  if (!button.dataset.originalText) button.dataset.originalText = originalText; // Сохраняем, если не было
+function setButtonState(button, state, message = null) { /* ... (улучшенная версия из предыдущего ответа) ... */
+    if (!button) return;
+  const originalText = button.dataset.originalText || button.textContent || 'SAVE';
+  if (!button.dataset.originalText) button.dataset.originalText = originalText;
 
   button.disabled = (state === 'saving');
-  button.classList.remove('saving', 'saved', 'error', 'idle'); // Добавил idle
+  button.classList.remove('saving', 'saved', 'error', 'idle');
   button.style.cursor = (state === 'saving') ? 'wait' : 'pointer';
-  // button.style.backgroundColor = ""; // Это может перебивать стили из CSS, лучше убрать или управлять через классы
 
   switch (state) {
     case 'saving':
@@ -500,7 +497,7 @@ function setButtonState(button, state, message = null) {
       button.textContent = message || 'SAVED!';
       button.classList.add('saved');
       setTimeout(() => {
-        if (button.classList.contains('saved')) { // Проверяем, не изменилось ли состояние
+        if (button.classList.contains('saved')) {
           button.textContent = originalText;
           button.classList.remove('saved');
           button.classList.add('idle');
@@ -511,7 +508,7 @@ function setButtonState(button, state, message = null) {
       button.textContent = message || 'ERROR!';
       button.classList.add('error');
       setTimeout(() => {
-        if (button.classList.contains('error')) { // Проверяем
+        if (button.classList.contains('error')) {
            button.textContent = originalText;
            button.classList.remove('error');
            button.classList.add('idle');
@@ -526,8 +523,8 @@ function setButtonState(button, state, message = null) {
   }
 }
 
-async function saveMatchData(matchIndex, buttonElement) {
-  console.log(`[Save] Saving data for Match ${matchIndex}...`);
+async function saveMatchData(matchIndex, buttonElement) { /* ... (без изменений) ... */
+    console.log(`[Save] Saving data for Match ${matchIndex}...`);
   setButtonState(buttonElement, 'saving');
   try {
     const matchData = gatherSingleMatchData(matchIndex);
@@ -546,8 +543,8 @@ async function saveMatchData(matchIndex, buttonElement) {
     }
   }
 }
-async function saveMapVetoData(buttonElement) {
-  console.log(`[Save] Saving Map Veto data...`);
+async function saveMapVetoData(buttonElement) { /* ... (без изменений) ... */
+    console.log(`[Save] Saving Map Veto data...`);
   setButtonState(buttonElement, 'saving');
   try {
     const mapVetoData = gatherMapVetoData();
@@ -563,8 +560,8 @@ async function saveMapVetoData(buttonElement) {
     }
   }
 }
-async function saveHeaderData(buttonElement) {
-  console.log(`[Save] Saving Header data...`);
+async function saveHeaderData(buttonElement) { /* ... (без изменений) ... */
+    console.log(`[Save] Saving Header data...`);
   setButtonState(buttonElement, 'saving');
   try {
     const customData = gatherCustomFieldsData();
@@ -579,8 +576,8 @@ async function saveHeaderData(buttonElement) {
     }
   }
 }
-async function savePauseData(buttonElement) {
-  console.log(`[Save] Saving Pause data...`);
+async function savePauseData(buttonElement) { /* ... (без изменений) ... */
+    console.log(`[Save] Saving Pause data...`);
   setButtonState(buttonElement, 'saving');
   try {
     const pauseData = gatherPauseData();
@@ -599,40 +596,33 @@ async function savePauseData(buttonElement) {
 // ========== Привязка обработчиков к кнопкам и селектам ==========
 function setupListeners() {
   document.querySelectorAll('.save-match-button').forEach(button => {
-    if (!button.dataset.originalText) button.dataset.originalText = button.textContent; // Убедимся, что текст сохранен
+    if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
     const matchIndex = button.dataset.matchIndex;
     if (matchIndex) {
       button.addEventListener('click', () => saveMatchData(parseInt(matchIndex, 10), button));
-    } else {
-      console.warn("[Init] Save match button found without data-match-index attribute.");
-    }
+    } else { console.warn("[Init] Save match button found without data-match-index attribute."); }
   });
 
   const saveVetoButton = document.getElementById('saveMapVetoButton');
   if (saveVetoButton) {
     if (!saveVetoButton.dataset.originalText) saveVetoButton.dataset.originalText = saveVetoButton.textContent;
     saveVetoButton.addEventListener('click', () => saveMapVetoData(saveVetoButton));
-  } else {
-    console.warn("[Init] Save Map Veto button (id='saveMapVetoButton') not found.");
-  }
+  } else { console.warn("[Init] Save Map Veto button (id='saveMapVetoButton') not found."); }
 
   const saveHeaderButton = document.getElementById('saveHeaderButton');
   if (saveHeaderButton) {
     if (!saveHeaderButton.dataset.originalText) saveHeaderButton.dataset.originalText = saveHeaderButton.textContent;
     saveHeaderButton.addEventListener('click', () => saveHeaderData(saveHeaderButton));
-  } else {
-    console.warn("[Init] Save Header button (id='saveHeaderButton') not found.");
-  }
+  } else { console.warn("[Init] Save Header button (id='saveHeaderButton') not found."); }
 
   const savePauseButton = document.getElementById('savePauseButton');
   if (savePauseButton) {
     if (!savePauseButton.dataset.originalText) savePauseButton.dataset.originalText = savePauseButton.textContent;
     savePauseButton.addEventListener('click', () => savePauseData(savePauseButton));
-  } else {
-    console.warn("[Init] Save Pause button (id='savePauseButton') not found.");
-  }
+  } else { console.warn("[Init] Save Pause button (id='savePauseButton') not found."); }
 
-  const matchSelectElement = document.getElementById("matchSelect"); // Переименовал
+  // Слушатели для обновления Veto
+  const matchSelectElement = document.getElementById("matchSelect");
   if (matchSelectElement) {
     matchSelectElement.addEventListener('change', () => {
         if (typeof updateVetoTeamOptions === 'function') {
@@ -664,19 +654,20 @@ window.addEventListener("DOMContentLoaded", async () => {
     await initPromise;
     console.log("DOMContentLoaded: Teams initialized.");
 
-    await Promise.all([ // Параллельная загрузка для ускорения
+    // Параллельная загрузка данных
+    await Promise.all([
         loadMatchesFromServer(),
         loadRawVRSData(),
         loadCustomFieldsFromServer(),
-        loadMapVetoFromServer(), // loadMapVetoFromServer теперь должен корректно стилизовать Veto селекты
+        loadMapVetoFromServer(), // Эта функция теперь также заботится о стилизации Veto селектов
         loadPauseDataFromServer()
     ]);
     
-    setupListeners();
+    setupListeners(); // Привязываем все обработчики
 
-    // Первичное обновление опций и стилей Veto (на случай, если loadMapVetoFromServer не успел полностью все сделать
-    // или если данные пришли до полной инициализации DOM для Veto)
-    // Эта логика теперь также есть внутри loadMapVetoFromServer и обработчика сокета.
+    // Дополнительный вызов для updateVetoTeamOptions после полной загрузки DOM и данных,
+    // чтобы гарантировать применение стилей, если loadMapVetoFromServer не охватил все случаи
+    // или если данные для Veto еще не были готовы к моменту первого вызова.
     const matchSelectElement = document.getElementById("matchSelect");
     if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
         updateVetoTeamOptions(matchSelectElement.value);

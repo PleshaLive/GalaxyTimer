@@ -18,6 +18,7 @@
   --color-text-secondary: #b0b3b8;    /* Вторичный текст */
   --color-text-muted: #8a8d93;        /* Приглушенный текст */
   --color-text-on-primary-bg: #ffffff; /* Текст на кнопках с основным цветом */
+  --color-text-on-accent-bg: #ffffff;  /* Общий для текста на ярких акцентных фонах */
   --color-text-placeholder: #65676b;  /* Цвет для плейсхолдеров */
 
   --color-primary: #58a6ff;           /* Яркий синий GitHub */
@@ -33,6 +34,7 @@
   --color-success: #3fb950;           /* Зеленый GitHub */
   --color-success-dark: #2da442;
   --color-success-light: #57d26a;
+  --rgb-success: 63, 185, 80;         /* Для RGBA теней фокуса */
 
   --color-warning: #f0b72f;           /* Желтый/оранжевый GitHub */
   --color-warning-dark: #c89213;
@@ -41,6 +43,7 @@
   --color-error: #f85149;             /* Красный GitHub */
   --color-error-dark: #d83630;
   --color-error-light: #ff7b72;
+  --rgb-error: 248, 81, 73;           /* Для RGBA теней фокуса */
 
   --color-info: #58a6ff;              /* Можно использовать основной синий или другой оттенок */
   --color-info-dark: #388bfd;
@@ -54,13 +57,13 @@
   /* АКЦЕНТНЫЕ ЦВЕТА ДЛЯ КОМАНД */
   --color-team1-accent: var(--color-primary); /* Синий для команды 1 */
   --color-team1-accent-hover: var(--color-primary-light);
-  --color-team1-accent-bg: rgba(var(--rgb-primary), 0.15); /* Чуть более заметный фон */
+  --color-team1-accent-bg: rgba(var(--rgb-primary), 0.15);
   --color-team1-text-on-accent: var(--color-text-on-primary-bg);
 
 
-  --color-team2-accent: #db6d28; /* Оранжевый для команды 2 (пример) */
+  --color-team2-accent: #db6d28; /* Оранжевый для команды 2 */
   --color-team2-accent-hover: #f5823f;
-  --color-team2-accent-bg: rgba(219, 109, 40, 0.18); /* Чуть более заметный фон */
+  --color-team2-accent-bg: rgba(219, 109, 40, 0.18);
   --color-team2-text-on-accent: #ffffff;
 
 
@@ -141,7 +144,7 @@ label {
   letter-spacing: 0.05em;
 }
 
-/* ========== ОСНОВНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (УЛУЧШЕННАЯ ТЕМНАЯ ТЕМА) ========== */
+/* ========== ОСНОВНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ ========== */
 .header-input,
 .control-select,
 .team-select,
@@ -189,8 +192,6 @@ label {
   box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.25);
   background-color: var(--color-surface);
 }
-/* :root { --rgb-primary: 88, 166, 255; } - уже определено выше */
-
 
 .header-input::placeholder,
 .map-score-input::placeholder,
@@ -465,6 +466,64 @@ label {
 #vetoTable th.team-1-text-accent { color: var(--color-team1-accent); }
 #vetoTable th.team-2-text-accent { color: var(--color-team2-accent); }
 
+/* Стилизация самого селекта .veto-action в зависимости от выбранного значения */
+#vetoTable select.veto-action {
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    text-align-last: center;
+}
+#vetoTable select.veto-action.action-is-ban {
+    background-color: var(--color-error) !important;
+    color: var(--color-text-on-accent-bg) !important;
+    border-color: var(--color-error-dark) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+#vetoTable select.veto-action.action-is-ban:focus {
+    border-color: var(--color-error-light) !important;
+    box-shadow: 0 0 0 3px rgba(var(--rgb-error), 0.35) !important;
+}
+
+#vetoTable select.veto-action.action-is-pick {
+    background-color: var(--color-success) !important;
+    color: var(--color-text-on-accent-bg) !important;
+    border-color: var(--color-success-dark) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+#vetoTable select.veto-action.action-is-pick:focus {
+    border-color: var(--color-success-light) !important;
+    box-shadow: 0 0 0 3px rgba(var(--rgb-success), 0.35) !important;
+}
+
+#vetoTable select.veto-action.action-is-decider {
+    background-color: var(--color-surface-secondary) !important;
+    color: var(--color-text-primary) !important;
+    border-color: var(--color-border) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23b0b3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+#vetoTable select.veto-action.action-is-decider:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.25) !important;
+}
+
+/* Стилизация опций в выпадающем списке .veto-action */
+#vetoTable .veto-action option {
+    background-color: var(--color-surface-tertiary);
+    color: var(--color-text-primary);
+}
+#vetoTable .veto-action option[value="BAN"] {
+    color: var(--color-error);
+    font-weight: var(--font-weight-semibold);
+}
+#vetoTable .veto-action option[value="PICK"] {
+    color: var(--color-success);
+    font-weight: var(--font-weight-semibold);
+}
+#vetoTable .veto-action option[value="DECIDER"] {
+    color: var(--color-text-primary);
+    font-weight: var(--font-weight-semibold);
+}
+
+
 /* Стилизация селекта команды в Veto в зависимости от выбранной команды */
 #vetoTable .veto-team.team-1-selected-veto {
     border-color: var(--color-team1-accent) !important;
@@ -487,23 +546,6 @@ label {
 #vetoTable .veto-team.team-1-selected-veto option[value="TEAM1"] { font-weight: var(--font-weight-semibold); color: var(--color-team1-accent); }
 #vetoTable .veto-team.team-2-selected-veto option[value="TEAM2"] { font-weight: var(--font-weight-semibold); color: var(--color-team2-accent); }
 
-/* Стилизация опций в селекте .veto-action */
-#vetoTable .veto-action option {
-    background-color: var(--color-surface-tertiary); /* Фон для выпадающего списка */
-    color: var(--color-text-primary); /* Стандартный цвет текста опций */
-}
-#vetoTable .veto-action option[value="BAN"] {
-    color: var(--color-error);
-    font-weight: var(--font-weight-semibold);
-}
-#vetoTable .veto-action option[value="PICK"] {
-    color: var(--color-success);
-    font-weight: var(--font-weight-semibold);
-}
-#vetoTable .veto-action option[value="DECIDER"] {
-    color: var(--color-text-primary); /* Белый оттенок */
-    font-weight: var(--font-weight-semibold);
-}
 
 #saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
 
@@ -514,8 +556,8 @@ label {
 
 /* ========== BUTTON STATES ========== */
 .app-button.saving, button.saving, .app-button:disabled, button:disabled { background-color: var(--color-secondary-dark) !important; border-color: var(--color-secondary-dark) !important; cursor: wait !important; color: var(--color-text-muted) !important; opacity: 0.65; transform: none; box-shadow: var(--shadow-inset); }
-.app-button.saved, button.saved { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; color: var(--color-text-on-primary-bg) !important; }
-.app-button.error, button.error { background-color: var(--color-error) !important; border-color: var(--color-error-dark) !important; color: var(--color-text-on-primary-bg) !important; }
+.app-button.saved, button.saved { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; color: var(--color-text-on-accent-bg) !important; } /* Изменено на --color-text-on-accent-bg */
+.app-button.error, button.error { background-color: var(--color-error) !important; border-color: var(--color-error-dark) !important; color: var(--color-text-on-accent-bg) !important; } /* Изменено на --color-text-on-accent-bg */
 
 /* ========== АДАПТИВНОСТЬ ========== */
 @media (max-width: 1200px) { .matches { grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); } .header-controls { gap: var(--spacing-md); } }
