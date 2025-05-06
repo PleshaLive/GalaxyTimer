@@ -54,13 +54,13 @@
   /* АКЦЕНТНЫЕ ЦВЕТА ДЛЯ КОМАНД */
   --color-team1-accent: var(--color-primary); /* Синий для команды 1 */
   --color-team1-accent-hover: var(--color-primary-light);
-  --color-team1-accent-bg: rgba(var(--rgb-primary), 0.1); /* Легкий фон */
+  --color-team1-accent-bg: rgba(var(--rgb-primary), 0.15); /* Чуть более заметный фон */
   --color-team1-text-on-accent: var(--color-text-on-primary-bg);
 
 
   --color-team2-accent: #db6d28; /* Оранжевый для команды 2 (пример) */
   --color-team2-accent-hover: #f5823f;
-  --color-team2-accent-bg: rgba(219, 109, 40, 0.12); /* Чуть насыщеннее фон */
+  --color-team2-accent-bg: rgba(219, 109, 40, 0.18); /* Чуть более заметный фон */
   --color-team2-text-on-accent: #ffffff;
 
 
@@ -189,7 +189,7 @@ label {
   box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.25);
   background-color: var(--color-surface);
 }
-:root { --rgb-primary: 88, 166, 255; }
+/* :root { --rgb-primary: 88, 166, 255; } - уже определено выше */
 
 
 .header-input::placeholder,
@@ -250,7 +250,7 @@ label {
     border-color: var(--color-primary);
 }
 .app-button.tertiary-button:hover {
-    background-color: var(--color-team1-accent-bg, rgba(var(--rgb-primary), 0.15)); /* Используем team1-accent-bg как основной акцентный фон для ховера */
+    background-color: var(--color-team1-accent-bg, rgba(var(--rgb-primary), 0.15));
     color: var(--color-primary);
     border-color: var(--color-primary-light);
 }
@@ -265,12 +265,12 @@ label {
   min-width: auto;
   margin-left: var(--spacing-sm);
   font-weight: var(--font-weight-normal);
-  box-shadow: none; /* Убираем тень для текстовых кнопок */
+  box-shadow: none;
 }
 .action-button:hover {
   text-decoration: underline;
   color: var(--color-primary);
-  transform: none; /* Убираем эффект подъема */
+  transform: none;
   box-shadow: none;
 }
 .action-button.delete-button { color: var(--color-error-light); }
@@ -388,9 +388,9 @@ label {
   border-radius: var(--border-radius-sm);
   text-align: center;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  box-shadow: none; /* Убираем тень для этих кнопок */
+  box-shadow: none;
 }
-.winner-btn:hover { transform: none; box-shadow: none; background-color: var(--color-surface-tertiary); } /* Упрощенный ховер */
+.winner-btn:hover { transform: none; box-shadow: none; background-color: var(--color-surface-tertiary); }
 
 .winner-btn.team-1-bg-accent { border-color: var(--color-team1-accent); color: var(--color-team1-accent); }
 .winner-btn.team-1-bg-accent:hover { background-color: var(--color-team1-accent-bg); }
@@ -412,14 +412,39 @@ label {
 .vrs-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
 .vrs-table th, .vrs-table td { border: 1px solid var(--color-border); padding: var(--spacing-sm); text-align: center; color: var(--color-text-secondary); background-color: var(--color-surface); }
 .vrs-table th { background-color: var(--color-surface-tertiary); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
-.vrs-table td:first-child { font-weight: var(--font-weight-semibold); color: var(--color-text-primary); text-align: left; }
+.vrs-table td:first-child { font-weight: var(--font-weight-semibold); /* Убрал цвет отсюда, он теперь на строке */ text-align: left; }
 
 /* Цветовая дифференциация для VRS */
-.vrs-table tr.team-1-row td:first-child { color: var(--color-team1-accent); font-weight: var(--font-weight-bold); }
-.vrs-table tr.team-2-row td:first-child { color: var(--color-team2-accent); font-weight: var(--font-weight-bold); }
-.vrs-table tr.team-1-row .vrs-input:focus { border-color: var(--color-team1-accent); box-shadow: 0 0 0 3px var(--color-team1-accent-bg); }
-.vrs-table tr.team-2-row .vrs-input:focus { border-color: var(--color-team2-accent); box-shadow: 0 0 0 3px var(--color-team2-accent-bg); }
-
+.vrs-table tr.team-1-row td:first-child {
+    background-color: var(--color-team1-accent-bg);
+    color: var(--color-team1-accent);
+    font-weight: var(--font-weight-bold);
+    border-left: 4px solid var(--color-team1-accent);
+    padding-left: calc(var(--spacing-sm) - 1px); /* Учесть смещение из-за рамки, если ячейка имеет точную ширину */
+}
+.vrs-table tr.team-2-row td:first-child {
+    background-color: var(--color-team2-accent-bg);
+    color: var(--color-team2-accent);
+    font-weight: var(--font-weight-bold);
+    border-left: 4px solid var(--color-team2-accent);
+    padding-left: calc(var(--spacing-sm) - 1px);
+}
+.vrs-table tr.team-1-row .vrs-input:focus {
+    border-color: var(--color-team1-accent);
+    box-shadow: 0 0 0 3px var(--color-team1-accent-bg), inset 0 0 0 1px var(--color-team1-accent);
+    background-color: var(--color-surface);
+}
+.vrs-table tr.team-2-row .vrs-input:focus {
+    border-color: var(--color-team2-accent);
+    box-shadow: 0 0 0 3px var(--color-team2-accent-bg), inset 0 0 0 1px var(--color-team2-accent);
+    background-color: var(--color-surface);
+}
+.vrs-table tr.team-1-row:hover td:not(:first-child) {
+    background-color: rgba(var(--rgb-primary), 0.05);
+}
+.vrs-table tr.team-2-row:hover td:not(:first-child) {
+    background-color: rgba(219, 109, 40, 0.05);
+}
 
 .vrs-input { width: 100%; padding: var(--spacing-xs); font-size: 0.85rem; }
 .save-match-button { margin: var(--spacing-md); width: calc(100% - (2 * var(--spacing-md))); }
@@ -448,7 +473,6 @@ label {
 #vetoTable .veto-team.team-1-selected-veto, #vetoTable .veto-team.team-1-selected-veto:focus {
     color: var(--color-team1-accent) !important;
 }
-
 #vetoTable .veto-team.team-2-selected-veto {
     border-color: var(--color-team2-accent) !important;
     background-color: var(--color-team2-accent-bg) !important;
@@ -456,16 +480,12 @@ label {
 #vetoTable .veto-team.team-2-selected-veto, #vetoTable .veto-team.team-2-selected-veto:focus {
     color: var(--color-team2-accent) !important;
 }
-
-/* Цвет текста опций внутри селекта */
 #vetoTable .veto-team option {
-    color: var(--color-text-primary); /* Обычный цвет текста для опций */
-    background-color: var(--color-surface-tertiary); /* Фон для выпадающего списка */
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-tertiary);
 }
-/* Выделение активной опции (если браузер поддерживает) */
 #vetoTable .veto-team.team-1-selected-veto option[value="TEAM1"] { font-weight: var(--font-weight-semibold); color: var(--color-team1-accent); }
 #vetoTable .veto-team.team-2-selected-veto option[value="TEAM2"] { font-weight: var(--font-weight-semibold); color: var(--color-team2-accent); }
-
 
 #vetoTable .veto-action option[value="BAN"] { color: var(--color-error); font-weight:bold; }
 #vetoTable .veto-action option[value="PICK"] { color: var(--color-success); font-weight:bold; }
