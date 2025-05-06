@@ -1,153 +1,142 @@
 // public/js/mapVeto.js
 
 /**
- * Инициализирует селект выбора матча для блока Map Veto.
+ * Применяет классы к селекту команды в Veto для стилизации.
+ * @param {HTMLSelectElement} selectElement - Элемент селекта.
  */
+function styleVetoTeamSelect(selectElement) {
+  if (!selectElement) return;
+  selectElement.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
+  if (selectElement.value === "TEAM1") {
+      selectElement.classList.add('team-1-selected-veto');
+  } else if (selectElement.value === "TEAM2") {
+      selectElement.classList.add('team-2-selected-veto');
+  }
+}
+
+/**
+* Инициализирует селект выбора матча для блока Map Veto.
+*/
 export function initMapVeto() {
-  const matchSelect = document.getElementById("matchSelect");
-  if (!matchSelect) {
-      console.warn("[MapVeto] Match select element (#matchSelect) not found.");
-      return;
-  };
+const matchSelect = document.getElementById("matchSelect");
+if (!matchSelect) {
+  console.warn("[MapVeto] Match select element (#matchSelect) not found.");
+  return;
+}
 
-  // Очищаем предыдущие опции (на всякий случай)
-  matchSelect.innerHTML = '';
+matchSelect.innerHTML = ''; // Очищаем предыдущие опции
+for (let i = 1; i <= 4; i++) {
+  const opt = document.createElement("option");
+  opt.value = i;
+  opt.textContent = `Match ${i}`;
+  matchSelect.appendChild(opt);
+}
+matchSelect.value = "1"; // Значение по умолчанию
 
-  // Заполняем опциями матчами 1–4
-  for (let i = 1; i <= 4; i++) {
-    const opt = document.createElement("option");
-    opt.value = i; // Значение - номер матча
-    opt.textContent = `Match ${i}`; // Текст - "Match X"
-    matchSelect.appendChild(opt);
+// Привязываем слушатели к селектам команд в таблице Veto для обновления стилей при ручном выборе
+const vetoTeamSelects = document.querySelectorAll("#vetoTable .veto-team");
+vetoTeamSelects.forEach(select => {
+  styleVetoTeamSelect(select); // Применяем стиль при инициализации (на основе дефолтного значения)
+  select.addEventListener('change', () => styleVetoTeamSelect(select));
+});
+
+console.log("[MapVeto] Map Veto initialized and team select listeners attached.");
+}
+
+/**
+* Обновляет опции в селектах выбора команды в таблице Map Veto
+* на основе названий команд, выбранных для указанного матча, и применяет стили.
+* @param {string|number} matchIndex - Индекс матча (1-4), для которого нужно обновить Veto.
+*/
+export function updateVetoTeamOptions(matchIndex) {
+const vetoTeamSelects = document.querySelectorAll("#vetoTable .veto-team");
+if (vetoTeamSelects.length === 0) return;
+
+const team1SelectElement = document.getElementById(`team1Select${matchIndex}`); // Избегаем конфликта имен
+const team2SelectElement = document.getElementById(`team2Select${matchIndex}`);
+const team1Name = team1SelectElement?.value || "Team 1";
+const team2Name = team2SelectElement?.value || "Team 2";
+
+console.log(`[Veto UI] Updating team options for Veto Match <span class="math-inline">\{matchIndex\}\: T1\=</span>{team1Name}, T2=${team2Name}`);
+
+vetoTeamSelects.forEach(select => {
+  const currentValue = select.value; // Сохраняем текущее значение (TEAM1 или TEAM2)
+  select.innerHTML = ''; // Очищаем старые опции
+
+  const opt1 = document.createElement('option');
+  opt1.value = "TEAM1";
+  opt1.textContent = team1Name;
+  select.appendChild(opt1);
+
+  const opt2 = document.createElement('option');
+  opt2.value = "TEAM2";
+  opt2.textContent = team2Name;
+  select.appendChild(opt2);
+
+  // Восстанавливаем ранее выбранное значение (TEAM1 или TEAM2)
+  if (currentValue === "TEAM1" || currentValue === "TEAM2") {
+    select.value = currentValue;
+  } else {
+    select.value = "TEAM1"; // По умолчанию ставим TEAM1
+  }
+  styleVetoTeamSelect(select); // Применяем/обновляем стиль к селекту
+});
+}
+
+
+/**
+* Собирает данные из таблицы Map Veto.
+* @returns {object} - Объект с данными Map Veto.
+*/
+export function gatherMapVetoData() {
+const matchSelect = document.getElementById("matchSelect");
+const matchIndex = matchSelect ? parseInt(matchSelect.value, 10) : 1;
+
+const sel1 = document.getElementById(`team1Select${matchIndex}`);
+const sel2 = document.getElementById(`team2Select${matchIndex}`);
+const team1Name = sel1?.value || "Team 1";
+const team2Name = sel2?.value || "Team 2";
+const team1Logo = sel1 && sel1.selectedIndex >= 0 ? sel1.options[sel1.selectedIndex]?.dataset.logo || "" : "";
+const team2Logo = sel2 && sel2.selectedIndex >= 0 ? sel2.options[sel2.selectedIndex]?.dataset.logo || "" : "";
+
+const rows = document.querySelectorAll("#vetoTable tbody tr");
+const vetoArr = [];
+
+rows.forEach(row => {
+  const i = parseInt(row.dataset.index, 10);
+  const actionSelect = row.querySelector(".veto-action");
+  const teamSelect = row.querySelector(".veto-team");
+  const mapSelect = row.querySelector(".veto-map");
+  const sideSelect = row.querySelector(".veto-side");
+
+  const action = actionSelect ? actionSelect.value : "BAN";
+  const teamKey = teamSelect ? teamSelect.value : "TEAM1";
+  const mapName = mapSelect ? mapSelect.value : "inferno";
+  const side = sideSelect ? sideSelect.value : "-";
+
+  const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
+  const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
+
+  const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\<span class="math-inline">\{action\}\\\\</span>{mapName}.png`;
+  let sideIMG = "";
+  if (side === "CT") {
+    sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
+  } else if (side === "T") {
+    sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\t.png";
   }
 
-  // Значение по умолчанию — первый матч
-  matchSelect.value = "1";
-
-  console.log("[MapVeto] Map Veto initialized.");
-}
-
-/**
- * Обновляет опции в селектах выбора команды в таблице Map Veto
- * на основе названий команд, выбранных для указанного матча.
- * @param {string|number} matchIndex - Индекс матча (1-4), для которого нужно обновить Veto.
- */
-export function updateVetoTeamOptions(matchIndex) {
-    const vetoTeamSelects = document.querySelectorAll("#vetoTable .veto-team");
-    if (vetoTeamSelects.length === 0) return; // Выходим, если селектов нет
-
-    // Находим селекты команд для выбранного матча
-    const team1Select = document.getElementById(`team1Select${matchIndex}`);
-    const team2Select = document.getElementById(`team2Select${matchIndex}`);
-
-    // Получаем названия команд (или используем дефолтные)
-    const team1Name = team1Select?.value || "Team 1";
-    const team2Name = team2Select?.value || "Team 2";
-
-    console.log(`[Veto UI] Updating team options for Veto Match ${matchIndex}: T1=${team1Name}, T2=${team2Name}`);
-
-    // Обновляем опции в каждом селекте `.veto-team`
-    vetoTeamSelects.forEach(select => {
-        const currentValue = select.value; // Сохраняем текущее выбранное значение (TEAM1 или TEAM2)
-        select.innerHTML = ''; // Очищаем старые опции
-
-        // Создаем и добавляем новые опции
-        const opt1 = document.createElement('option');
-        opt1.value = "TEAM1";
-        opt1.textContent = team1Name; // Отображаемое имя
-        select.appendChild(opt1);
-
-        const opt2 = document.createElement('option');
-        opt2.value = "TEAM2";
-        opt2.textContent = team2Name; // Отображаемое имя
-        select.appendChild(opt2);
-
-        // Восстанавливаем ранее выбранное значение (TEAM1 или TEAM2), если оно валидно
-        if (currentValue === "TEAM1" || currentValue === "TEAM2") {
-             select.value = currentValue;
-        } else {
-             select.value = "TEAM1"; // По умолчанию ставим TEAM1
-        }
-    });
-}
-
-
-/**
- * Собирает данные из таблицы Map Veto.
- * @returns {object} - Объект с данными Map Veto.
- */
-export function gatherMapVetoData() {
-  // Номер выбранного в UI матча
-  const matchSelect = document.getElementById("matchSelect");
-  const matchIndex = matchSelect ? parseInt(matchSelect.value, 10) : 1; // По умолчанию 1
-
-  // Селекты команд в этом матче
-  const sel1 = document.getElementById(`team1Select${matchIndex}`);
-  const sel2 = document.getElementById(`team2Select${matchIndex}`);
-
-  // Имя и лого из data-атрибута ВЫБРАННОЙ опции селекта команды
-  const team1Name = sel1?.value || "Team 1"; // Имя команды 1
-  const team2Name = sel2?.value || "Team 2"; // Имя команды 2
-  const team1Logo = sel1 && sel1.selectedIndex >= 0 ? sel1.options[sel1.selectedIndex]?.dataset.logo || "" : "";
-  const team2Logo = sel2 && sel2.selectedIndex >= 0 ? sel2.options[sel2.selectedIndex]?.dataset.logo || "" : "";
-
-
-  // Проходим по всем строкам veto-таблицы
-  const rows = document.querySelectorAll("#vetoTable tbody tr");
-  const vetoArr = [];
-
-  rows.forEach(row => {
-    const i = parseInt(row.dataset.index, 10);
-    const actionSelect = row.querySelector(".veto-action");
-    const teamSelect = row.querySelector(".veto-team");
-    const mapSelect = row.querySelector(".veto-map");
-    const sideSelect = row.querySelector(".veto-side");
-
-    // Получаем значения из селектов
-    const action = actionSelect ? actionSelect.value : "BAN";
-    const teamKey = teamSelect ? teamSelect.value : "TEAM1"; // "TEAM1" или "TEAM2"
-    const mapName = mapSelect ? mapSelect.value : "inferno";
-    const side = sideSelect ? sideSelect.value : "-";
-
-    // Подставляем реальные имя и лого в зависимости от выбранного teamKey
-    const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
-    const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
-
-    // --- ИЗМЕНЕНИЕ: Восстанавливаем генерацию путей ---
-    // Вычисляем ссылку на изображение карты (vetoIMG)
-    // ВАЖНО: Убедитесь, что этот путь корректен для вашего vMix!
-    const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
-
-    // Вычисляем ссылку на изображение стороны (sideIMG)
-    let sideIMG = "";
-    // ВАЖНО: Убедитесь, что эти пути корректны для вашего vMix!
-    if (side === "CT") {
-      sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
-    } else if (side === "T") {
-      sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\t.png";
-    }
-    // --- КОНЕЦ ИЗМЕНЕНИЯ ---
-
-    vetoArr.push({
-      mapIndex: i,
-      action,
-      team: teamKey, // Сохраняем ключ TEAM1/TEAM2
-      teamName: realTeamName, // Сохраняем актуальное имя
-      teamLogo: realTeamLogo, // Сохраняем актуальное лого
-      map: mapName,
-      side,
-      vetoIMG, // Добавляем сгенерированный путь
-      sideIMG  // Добавляем сгенерированный путь
-    });
+  vetoArr.push({
+    mapIndex: i, action, team: teamKey, teamName: realTeamName,
+    teamLogo: realTeamLogo, map: mapName, side, vetoIMG, sideIMG
   });
+});
 
-  // Возвращаем объект с данными Veto
-  return {
-    matchIndex,
-    teams: {
-      TEAM1: { name: team1Name, logo: team1Logo },
-      TEAM2: { name: team2Name, logo: team2Logo }
-    },
-    veto: vetoArr
-  };
+return {
+  matchIndex,
+  teams: {
+    TEAM1: { name: team1Name, logo: team1Logo },
+    TEAM2: { name: team2Name, logo: team2Logo }
+  },
+  veto: vetoArr
+};
 }
