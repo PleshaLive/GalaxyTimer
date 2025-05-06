@@ -3,49 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление командами</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="teams.css"> </head>
+    <title>Управление командами - Обновленный дизайн</title>
+    <link rel="stylesheet" href="style.css"> <style>
+        /* Специфичные стили для страницы команд, если нужны, но постараемся обойтись общими */
+        .teams-page-container {
+            max-width: 900px;
+            margin: var(--spacing-xl) auto;
+            padding: var(--spacing-lg);
+            background-color: var(--color-surface);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .teams-page-container h1 {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+            color: var(--color-primary);
+        }
+        #addTeamForm {
+            display: flex;
+            flex-wrap: wrap; /* Для адаптивности */
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background-color: var(--color-surface-secondary);
+            border-radius: var(--border-radius-md);
+        }
+        #addTeamForm .header-input { /* Используем класс из общих стилей */
+            flex-grow: 1;
+            min-width: 200px; /* Минимальная ширина для полей */
+        }
+        #addTeamForm button { /* Используем стили для .app-button */
+            white-space: nowrap;
+            flex-shrink: 0; /* Чтобы кнопка не сжималась */
+        }
+
+        .table-wrapper { overflow-x: auto; } /* Для адаптивности таблицы */
+
+        #teamsTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--spacing-lg);
+        }
+        #teamsTable th, #teamsTable td {
+            border: 1px solid var(--color-border);
+            padding: var(--spacing-md);
+            text-align: left;
+            vertical-align: middle;
+        }
+        #teamsTable th {
+            background-color: var(--color-surface-secondary);
+            font-weight: var(--font-weight-semibold);
+        }
+        #teamsTable td input.edit-input {
+            width: calc(100% - 10px); /* Немного отступа */
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--color-border);
+            font-size: 0.9rem;
+        }
+        #teamsTable td input.edit-input:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        .actions-cell {
+            white-space: nowrap; /* Чтобы кнопки не переносились */
+        }
+        .actions-cell .action-button + .action-button { /* Отступ между кнопками действий */
+            margin-left: var(--spacing-sm);
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: var(--spacing-xl);
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: var(--font-weight-semibold);
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            #addTeamForm {
+                flex-direction: column;
+            }
+            #addTeamForm .header-input, #addTeamForm button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
 <body>
-    <div class="container">
-        <header class="page-header">
-            <h1>Управление командами</h1>
-            <a href="/" class="back-link">Назад к матчам</a>
-        </header>
+    <div class="teams-page-container">
+        <a href="/" class="back-link">&larr; Назад к интерфейсу матчей</a>
+        <h1>Управление командами</h1>
 
-        <section class="add-team-section">
-            <h2>Добавить новую команду</h2>
-            <form id="addTeamForm" class="team-form">
-                <div class="form-group form-group-name">
-                    <label for="newTeamName">Название команды:</label>
-                    <input type="text" id="newTeamName" name="name" required class="team-input">
-                </div>
-                <div class="form-group form-group-logo">
-                    <label for="newTeamLogo">Имя файла лого (без .png и /logos/):</label>
-                    <input type="text" id="newTeamLogo" name="logoFilename" placeholder="например, navi или g2" class="team-input">
-                </div>
-                <button type="submit" class="team-button add-button">Добавить команду</button>
-            </form>
-        </section>
+        <form id="addTeamForm">
+            <input type="text" id="newTeamName" placeholder="Название команды" required class="header-input">
+            <input type="text" id="newTeamLogo" placeholder="Имя файла лого (например, navi)" class="header-input">
+            <button type="submit" class="app-button">Добавить команду</button>
+        </form>
 
-        <section class="team-list-section">
-            <h2>Список команд</h2>
-            <div class="table-wrapper">
-                <table id="teamsTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th>                 <th>Название команды</th>   <th>Имя файла лого</th>    <th>Действия</th>           </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="4">Загрузка команд...</td>
-                        </tr>
-                        </tbody>
-                </table>
-            </div>
-        </section>
+        <div class="table-wrapper">
+            <table id="teamsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Название</th>
+                        <th>Лого (файл)</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="4" style="text-align:center; padding: var(--spacing-lg);">Загрузка команд...</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="js/teams.js"></script>
 </body>
 </html>
