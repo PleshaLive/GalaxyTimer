@@ -1,4 +1,4 @@
-/* ========== ГЛОБАЛЬНЫЕ СТИЛИ И ПЕРЕМЕННЫЕ (ОБНОВЛЕННЫЕ) ========== */
+/* ========== ГЛОБАЛЬНЫЕ СТИЛИ И ПЕРЕМЕННЫЕ (ТЕМНАЯ ТЕМА) ========== */
 :root {
   --font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   --font-weight-light: 300;
@@ -6,51 +6,48 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  /* Светлая тема */
-  --color-background: #f8f9fa;       /* Очень светлый фон страницы */
-  --color-surface: #ffffff;          /* Фон карточек, элементов */
-  --color-surface-secondary: #f1f3f5; /* Слегка отличающийся фон для некоторых блоков */
-  --color-border: #dee2e6;           /* Цвет границ */
-  --color-divider: #e9ecef;          /* Разделители */
+  /* Темная тема */
+  --color-background: #121212;       /* Очень темный фон страницы (почти черный) */
+  --color-surface: #1e1e1e;          /* Фон карточек, элементов (темно-серый) */
+  --color-surface-secondary: #2a2a2a; /* Слегка отличающийся фон для некоторых блоков */
+  --color-border: #3a3a3a;           /* Цвет границ */
+  --color-divider: #303030;          /* Разделители */
 
-  --color-text-primary: #212529;       /* Основной цвет текста (почти черный) */
-  --color-text-secondary: #495057;    /* Вторичный текст, лейблы */
-  --color-text-muted: #6c757d;        /* Приглушенный текст */
-  --color-text-on-primary: #ffffff;   /* Текст на основных кнопках */
-  --color-text-on-dark-bg: #ffffff;   /* Текст для темных фонов (например, JSON output) */
+  --color-text-primary: #e0e0e0;       /* Основной цвет текста (светло-серый) */
+  --color-text-secondary: #b0b0b0;    /* Вторичный текст, лейблы */
+  --color-text-muted: #757575;        /* Приглушенный текст */
+  --color-text-on-primary: #ffffff;   /* Текст на основных кнопках (если фон кнопки темный) */
+                                      /* или #000000 если фон кнопки светлый акцентный */
+  --color-text-placeholder: #5a5a5a;  /* Цвет для плейсхолдеров */
 
+  --color-primary: #3d8bfd;           /* Яркий синий для акцентов на темном */
+  --color-primary-dark: #0069d9;
+  --color-primary-light: #60a3ff;
 
-  --color-primary: #007bff;           /* Основной акцентный цвет (стандартный синий) */
-  --color-primary-dark: #0056b3;
-  --color-primary-light: #cfe2ff;     /* Для ховеров и акцентов */
-
-  --color-secondary: #6c757d;         /* Вторичный акцент (серый) */
+  --color-secondary: #6c757d;         /* Вторичный акцент (серый, как и был, но для контраста) */
   --color-secondary-dark: #545b62;
-  --color-secondary-light: #e9ecef;
+  --color-secondary-light: #8a9299;
 
-  --color-success: #198754;           /* Успех (зеленый) */
-  --color-success-dark: #146c43;
-  --color-success-light: #d1e7dd;
+  --color-success: #20c997;           /* Яркий зеленый */
+  --color-success-dark: #19a478;
+  --color-success-light: #50d7aa;
 
-
-  --color-warning: #ffc107;           /* Предупреждение (желтый, для LIVE) */
+  --color-warning: #ffc107;           /* Желтый (остается ярким) */
   --color-warning-dark: #d39e00;
-  --color-warning-text: #000;         /* Текст для желтого фона */
+  --color-warning-text: #212529;      /* Темный текст для желтого фона */
 
+  --color-error: #f25252;             /* Яркий красный */
+  --color-error-dark: #d93a3a;
+  --color-error-light: #f77878;
 
-  --color-error: #dc3545;             /* Ошибка (красный, для BAN) */
-  --color-error-dark: #b02a37;
-  --color-error-light: #f8d7da;
-
-  --color-info: #0dcaf0;              /* Инфо (голубой, для UPCOM) */
-  --color-info-dark: #0aa3c2;
-  --color-info-text: #000;            /* Текст для голубого фона */
+  --color-info: #31d2f2;              /* Яркий голубой */
+  --color-info-dark: #25b6cf;
+  --color-info-text: #212529;         /* Темный текст для светлого инфо-фона */
 
   /* Цвета для статусов матчей */
   --color-upcom: var(--color-info);
   --color-live: var(--color-warning);
-  --color-finished: var(--color-success); /* Сделал зеленым для завершенных */
-
+  --color-finished: var(--color-success);
 
   --spacing-xs: 4px;
   --spacing-sm: 8px;
@@ -60,13 +57,14 @@
 
   --border-radius-sm: 0.2rem;
   --border-radius-md: 0.25rem;
-  --border-radius-lg: 0.375rem; /* Немного увеличил для карточек */
+  --border-radius-lg: 0.375rem;
   --border-radius-xl: 0.5rem;
 
-
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); /* Bootstrap-like shadows */
-  --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+  /* Тени для темной темы могут быть светлыми или отсутствовать,
+     вместо них используется контраст и рамки */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2); /* Более выраженные тени на темном */
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.3);
 
   --transition-base: all 0.2s ease-in-out;
 }
@@ -97,16 +95,36 @@ body {
   padding: var(--spacing-lg);
 }
 
+/* Общий стиль для "карточных" блоков */
+.card-style {
+  background-color: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+.card-style:hover {
+    box-shadow: var(--shadow-md);
+    /* transform: translateY(-2px); */ /* Можно добавить, если нравится эффект */
+}
+
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-semibold);
   line-height: 1.3;
-  margin-bottom: var(--spacing-md); /* Увеличил отступ для заголовков */
+  margin-bottom: var(--spacing-md);
   color: var(--color-text-primary);
 }
 h1 { font-size: 2.25rem; color: var(--color-primary); margin-bottom: var(--spacing-lg);}
-h2 { font-size: 1.5rem; } /* Для названий матчей */
-h3 { font-size: 1.1rem; color: var(--color-text-secondary); margin-bottom: var(--spacing-sm); } /* Для подзаголовков в карточках */
-
+h2 { font-size: 1.5rem; }
+.section-title { /* Для заголовков в отдельных блоках, как "Управление паузой" */
+    font-size: 1.3rem;
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-divider);
+}
 
 label {
   display: block;
@@ -116,7 +134,7 @@ label {
   margin-bottom: var(--spacing-xs);
 }
 
-/* ========== ОСНОВНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (ОБНОВЛЕННЫЕ) ========== */
+/* ========== ОСНОВНЫЕ ЭЛЕМЕНТЫ УПРАВЛЕНИЯ (ТЕМНАЯ ТЕМА) ========== */
 .header-input,
 .control-select,
 .team-select,
@@ -125,7 +143,7 @@ label {
 .time-input,
 .status-select,
 .veto-action, .veto-map, .veto-team, .veto-side {
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-secondary); /* Темнее фон для инпутов */
   border: 1px solid var(--color-border);
   color: var(--color-text-primary);
   border-radius: var(--border-radius-md);
@@ -135,13 +153,13 @@ label {
   transition: var(--transition-base);
   outline: none;
   width: 100%;
-  appearance: none; /* Убрать стандартный вид селекта для кастомизации */
+  appearance: none;
 }
 
-/* Кастомная стрелка для селектов */
+/* Кастомная стрелка для селектов (под темную тему) */
 .control-select, .team-select, .map-name-select, .status-select,
 .veto-action, .veto-map, .veto-team, .veto-side {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23b0b0b0' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e"); /* Цвет стрелки изменен */
   background-repeat: no-repeat;
   background-position: right var(--spacing-md) center;
   background-size: 16px 12px;
@@ -158,14 +176,17 @@ label {
 .status-select:focus,
 .veto-action:focus, .veto-map:focus, .veto-team:focus, .veto-side:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 0.2rem rgba(var(--rgb-primary, 61, 139, 253), 0.35); /* Нужна переменная --rgb-primary или явный цвет */
+  background-color: var(--color-surface); /* Чуть светлее при фокусе */
 }
+:root { --rgb-primary: 61, 139, 253; } /* Добавил для box-shadow */
+
 
 .header-input::placeholder,
 .map-score-input::placeholder,
 .time-input::placeholder {
-  color: var(--color-text-muted);
-  opacity: 0.8;
+  color: var(--color-text-placeholder);
+  opacity: 1; /* На темном фоне лучше без прозрачности */
 }
 
 /* Базовый стиль для кнопок */
@@ -183,16 +204,19 @@ label {
   min-width: 120px;
 }
 
-/* Основная кнопка (синяя) */
+/* Основная кнопка */
 .app-button,
 .save-match-button,
 #saveMapVetoButton,
 #saveHeaderButton,
 #savePauseButton {
   background-color: var(--color-primary);
-  color: var(--color-text-on-primary);
+  color: var(--color-text-on-primary); /* Предполагаем, что --color-primary достаточно темный для белого текста */
   border-color: var(--color-primary);
 }
+/* Если --color-primary светлый, то текст кнопки должен быть темным:
+   color: var(--color-text-primary);
+*/
 .app-button:hover,
 .save-match-button:hover,
 #saveMapVetoButton:hover,
@@ -204,20 +228,20 @@ label {
 
 /* Вторичная/контурная кнопка */
 .app-button.tertiary-button {
-    background-color: var(--color-surface);
-    color: var(--color-primary);
+    background-color: transparent;
+    color: var(--color-primary-light); /* Светлее для лучшего контраста */
     border-color: var(--color-primary);
 }
 .app-button.tertiary-button:hover {
-    background-color: var(--color-primary-light);
-    color: var(--color-primary-dark);
+    background-color: rgba(var(--rgb-primary), 0.1);
+    color: var(--color-primary);
 }
 
 
 /* Кнопки действий в таблице команд (Edit, Delete) */
 .action-button {
   background-color: transparent;
-  color: var(--color-primary);
+  color: var(--color-primary-light);
   border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
   font-size: 0.85rem;
@@ -227,13 +251,17 @@ label {
 }
 .action-button:hover {
   text-decoration: underline;
+  color: var(--color-primary);
 }
 .action-button.delete-button {
+  color: var(--color-error-light);
+}
+.action-button.delete-button:hover {
   color: var(--color-error);
 }
 
 
-/* ========== HEADER (ОБНОВЛЕННЫЙ) ========== */
+/* ========== HEADER (ТЕМНАЯ ТЕМА) ========== */
 .header-controls {
   background-color: var(--color-surface);
   padding: var(--spacing-lg);
@@ -244,12 +272,13 @@ label {
   flex-wrap: wrap;
   gap: var(--spacing-lg);
   align-items: flex-end;
+  border: 1px solid var(--color-border);
 }
 
 .header-group {
   display: flex;
   flex-wrap: nowrap;
-  gap: var(--spacing-md); /* Увеличил немного */
+  gap: var(--spacing-md);
   align-items: center;
   flex-grow: 1;
 }
@@ -257,10 +286,10 @@ label {
   margin-bottom: 0;
   white-space: nowrap;
   color: var(--color-text-secondary);
-  font-size: 0.8rem; /* Чуть меньше лейблы в хедере */
+  font-size: 0.8rem;
 }
 .header-group .header-input {
-    min-width: 180px; /* Увеличил для лучшего вида */
+    min-width: 180px;
 }
 
 .tournament-dates {
@@ -269,36 +298,53 @@ label {
 .date-input {
   width: auto;
   min-width: 150px;
+  color-scheme: dark; /* Чтобы календарь тоже был темным */
 }
 
 .tournament-day {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-primary);
+  color: var(--color-primary-light);
   margin-left: var(--spacing-sm);
-  font-size: 0.9rem; /* Немного уменьшил */
+  font-size: 0.9rem;
   white-space: nowrap;
   padding: var(--spacing-sm) 0;
 }
 
-.pause-controls {
-  flex-grow: 2;
-  border-left: 2px solid var(--color-divider); /* Визуальное разделение */
-  padding-left: var(--spacing-lg);
-}
-.pause-message {
-  flex-grow: 2;
-}
-.pause-time {
-  width: 110px;
-  text-align: center;
-  flex-grow: 0;
-}
 
-#saveHeaderButton, #savePauseButton {
+#saveHeaderButton {
     flex-grow: 0;
     white-space: nowrap;
-    padding: var(--spacing-sm) var(--spacing-md); /* Компактнее кнопки в хедере */
+    padding: var(--spacing-sm) var(--spacing-md);
 }
+
+/* Отдельный блок для паузы */
+.pause-section {
+    /* card-style уже применен в HTML */
+}
+.pause-controls-standalone {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+.pause-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* По умолчанию в одну колонку */
+    gap: var(--spacing-md);
+}
+@media (min-width: 768px) { /* Для десктопов в две колонки */
+    .pause-fields-grid {
+        grid-template-columns: repeat(2, 1fr);
+        align-items: flex-end; /* Чтобы лейблы и инпуты выровнялись */
+    }
+}
+.form-group { /* Обертка для label + input в гриде */
+    display: flex;
+    flex-direction: column;
+}
+.pause-controls-standalone .app-button {
+    align-self: flex-start; /* Кнопка не растягивается */
+}
+
 
 /* Заголовок страницы и ссылка на команды */
 .page-title-container {
@@ -313,7 +359,7 @@ label {
   margin-bottom: 0;
 }
 .teams-link {
-  color: var(--color-primary);
+  color: var(--color-primary-light);
   text-decoration: none;
   padding: var(--spacing-sm) var(--spacing-lg);
   border: 1px solid var(--color-primary);
@@ -323,11 +369,11 @@ label {
 }
 .teams-link:hover {
   background-color: var(--color-primary);
-  color: var(--color-text-on-primary);
+  color: var(--color-text-on-primary); /* Или var(--color-background) если основной цвет светлый */
 }
 
 
-/* ========== DASHBOARD & MATCHES GRID (ОБНОВЛЕННЫЙ) ========== */
+/* ========== DASHBOARD & MATCHES GRID (ТЕМНАЯ ТЕМА) ========== */
 .dashboard {
     display: flex;
     flex-direction: column;
@@ -340,20 +386,9 @@ label {
   gap: var(--spacing-lg);
 }
 
-/* ========== MATCH CARD (ОБНОВЛЕННЫЙ) ========== */
-.match-column {
-  background-color: var(--color-surface);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  transition: var(--transition-base);
-  border: 1px solid var(--color-border);
-  overflow: hidden;
-}
-.match-column:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-3px);
+/* ========== MATCH CARD (ТЕМНАЯ ТЕМА) ========== */
+.match-column { /* card-style уже применен в HTML */
+  overflow: hidden; /* Для корректного отображения border-top */
 }
 
 /* Индикация статуса */
@@ -367,12 +402,12 @@ label {
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md);
-  /* background-color: var(--color-surface-secondary); убрал, чтобы было чище */
   border-bottom: 1px solid var(--color-divider);
+  background-color: var(--color-surface-secondary); /* Шапка чуть темнее */
 }
 .match-header h2 {
   margin-bottom: 0;
-  font-size: 1.25rem; /* Чуть крупнее */
+  font-size: 1.25rem;
   color: var(--color-text-primary);
 }
 .match-header .status-select { width: 110px; font-size: 0.85rem; }
@@ -386,7 +421,7 @@ label {
 
 .match-teams {
   display: flex;
-  align-items: stretch; /* Чтобы блоки команд были одной высоты */
+  align-items: stretch;
   justify-content: space-between;
   padding: var(--spacing-md);
   gap: var(--spacing-md);
@@ -397,7 +432,7 @@ label {
   flex-direction: column;
 }
 .team-block label {
-    font-size: 0.75rem; /* Меньше лейблы */
+    font-size: 0.75rem;
     margin-bottom: var(--spacing-xs);
 }
 .vs-indicator {
@@ -419,7 +454,7 @@ label {
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   padding: var(--spacing-sm);
-  font-size: 0.8rem; /* Компактнее */
+  font-size: 0.8rem;
   border-radius: var(--border-radius-sm);
   text-align: center;
   white-space: nowrap;
@@ -427,20 +462,25 @@ label {
   text-overflow: ellipsis;
 }
 .winner-btn:hover {
-  background-color: var(--color-secondary-light);
+  background-color: var(--color-secondary-light); /* Нужно подобрать цвет для ховера на темном */
   border-color: var(--color-text-muted);
   color: var(--color-text-primary);
 }
 .winner-btn.winner-selected {
   background-color: var(--color-success);
   border-color: var(--color-success-dark);
-  color: var(--color-text-on-primary);
+  color: var(--color-text-on-primary); /* или темный, если success светлый */
   font-weight: var(--font-weight-semibold);
 }
 
 .maps {
   padding: var(--spacing-md);
   border-top: 1px solid var(--color-divider);
+}
+.maps h3 {
+  font-size: 1rem;
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-text-secondary);
 }
 
 .map-row {
@@ -463,7 +503,7 @@ label {
 .vrs-block-wrapper {
   padding: var(--spacing-md);
   border-top: 1px solid var(--color-divider);
-  background-color: var(--color-surface-secondary); /* Фон для всего блока VRS */
+  /* background-color: var(--color-surface-secondary); */ /* Убрал, т.к. вся карточка одного фона */
 }
 .vrs-block h3 {
     font-size: 1rem;
@@ -481,10 +521,9 @@ label {
   padding: var(--spacing-sm);
   text-align: center;
   color: var(--color-text-secondary);
-  background-color: var(--color-surface); /* Ячейки белые */
 }
 .vrs-table th {
-  background-color: var(--color-surface-secondary); /* Шапка таблицы чуть темнее */
+  background-color: var(--color-surface-secondary);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
@@ -497,27 +536,17 @@ label {
   width: 100%;
   padding: var(--spacing-xs);
   font-size: 0.85rem;
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  text-align: center;
-  border-radius: var(--border-radius-sm);
+  /* Стили инпутов уже определены глобально */
 }
-.vrs-input:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 0.15rem rgba(0, 123, 255, 0.25);
-}
+
 
 .save-match-button {
   margin: var(--spacing-md);
   width: calc(100% - (2 * var(--spacing-md)));
 }
 
-/* ========== MAP VETO SECTION (ОБНОВЛЕННЫЙ) ========== */
-.map-veto-block {
-  background-color: var(--color-surface);
-  padding: var(--spacing-lg);
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-sm);
+/* ========== MAP VETO SECTION (ТЕМНАЯ ТЕМА) ========== */
+.map-veto-block { /* card-style уже применен */
   margin-top: var(--spacing-xl);
 }
 
@@ -530,7 +559,7 @@ label {
 .map-veto-header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md); /* Увеличил отступ */
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
 }
 .map-veto-header label {
@@ -538,7 +567,7 @@ label {
   font-weight: var(--font-weight-normal);
 }
 #matchSelect {
-  min-width: 250px; /* Увеличил */
+  min-width: 250px;
   width: auto;
   flex-grow: 1;
   max-width: 400px;
@@ -565,17 +594,15 @@ label {
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
 }
-#vetoTable .control-select {
-  width: 100%;
-  padding: var(--spacing-sm);
-  font-size: 0.9rem;
-  background-color: var(--color-surface);
+#vetoTable .control-select { /* Селекты внутри таблицы Veto */
+  /* Стили уже определены глобально */
 }
 
 
 #vetoTable .veto-action option[value="BAN"] { color: var(--color-error); font-weight: var(--font-weight-semibold); }
 #vetoTable .veto-action option[value="PICK"] { color: var(--color-success); font-weight: var(--font-weight-semibold); }
 #vetoTable .veto-action option[value="DECIDER"] { color: var(--color-primary); font-weight: var(--font-weight-semibold); }
+/* Примечание: стилизация option может плохо работать в некоторых браузерах */
 
 #saveMapVetoButton {
   display: block;
@@ -583,39 +610,41 @@ label {
   min-width: 200px;
 }
 
-/* ========== JSON OUTPUT (ОБНОВЛЕННЫЙ) ========== */
-.json-output-container {
+/* ========== JSON OUTPUT (ТЕМНАЯ ТЕМА) ========== */
+.json-output-container { /* card-style уже применен */
     margin-top: var(--spacing-xl);
-    text-align: center;
+    padding: var(--spacing-md); /* Внутренний отступ для кнопки */
+}
+.json-output-container #toggleJsonOutput {
+    margin-bottom: var(--spacing-md);
 }
 .json-output {
-  background: #282c34; /* Более стандартный темный фон для кода */
-  color: #abb2bf;      /* Стандартный светлый текст для кода */
+  background: #1c1c1c; /* Чуть светлее основного фона для выделения */
+  color: #d4d4d4;
   padding: var(--spacing-lg);
   border-radius: var(--border-radius-md);
   white-space: pre-wrap;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-  font-size: 0.875rem; /* Чуть крупнее для читаемости */
-  border: 1px solid #3a3f4a;
+  font-size: 0.875rem;
+  border: 1px solid var(--color-border);
   max-height: 450px;
   overflow-y: auto;
   text-align: left;
-  margin-top: var(--spacing-md);
 }
 
-/* ========== BUTTON STATES (SAVING, SAVED, ERROR) - ОБНОВЛЕННЫЕ ========== */
+/* ========== BUTTON STATES (SAVING, SAVED, ERROR) - ТЕМНАЯ ТЕМА ========== */
 .app-button.saving, button.saving,
 .app-button:disabled, button:disabled {
-  background-color: var(--color-secondary) !important; /* Серый цвет */
-  border-color: var(--color-secondary) !important;
+  background-color: var(--color-secondary-dark) !important;
+  border-color: var(--color-secondary-dark) !important;
   cursor: wait !important;
-  color: var(--color-text-on-dark-bg) !important;
+  color: var(--color-text-muted) !important;
   opacity: 0.65;
 }
 .app-button.saved, button.saved {
   background-color: var(--color-success) !important;
   border-color: var(--color-success-dark) !important;
-  color: var(--color-text-on-primary) !important;
+  color: var(--color-text-on-primary) !important; /* или темный текст, если success светлый */
 }
 .app-button.error, button.error {
   background-color: var(--color-error) !important;
@@ -644,30 +673,33 @@ label {
     flex-direction: column;
     align-items: stretch;
     width: 100%;
-    gap: var(--spacing-sm); /* Уменьшил гэп в мобильной версии */
+    gap: var(--spacing-sm);
   }
   .header-group .header-input,
-  .header-group .date-input,
-  .header-group .pause-time,
-  .header-group .pause-message {
+  .header-group .date-input {
     width: 100%;
   }
-  #saveHeaderButton, #savePauseButton {
+  #saveHeaderButton {
     width: 100%;
-    margin-top: var(--spacing-md); /* Увеличил отступ */
+    margin-top: var(--spacing-md);
   }
   .tournament-day { text-align: center; padding: var(--spacing-sm) 0; }
-  .pause-controls { border-left: none; padding-left: 0; border-top: 2px solid var(--color-divider); padding-top: var(--spacing-lg); }
+
+  .pause-section .pause-fields-grid {
+      grid-template-columns: 1fr; /* В одну колонку на планшетах тоже */
+  }
+  .pause-section .app-button {
+      width: 100%;
+  }
 
 
   .page-title-container {
       flex-direction: column;
       gap: var(--spacing-md);
-      align-items: center; /* Центрирование */
+      align-items: center;
       text-align: center;
   }
   .teams-link {
-      /* align-self: center; - уже не нужно, т.к. родитель center */
       display: inline-block;
       width: auto;
   }

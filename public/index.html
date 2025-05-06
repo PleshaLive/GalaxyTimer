@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Интерфейс матчей v2.3 - Обновленный дизайн</title>
+  <title>Интерфейс матчей v2.3 - Темный дизайн</title>
   <link rel="stylesheet" href="style.css" />
-  </head>
+</head>
 <body>
   <div class="container">
 
@@ -24,36 +24,45 @@
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
-      <button id="saveHeaderButton" class="app-button">Save Header</button> <div class="header-group pause-controls">
-          <label for="pauseMessageInput">Сообщение паузы:</label>
-          <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
-          <label for="pauseTimeInput">Last UPD:</label>
-          <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
-          <button id="savePauseButton" class="app-button">Save Pause</button> </div>
+      <button id="saveHeaderButton" class="app-button">Save Header</button>
     </header>
+
+    <section class="pause-section card-style">
+        <div class="pause-controls-standalone">
+            <h2 class="section-title">Управление паузой</h2>
+            <div class="pause-fields-grid">
+                <div class="form-group">
+                    <label for="pauseMessageInput">Сообщение паузы:</label>
+                    <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
+                </div>
+                <div class="form-group">
+                    <label for="pauseTimeInput">Last UPD:</label>
+                    <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
+                </div>
+            </div>
+            <button id="savePauseButton" class="app-button">Save Pause</button>
+        </div>
+    </section>
 
     <div class="page-title-container">
         <h1>Интерфейс матчей</h1>
         <a href="/teams" class="teams-link">Управление командами</a>
     </div>
 
-
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
-
-      socket.on("jsonUpdate", data => {
-        // console.log("[SOCKET] Received jsonUpdate for debug display:", data); // Оставим на случай отладки
+      // ... (остальной ваш JS для сокетов на этой странице, если он был)
+      // Важно: убедитесь, что обработчик socket.on("pauseUpdate", ...) находится в main.js
+      // и корректно обновляет эти поля, если он был убран из HTML.
+      // Для примера оставлю его здесь, но лучше иметь один источник истины для обновления UI.
+       socket.on("jsonUpdate", data => {
         const jsonOutput = document.getElementById("jsonOutput");
         if (jsonOutput) {
           jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
       });
-
-      // Обработчик pauseUpdate в main.js, здесь можно убрать дублирование, если оно там есть.
-      // Если нет, то оставляем. Для примера - оставляю, но лучше проверить main.js
       socket.on("pauseUpdate", (pauseData) => {
-         console.log("[SOCKET] Received pauseUpdate (index.html direct):", pauseData);
          const msgInput = document.getElementById('pauseMessageInput');
          const timeInput = document.getElementById('pauseTimeInput');
          if (pauseData) {
@@ -68,8 +77,7 @@
 
     <div class="dashboard">
       <div class="matches">
-
-        <div class="match-column" data-match="1" data-winner="">
+        <div class="match-column card-style" data-match="1" data-winner="">
           <div class="match-header">
             <h2>Match 1</h2>
             <select class="status-select" id="statusSelect1">
@@ -126,7 +134,7 @@
           <button class="save-match-button app-button" data-match-index="1">Save Match 1</button>
         </div>
 
-        <div class="match-column" data-match="2" data-winner="">
+        <div class="match-column card-style" data-match="2" data-winner="">
             <div class="match-header">
               <h2>Match 2</h2>
               <select class="status-select" id="statusSelect2"><option value="UPCOM">UPCOM</option> <option value="LIVE">LIVE</option> <option value="FINISHED">FINISHED</option></select>
@@ -168,7 +176,7 @@
               <button class="save-match-button app-button" data-match-index="2">Save Match 2</button>
         </div>
 
-        <div class="match-column" data-match="3" data-winner="">
+        <div class="match-column card-style" data-match="3" data-winner="">
             <div class="match-header">
               <h2>Match 3</h2>
               <select class="status-select" id="statusSelect3"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
@@ -210,7 +218,7 @@
               <button class="save-match-button app-button" data-match-index="3">Save Match 3</button>
         </div>
 
-        <div class="match-column" data-match="4" data-winner="">
+        <div class="match-column card-style" data-match="4" data-winner="">
             <div class="match-header">
               <h2>Match 4</h2>
               <select class="status-select" id="statusSelect4"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
@@ -252,7 +260,7 @@
               <button class="save-match-button app-button" data-match-index="4">Save Match 4</button>
         </div>
 
-      </div> <div class="map-veto-block">
+      </div> <div class="map-veto-block card-style">
         <div class="map-veto-content">
           <h1>MAP VETO</h1>
           <div class="map-veto-header">
@@ -268,9 +276,9 @@
                 </tr>
               </thead>
               <tbody>
-                <tr data-index="1"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
-                <tr data-index="2"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
-                <tr data-index="3"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option>overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                <tr data-index="1"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option>vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                <tr data-index="2"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                <tr data-index="3"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option>train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
                 <tr data-index="4"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
                 <tr data-index="5"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option>anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
                 <tr data-index="6"><td><select class="veto-action control-select"><option>BAN</option><option>PICK</option><option>DECIDER</option></select></td><td><select class="veto-map control-select"><option>inferno</option><option>dust2</option><option>mirage</option><option>nuke</option><option>ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select></td><td><select class="veto-team control-select"><option value="TEAM1">TEAM1</option><option value="TEAM2">TEAM2</option></select></td><td><select class="veto-side control-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
@@ -280,13 +288,12 @@
           </div>
           <button id="saveMapVetoButton" class="app-button">Save Map Veto</button>
         </div>
-        </div> <div class="json-output-container">
+      </div> <div class="json-output-container card-style">
           <button id="toggleJsonOutput" class="app-button tertiary-button">Показать/Скрыть JSON</button>
           <div class="json-output" id="jsonOutput" style="display: none;">
             JSON data will appear here...
           </div>
       </div>
-
 
     </div> </div> <script type="module" src="js/main.js"></script>
   <script>

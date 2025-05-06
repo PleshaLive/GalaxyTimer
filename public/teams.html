@@ -3,41 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Управление командами - Обновленный дизайн</title>
+    <title>Управление командами - Темный дизайн</title>
     <link rel="stylesheet" href="style.css"> <style>
         /* Специфичные стили для страницы команд, если нужны, но постараемся обойтись общими */
-        .teams-page-container {
+        .teams-page-container { /* Используем card-style для единообразия */
             max-width: 900px;
             margin: var(--spacing-xl) auto;
-            padding: var(--spacing-lg);
-            background-color: var(--color-surface);
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
+            /* padding, background-color, border-radius, box-shadow, border - уже из .card-style */
         }
         .teams-page-container h1 {
             text-align: center;
             margin-bottom: var(--spacing-lg);
-            color: var(--color-primary);
+            color: var(--color-primary); /* Или var(--color-text-primary) для менее яркого заголовка */
         }
         #addTeamForm {
             display: flex;
-            flex-wrap: wrap; /* Для адаптивности */
+            flex-wrap: wrap;
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
             padding: var(--spacing-lg);
-            background-color: var(--color-surface-secondary);
+            background-color: var(--color-surface-secondary); /* Немного другой фон для формы */
             border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border);
         }
-        #addTeamForm .header-input { /* Используем класс из общих стилей */
+        #addTeamForm .header-input {
             flex-grow: 1;
-            min-width: 200px; /* Минимальная ширина для полей */
+            min-width: 200px;
         }
-        #addTeamForm button { /* Используем стили для .app-button */
+        #addTeamForm button {
             white-space: nowrap;
-            flex-shrink: 0; /* Чтобы кнопка не сжималась */
+            flex-shrink: 0;
         }
 
-        .table-wrapper { overflow-x: auto; } /* Для адаптивности таблицы */
+        .table-wrapper { overflow-x: auto; }
 
         #teamsTable {
             width: 100%;
@@ -51,35 +49,33 @@
             vertical-align: middle;
         }
         #teamsTable th {
-            background-color: var(--color-surface-secondary);
+            background-color: var(--color-surface-secondary); /* Шапка таблицы */
             font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
         }
         #teamsTable td input.edit-input {
-            width: calc(100% - 10px); /* Немного отступа */
+            width: calc(100% - 10px);
             padding: var(--spacing-sm);
             border-radius: var(--border-radius-sm);
-            border: 1px solid var(--color-border);
-            font-size: 0.9rem;
+            /* Стили для инпутов уже определены глобально */
         }
-        #teamsTable td input.edit-input:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
+
         .actions-cell {
-            white-space: nowrap; /* Чтобы кнопки не переносились */
+            white-space: nowrap;
         }
-        .actions-cell .action-button + .action-button { /* Отступ между кнопками действий */
+        .actions-cell .action-button + .action-button {
             margin-left: var(--spacing-sm);
         }
         .back-link {
             display: inline-block;
             margin-bottom: var(--spacing-xl);
-            color: var(--color-primary);
+            color: var(--color-primary-light);
             text-decoration: none;
             font-weight: var(--font-weight-semibold);
         }
         .back-link:hover {
             text-decoration: underline;
+            color: var(--color-primary);
         }
 
         @media (max-width: 600px) {
@@ -92,9 +88,7 @@
         }
     </style>
 </head>
-<body>
-    <div class="teams-page-container">
-        <a href="/" class="back-link">&larr; Назад к интерфейсу матчей</a>
+<body class="card-style teams-page-container"> <div> <a href="/" class="back-link">&larr; Назад к интерфейсу матчей</a>
         <h1>Управление командами</h1>
 
         <form id="addTeamForm">
