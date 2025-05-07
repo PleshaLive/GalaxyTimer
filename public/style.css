@@ -124,7 +124,7 @@
     /* === START: Team 2 Specific Colors === */
     --team2-color-accent: #bd7e2c; /* Основной акцентный цвет T2 */
     --team2-color-rgb: 14, 165, 233; /* RGB для использования в rgba() */
-    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Фоновый оттенок T2 */
+    --team2-color-bg: #503d24da; /* Фоновый оттенок T2 */
     --team2-color-text-on-accent: #ffffff; /* Цвет текста на фоне T2 */
     --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5); /* Свечение T2 */
     --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8); /* Тень текста T2 */
