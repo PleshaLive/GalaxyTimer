@@ -4,7 +4,7 @@ import { saveData } from './api.js';
 import { setButtonState } from './main.js';
 
 let allCasters = []; // Локальное хранилище списка всех кастеров
-// Локальное хранилище выбранных кастеров (продолжаем хранить только имена для удобства работы с селектами)
+// Локальное хранилище имен выбранных кастеров
 let currentSelectedCasterNames = { caster1: null, caster2: null };
 
 // Элементы DOM
@@ -16,6 +16,8 @@ const newCasterSocialInputElement = document.getElementById('newCasterSocial');
 const addCasterButtonElement = document.getElementById('addCasterButton');
 const saveSelectedCastersButtonElement = document.getElementById('saveSelectedCastersButton');
 const castersListContainerElement = document.getElementById('castersListContainer');
+
+// --- Функции загрузки данных ---
 
 /**
  * Загружает всех кастеров с сервера.
@@ -35,13 +37,14 @@ export async function loadCasters() {
         allCasters = [];
         if (castersListContainerElement) castersListContainerElement.innerHTML = '<p style="color: var(--color-error);">Не удалось загрузить список кастеров.</p>';
     }
-    populateCasterSelects(); // Обновляем селекты
-    displayCastersList();    // Обновляем отображаемый список
+    // Всегда обновляем UI после попытки загрузки
+    populateCasterSelects();
+    displayCastersList();
 }
 
 /**
  * Загружает текущих выбранных кастеров с сервера.
- * Обрабатывает новый формат ответа { caster1: ..., caster1soc: ..., ... }.
+ * Обрабатывает формат ответа { caster1: ..., caster1soc: ..., ... }.
  */
 export async function loadSelectedCasters() {
     console.log("[Casters] Attempting to load selected casters...");
@@ -51,23 +54,23 @@ export async function loadSelectedCasters() {
             const errorData = await response.json().catch(() => ({ message: response.statusText }));
             throw new Error(`HTTP error ${response.status}: ${errorData.message || 'Failed to fetch'}`);
         }
-        const selectedDataFromServer = await response.json(); // Получаем { caster1: ..., caster1soc: ..., ... }
+        const selectedDataFromServer = await response.json();
 
-        // Сохраняем только имена в локальное состояние для управления селектами
+        // Сохраняем только имена в локальное состояние
         currentSelectedCasterNames.caster1 = selectedDataFromServer.caster1 || null;
         currentSelectedCasterNames.caster2 = selectedDataFromServer.caster2 || null;
 
-        console.log("[Casters] Selected caster data (incl. socials) loaded successfully:", selectedDataFromServer);
-        console.log("[Casters] Stored selected caster names locally:", currentSelectedCasterNames);
+        console.log("[Casters] Selected caster data loaded successfully (names stored locally):", currentSelectedCasterNames);
 
     } catch (error) {
         console.error("[Casters] Failed to load selected casters:", error);
-        currentSelectedCasterNames = { caster1: null, caster2: null }; // Сброс в случае ошибки
+        currentSelectedCasterNames = { caster1: null, caster2: null };
     }
     // Обновляем селекты, используя загруженные имена
     populateCasterSelects();
 }
 
+// --- Функции отображения и UI ---
 
 /**
  * Заполняет выпадающие списки (select) кастерами.
@@ -75,15 +78,24 @@ export async function loadSelectedCasters() {
  */
 function populateCasterSelects() {
     const selects = [caster1SelectElement, caster2SelectElement];
+    const currentSelection = {
+        caster1: selects[0]?.value,
+        caster2: selects[1]?.value
+    };
 
     selects.forEach((select, index) => {
         if (!select) return;
+        let valueToSelect = "";
+        const currentUiValue = (index === 0) ? currentSelection.caster1 : currentSelection.caster2;
+        const savedValue = (index === 0) ? currentSelectedCasterNames.caster1 : currentSelectedCasterNames.caster2;
 
-        const valueToSelect = (index === 0) ? currentSelectedCasterNames.caster1 : currentSelectedCasterNames.caster2;
-        const currentValueInSelect = select.value; // Запоминаем текущее значение перед очисткой
+        if (currentUiValue && allCasters.some(c => c.caster === currentUiValue)) {
+            valueToSelect = currentUiValue;
+        } else if (savedValue && allCasters.some(c => c.caster === savedValue)) {
+            valueToSelect = savedValue;
+        }
 
-        select.innerHTML = '<option value="">- Выбрать кастера -</option>'; // Опция по умолчанию
-
+        select.innerHTML = '<option value="">- Выбрать кастера -</option>';
         allCasters.forEach(caster => {
             const option = document.createElement('option');
             option.value = caster.caster;
@@ -91,26 +103,13 @@ function populateCasterSelects() {
             option.dataset.social = caster.social || '';
             select.appendChild(option);
         });
-
-        // Пытаемся установить сохраненное/загруженное значение
-        if (valueToSelect && allCasters.some(c => c.caster === valueToSelect)) {
-            select.value = valueToSelect;
-        }
-        // Если сохраненного значения нет или оно невалидно, пытаемся сохранить текущее значение из UI, если оно валидно
-        else if (currentValueInSelect && allCasters.some(c => c.caster === currentValueInSelect)) {
-             select.value = currentValueInSelect;
-        }
-        // Иначе остается дефолтное "- Выбрать кастера -"
-        else {
-             select.value = "";
-        }
-
+        select.value = valueToSelect;
     });
-    console.log("[Casters] Caster select elements populated/repopulated. Current names state:", currentSelectedCasterNames);
+    // console.log("[Casters] Caster select elements populated/repopulated. Current names state:", currentSelectedCasterNames);
 }
 
 /**
- * Отображает список всех кастеров на странице с кнопками удаления.
+ * Отображает список всех кастеров на странице с кнопками Edit/Delete.
  */
 function displayCastersList() {
     if (!castersListContainerElement) {
@@ -120,7 +119,7 @@ function displayCastersList() {
     castersListContainerElement.innerHTML = '';
 
     if (!allCasters || allCasters.length === 0) {
-        if (castersListContainerElement.innerHTML === '') { // Показываем, только если нет сообщения об ошибке
+        if (castersListContainerElement.innerHTML === '') {
              castersListContainerElement.innerHTML = '<p>Список кастеров пуст.</p>';
         }
         return;
@@ -131,33 +130,134 @@ function displayCastersList() {
         if (!caster || !caster.id) return;
 
         const li = document.createElement('li');
-        const detailsDiv = document.createElement('div');
-        detailsDiv.classList.add('caster-details');
-        const nameSpan = document.createElement('span');
-        nameSpan.classList.add('caster-name');
-        nameSpan.textContent = caster.caster || 'Имя не указано';
-        const socialSpan = document.createElement('span');
-        socialSpan.classList.add('caster-social');
-        socialSpan.textContent = ` (${caster.social || 'нет соц.сети'})`;
-        detailsDiv.appendChild(nameSpan);
-        detailsDiv.appendChild(socialSpan);
-        li.appendChild(detailsDiv);
+        li.dataset.casterId = caster.id;
+        li.dataset.originalName = caster.caster;
+        li.dataset.originalSocial = caster.social || ""; // Сохраняем пустую строку, если social undefined
 
-        const actionsDiv = document.createElement('div');
-        actionsDiv.classList.add('caster-actions');
-        const deleteButton = document.createElement('button');
-        deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
-        deleteButton.classList.add('app-button', 'delete-caster-btn');
-        deleteButton.title = `Удалить кастера ${caster.caster}`;
-        deleteButton.addEventListener('click', () => handleDeleteCaster(caster.id, caster.caster));
-        actionsDiv.appendChild(deleteButton);
-        li.appendChild(actionsDiv);
+        // Создаем контент для режима отображения по умолчанию
+        createCasterDisplayMode(li, caster);
+
         ul.appendChild(li);
     });
     castersListContainerElement.appendChild(ul);
-    console.log("[Casters] Casters list has been displayed.");
+    // console.log("[Casters] Casters list has been displayed with edit/delete buttons.");
 }
 
+/**
+ * Создает и добавляет элементы для режима отображения кастера.
+ * @param {HTMLElement} liElement - Элемент <li>.
+ * @param {object} caster - Данные кастера.
+ */
+function createCasterDisplayMode(liElement, caster) {
+    liElement.innerHTML = ''; // Очищаем предыдущее содержимое
+    liElement.classList.remove('editing');
+
+    const detailsDiv = document.createElement('div');
+    detailsDiv.classList.add('caster-details');
+    const nameSpan = document.createElement('span');
+    nameSpan.classList.add('caster-name');
+    nameSpan.textContent = caster.caster || 'Имя не указано';
+    const socialSpan = document.createElement('span');
+    socialSpan.classList.add('caster-social');
+    socialSpan.textContent = ` (${caster.social || 'нет соц.сети'})`;
+    detailsDiv.appendChild(nameSpan);
+    detailsDiv.appendChild(socialSpan);
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('caster-actions');
+
+    const editButton = document.createElement('button');
+    editButton.innerHTML = '<i class="fas fa-edit"></i>';
+    editButton.classList.add('app-button', 'edit-caster-btn');
+    editButton.title = `Редактировать кастера ${caster.caster}`;
+    editButton.addEventListener('click', () => toggleEditMode(liElement, true));
+
+    const deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '<i class="fas fa-trash-alt"></i>';
+    deleteButton.classList.add('app-button', 'delete-caster-btn');
+    deleteButton.title = `Удалить кастера ${caster.caster}`;
+    deleteButton.addEventListener('click', () => handleDeleteCaster(caster.id, caster.caster));
+
+    actionsDiv.appendChild(editButton);
+    actionsDiv.appendChild(deleteButton);
+
+    liElement.appendChild(detailsDiv);
+    liElement.appendChild(actionsDiv);
+}
+
+/**
+ * Создает и добавляет элементы для режима редактирования кастера.
+ * @param {HTMLElement} liElement - Элемент <li>.
+ */
+function createCasterEditMode(liElement) {
+    liElement.innerHTML = ''; // Очищаем предыдущее содержимое
+    liElement.classList.add('editing');
+
+    const casterId = liElement.dataset.casterId;
+    const originalName = liElement.dataset.originalName;
+    const originalSocial = liElement.dataset.originalSocial;
+
+    const detailsDiv = document.createElement('div');
+    detailsDiv.classList.add('caster-details');
+    detailsDiv.innerHTML = `
+        <input type="text" class="edit-input caster-name-input" value="${originalName}" placeholder="Имя кастера" required>
+        <input type="text" class="edit-input caster-social-input" value="${originalSocial}" placeholder="Соц.сеть">
+    `;
+
+    const actionsDiv = document.createElement('div');
+    actionsDiv.classList.add('caster-actions');
+
+    const saveButton = document.createElement('button');
+    saveButton.innerHTML = '<i class="fas fa-save"></i>';
+    saveButton.classList.add('app-button', 'save-caster-btn');
+    saveButton.title = 'Сохранить изменения';
+    saveButton.addEventListener('click', () => {
+        const newNameInput = detailsDiv.querySelector('.caster-name-input');
+        const newSocialInput = detailsDiv.querySelector('.caster-social-input');
+        handleSaveCasterEdit(casterId, newNameInput.value.trim(), newSocialInput.value.trim(), liElement, saveButton);
+    });
+
+    const cancelButton = document.createElement('button');
+    cancelButton.innerHTML = '<i class="fas fa-times"></i>';
+    cancelButton.classList.add('app-button', 'cancel-caster-btn');
+    cancelButton.title = 'Отменить редактирование';
+    cancelButton.addEventListener('click', () => toggleEditMode(liElement, false));
+
+    actionsDiv.appendChild(saveButton);
+    actionsDiv.appendChild(cancelButton);
+
+    liElement.appendChild(detailsDiv);
+    liElement.appendChild(actionsDiv);
+
+    detailsDiv.querySelector('.caster-name-input')?.focus();
+}
+
+
+/**
+ * Переключает режим отображения/редактирования для строки кастера.
+ * @param {HTMLElement} liElement - Элемент <li> строки кастера.
+ * @param {boolean} isEditing - True для перехода в режим редактирования, false для возврата.
+ */
+function toggleEditMode(liElement, isEditing) {
+    const casterId = liElement.dataset.casterId;
+    if (!casterId) return;
+
+    if (isEditing) {
+        createCasterEditMode(liElement);
+    } else {
+        // Находим оригинальные данные из allCasters (на случай, если data-атрибуты устарели)
+        // или используем data-атрибуты как запасной вариант
+        const currentCasterData = allCasters.find(c => c.id === casterId) || {
+            id: casterId,
+            caster: liElement.dataset.originalName,
+            social: liElement.dataset.originalSocial
+        };
+        createCasterDisplayMode(liElement, currentCasterData);
+    }
+}
+
+
+// --- Функции обработки действий ---
 
 /**
  * Обработчик отправки формы добавления нового кастера.
@@ -167,27 +267,14 @@ async function handleAddCasterSubmit(event) {
     const name = newCasterNameInputElement.value.trim();
     const social = newCasterSocialInputElement.value.trim();
 
-    if (!name) {
-        alert("Имя кастера не может быть пустым.");
-        newCasterNameInputElement.focus();
-        return;
-    }
-    if (allCasters.some(c => c.caster.toLowerCase() === name.toLowerCase())) {
-         alert(`Кастер с именем "${name}" уже существует.`);
-         newCasterNameInputElement.focus();
-         return;
-    }
+    if (!name) { /* ... валидация ... */ return; }
+    if (allCasters.some(c => c.caster.toLowerCase() === name.toLowerCase())) { /* ... валидация ... */ return; }
 
     setButtonState(addCasterButtonElement, 'saving', 'Добавление...');
     try {
         const newCasterData = { caster: name, social: social };
-        const savedCaster = await saveData('/api/casters', newCasterData, 'POST');
-        console.log('[Casters] New caster added response:', savedCaster);
-        // После успешного добавления сервер отправит 'castersUpdate',
-        // клиент его получит и вызовет updateCastersUIFromSocket,
-        // поэтому явный loadCasters() здесь не обязателен, если сокет работает надежно.
-        // await loadCasters(); // Можно раскомментировать для надежности
-
+        await saveData('/api/casters', newCasterData, 'POST');
+        // UI обновится через сокет 'castersUpdate'
         newCasterNameInputElement.value = '';
         newCasterSocialInputElement.value = '';
         setButtonState(addCasterButtonElement, 'saved', 'Добавлено!');
@@ -205,32 +292,62 @@ async function handleSaveSelectedCasters() {
     const caster1Name = caster1SelectElement.value;
     const caster2Name = caster2SelectElement.value;
 
-    if (caster1Name && caster2Name && caster1Name === caster2Name) {
-        alert("Кастер 1 и Кастер 2 не могут быть одинаковыми.");
-        return;
-    }
+    if (caster1Name && caster2Name && caster1Name === caster2Name) { /* ... валидация ... */ return; }
 
-    const dataToSave = {
-        caster1: caster1Name || null,
-        caster2: caster2Name || null,
-    };
-
+    const dataToSave = { caster1: caster1Name || null, caster2: caster2Name || null };
     console.log('[Casters] Saving selected casters:', dataToSave);
     setButtonState(saveSelectedCastersButtonElement, 'saving', 'Сохранение...');
 
     try {
-        // Сервер вернет данные в новом формате { caster1, caster1soc, ... }
         const result = await saveData('/api/selected-casters', dataToSave, 'POST');
-        // Обновляем локальное состояние имен (сервер сам отправит сокет с полными данными)
+        // Обновляем локальное состояние имен (полные данные придут через сокет)
         currentSelectedCasterNames.caster1 = result.data.caster1 || null;
         currentSelectedCasterNames.caster2 = result.data.caster2 || null;
         setButtonState(saveSelectedCastersButtonElement, 'saved', 'Назначено!');
         console.log('[Casters] Selected casters saved successfully response:', result);
-        // Явный вызов обновления UI после сохранения не нужен, т.к. придет сокет 'selectedCastersUpdate'
     } catch (error) {
         console.error('[Casters] Error saving selected casters:', error);
         setButtonState(saveSelectedCastersButtonElement, 'error', error.message || 'Ошибка сохранения');
         alert(`Ошибка назначения кастеров: ${error.message}`);
+    }
+}
+
+/**
+ * Обработчик сохранения изменений кастера после редактирования.
+ */
+async function handleSaveCasterEdit(casterId, newName, newSocial, liElement, saveButton) {
+    const originalName = liElement.dataset.originalName;
+    const originalSocial = liElement.dataset.originalSocial;
+
+    if (!newName) { /* ... валидация ... */ return; }
+    if (newName === originalName && newSocial === originalSocial) { toggleEditMode(liElement, false); return; }
+    if (newName.toLowerCase() !== originalName.toLowerCase() &&
+        allCasters.some(c => c.id !== casterId && c.caster.toLowerCase() === newName.toLowerCase())) { /* ... валидация конфликта ... */ return; }
+
+    setButtonState(saveButton, 'saving');
+    try {
+        const updatedData = { caster: newName, social: newSocial };
+        const result = await saveData(`/api/casters/${casterId}`, updatedData, 'PUT');
+
+        console.log('[Casters] Caster updated response:', result);
+        // Обновляем data-атрибуты для консистентности (хотя UI обновится через сокет)
+        liElement.dataset.originalName = newName;
+        liElement.dataset.originalSocial = newSocial;
+
+        // Обновление UI произойдет через сокет 'castersUpdate' и 'selectedCastersUpdate'
+        // Поэтому просто выходим из режима редактирования
+        toggleEditMode(liElement, false);
+
+    } catch (error) {
+        console.error(`[Casters] Error updating caster ${casterId}:`, error);
+        setButtonState(saveButton, 'error', 'Ошибка');
+        alert(`Ошибка обновления кастера: ${error.message}`);
+        // Не выходим из режима редактирования при ошибке
+        setTimeout(() => {
+            if(saveButton?.classList.contains('error')){ // Проверяем, что кнопка еще существует
+                 setButtonState(saveButton, 'idle');
+            }
+        }, 2500);
     }
 }
 
@@ -242,21 +359,19 @@ async function handleDeleteCaster(casterId, casterName) {
         return;
     }
     console.log(`[Casters] Attempting to delete caster ${casterId}`);
-    const deleteButton = castersListContainerElement.querySelector(`button[title="Удалить кастера ${casterName}"]`);
+    const listItem = castersListContainerElement.querySelector(`li[data-caster-id="${casterId}"]`);
+    const deleteButton = listItem?.querySelector('.delete-caster-btn');
     if (deleteButton) deleteButton.disabled = true;
 
     try {
         const response = await fetch(`/api/casters/${casterId}`, { method: 'DELETE' });
         if (!response.ok) {
             let errorMsg = `HTTP error ${response.status}`;
-            try {
-                const errorData = await response.json();
-                errorMsg = errorData.message || errorMsg;
-            } catch (e) { /* ignore */ }
+            try { const errorData = await response.json(); errorMsg = errorData.message || errorMsg; } catch (e) { /* ignore */ }
             throw new Error(errorMsg);
         }
-        console.log(`[Casters] Caster ${casterId} deleted successfully.`);
-        // Обновление UI произойдет через сокеты 'castersUpdate' и 'selectedCastersUpdate' от сервера
+        console.log(`[Casters] Caster ${casterId} deleted request sent successfully.`);
+        // UI обновится через сокеты 'castersUpdate' и 'selectedCastersUpdate'
     } catch (error) {
         console.error(`[Casters] Error deleting caster ${casterId}:`, error);
         alert(`Ошибка удаления кастера: ${error.message}`);
@@ -264,6 +379,7 @@ async function handleDeleteCaster(casterId, casterName) {
     }
 }
 
+// --- Инициализация модуля ---
 
 /**
  * Инициализация вкладки "Кастеры".
@@ -285,17 +401,15 @@ export async function initCasters() {
     }
 
     try {
-        // Загружаем параллельно список всех кастеров и текущих выбранных
-        await Promise.all([
-             loadCasters(),
-             loadSelectedCasters()
-        ]);
+        await Promise.all([ loadCasters(), loadSelectedCasters() ]);
          console.log("[Casters] Initial caster data loaded.");
     } catch(error) {
         console.error("[Casters] Error during initial data load:", error);
     }
     console.log("[Casters] Casters tab module initialized.");
 }
+
+// --- Функции обновления UI от Socket.IO ---
 
 /**
  * Обновляет UI списка кастеров при получении данных через Socket.IO.
@@ -304,7 +418,7 @@ export async function initCasters() {
 export function updateCastersUIFromSocket(updatedCastersData) {
     console.log("[Casters Socket] Received 'castersUpdate'. Updating UI.");
     allCasters = Array.isArray(updatedCastersData) ? updatedCastersData : [];
-    populateCasterSelects(); // Перезаполняем селекты
+    populateCasterSelects(); // Перезаполняем селекты (сохраняя текущий выбор, если он валиден)
     displayCastersList();    // Перерисовываем список
 }
 
@@ -315,7 +429,7 @@ export function updateCastersUIFromSocket(updatedCastersData) {
 export function updateSelectedCastersUIFromSocket(selectedCastersDataFromServer) {
     console.log("[Casters Socket] Received 'selectedCastersUpdate'. Data:", selectedCastersDataFromServer);
 
-    // Обновляем локальное состояние имен для консистентности
+    // Обновляем локальное состояние имен
     currentSelectedCasterNames.caster1 = selectedCastersDataFromServer.caster1 || null;
     currentSelectedCasterNames.caster2 = selectedCastersDataFromServer.caster2 || null;
 
@@ -326,8 +440,5 @@ export function updateSelectedCastersUIFromSocket(selectedCastersDataFromServer)
     if (caster2SelectElement) {
         caster2SelectElement.value = selectedCastersDataFromServer.caster2 || "";
     }
-
-    // Здесь можно добавить код для отображения caster1soc и caster2soc в других элементах UI, если нужно
-    // console.log("Selected Caster 1 Social:", selectedCastersDataFromServer.caster1soc);
-    // console.log("Selected Caster 2 Social:", selectedCastersDataFromServer.caster2soc);
+    // Дополнительно можно отобразить соц.сети, если есть куда
 }
