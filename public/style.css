@@ -506,7 +506,7 @@ label i {
 }
 .match-meta { display: flex; gap: var(--spacing-sm); align-items: center; }
 .match-header .status-select {
-    width: 110px;
+    width: 180px;
     font-size: 0.8rem;
     font-weight: var(--font-weight-semibold);
     padding: var(--spacing-xs) var(--spacing-sm);
