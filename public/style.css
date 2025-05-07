@@ -95,9 +95,9 @@
     --glow-veto-pick: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение (исходный: --glow-success) */
 
     /* Действие DECIDER (Нейтральный, но настраиваемый) */
-    --color-veto-decider-bg: var(--color-surface-secondary); /* Фон */
-    --color-veto-decider-text: var(--color-text-primary);    /* Текст */
-    --color-veto-decider-border: var(--color-border-light);  /* Рамка */
+    --color-veto-decider-bg:  #646464; /* Фон */
+    --color-veto-decider-text:  #ffffff;   /* Текст */
+    --color-veto-decider-border:  #b8b8b8;  /* Рамка */
     --glow-veto-decider: none;                               /* Свечение (по умолчанию нет) */
 
     /* Сторона CT (Counter-Terrorists) */
@@ -111,15 +111,24 @@
     --color-veto-side-t-border: #c05621;  /* Темно-оранжевая рамка */
     /* === END MAP VETO TABLE SPECIFIC COLORS === */
 
-    --color-team1-accent: var(--color-primary-base);
-    --color-team1-accent-glow: var(--glow-primary);
-    --color-team1-accent-bg: rgba(var(--rgb-primary), 0.15);
-    --color-team1-text-on-accent: var(--color-text-on-primary);
+    /* ВСТАВЬТЕ ЭТОТ БЛОК: */
+    /* === START: Team 1 Specific Colors === */
+    --team1-color-accent: #4f46e5; /* Основной акцентный цвет T1 */
+    --team1-color-rgb: 79, 70, 229; /* RGB для использования в rgba() */
+    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Фоновый оттенок T1 */
+    --team1-color-text-on-accent: #ffffff; /* Цвет текста на фоне T1 */
+    --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5); /* Свечение T1 */
+    --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8); /* Тень текста T1 */
+    /* === END: Team 1 Specific Colors === */
 
-    --color-team2-accent: var(--color-secondary-base);
-    --color-team2-accent-glow: var(--glow-secondary);
-    --color-team2-accent-bg: rgba(var(--rgb-secondary), 0.15);
-    --color-team2-text-on-accent: var(--color-text-on-accent);
+    /* === START: Team 2 Specific Colors === */
+    --team2-color-accent: #bd7e2c; /* Основной акцентный цвет T2 */
+    --team2-color-rgb: 14, 165, 233; /* RGB для использования в rgba() */
+    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Фоновый оттенок T2 */
+    --team2-color-text-on-accent: #ffffff; /* Цвет текста на фоне T2 */
+    --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5); /* Свечение T2 */
+    --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8); /* Тень текста T2 */
+    /* === END: Team 2 Specific Colors === */
 
     --spacing-xs: 0.25rem;  /* 4px */
     --spacing-sm: 0.5rem;   /* 8px */
@@ -604,11 +613,30 @@ label i {
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
 }
-.team-block label { font-size: 0.75rem; margin-bottom: var(--spacing-xs); }
-.team-1-block { border-color: var(--color-team1-accent); background-color: var(--color-team1-accent-bg); }
-.team-1-block:hover { border-color: var(--color-primary-light); background-color: rgba(var(--rgb-primary), 0.2); }
-.team-2-block { border-color: var(--color-team2-accent); background-color: var(--color-team2-accent-bg); }
-.team-2-block:hover { border-color: var(--color-secondary-light); background-color: rgba(var(--rgb-secondary), 0.2); }
+
+/* 1. Блок Команды 1 */
+.team-1-block {
+    border-color: var(--team1-color-accent);
+    background-color: var(--team1-color-bg);
+}
+
+/* 2. Ховер Блока Команды 1 */
+.team-1-block:hover {
+    border-color: var(--team1-color-accent);
+    background-color: rgba(var(--team1-color-rgb), 0.25);
+}
+
+/* 3. Блок Команды 2 */
+.team-2-block {
+    border-color: var(--team2-color-accent);
+    background-color: var(--team2-color-bg);
+}
+
+/* 4. Ховер Блока Команды 2 */
+.team-2-block:hover {
+    border-color: var(--team2-color-accent);
+    background-color: rgba(var(--team2-color-rgb), 0.25);
+}
 
 .vs-indicator {
     font-weight: var(--font-weight-bold);
@@ -642,14 +670,46 @@ label i {
     min-width: auto;
     text-transform: none;
 }
-.winner-btn:hover { transform: scale(1.03); box-shadow: none; background-color: var(--color-surface); }
-.winner-btn.team-1-accent-border { border-left: 4px solid var(--color-team1-accent); color: var(--color-team1-accent); }
-.winner-btn.team-1-accent-border:hover { background-color: var(--color-team1-accent-bg); box-shadow: var(--glow-primary); }
-.winner-btn.team-1-accent-border.winner-selected { background-color: var(--color-team1-accent); color: var(--color-team1-text-on-accent); box-shadow: var(--glow-primary); font-weight: var(--font-weight-bold); }
 
-.winner-btn.team-2-accent-border { border-left: 4px solid var(--color-team2-accent); color: var(--color-team2-accent); }
-.winner-btn.team-2-accent-border:hover { background-color: var(--color-team2-accent-bg); box-shadow: var(--glow-secondary); }
-.winner-btn.team-2-accent-border.winner-selected { background-color: var(--color-team2-accent); color: var(--color-team2-text-on-accent); box-shadow: var(--glow-secondary); font-weight: var(--font-weight-bold); }
+/* 5. Кнопка Победитель T1 (база) */
+.winner-btn.team-1-accent-border {
+    border-left: 4px solid var(--team1-color-accent);
+    color: var(--team1-color-accent);
+}
+
+/* 6. Кнопка Победитель T1 (ховер) */
+.winner-btn.team-1-accent-border:hover {
+    background-color: var(--team1-color-bg);
+    box-shadow: var(--team1-glow);
+}
+
+/* 7. Кнопка Победитель T1 (выбрана) */
+.winner-btn.team-1-accent-border.winner-selected {
+    background-color: var(--team1-color-accent);
+    color: var(--team1-color-text-on-accent);
+    box-shadow: var(--team1-glow);
+    font-weight: var(--font-weight-bold);
+}
+
+/* 8. Кнопка Победитель T2 (база) */
+.winner-btn.team-2-accent-border {
+    border-left: 4px solid var(--team2-color-accent);
+    color: var(--team2-color-accent);
+}
+
+/* 9. Кнопка Победитель T2 (ховер) */
+.winner-btn.team-2-accent-border:hover {
+    background-color: var(--team2-color-bg);
+    box-shadow: var(--team2-glow);
+}
+
+/* 10. Кнопка Победитель T2 (выбрана) */
+.winner-btn.team-2-accent-border.winner-selected {
+    background-color: var(--team2-color-accent);
+    color: var(--team2-color-text-on-accent);
+    box-shadow: var(--team2-glow);
+    font-weight: var(--font-weight-bold);
+}
 
 .maps { border-top: 1px solid var(--color-divider); padding-top: var(--spacing-md); }
 .maps h3 { font-size: 0.9rem; margin-bottom: var(--spacing-sm); color: var(--color-text-secondary); font-weight: var(--font-weight-semibold); text-transform: uppercase; letter-spacing: 0.03em;}
@@ -666,8 +726,19 @@ label i {
 .vrs-table th, .vrs-table td { border: 1px solid var(--color-border); padding: var(--spacing-sm); text-align: center; color: var(--color-text-secondary); background-color: transparent; }
 .vrs-table th { background-color: var(--color-surface); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
 .vrs-table td:first-child { font-weight: var(--font-weight-semibold); text-align: left; }
-.vrs-table tr.team-1-row td:first-child { background-color: var(--color-team1-accent-bg); color: var(--color-team1-accent); border-left: 4px solid var(--color-team1-accent); }
-.vrs-table tr.team-2-row td:first-child { background-color: var(--color-team2-accent-bg); color: var(--color-team2-accent); border-left: 4px solid var(--color-team2-accent); }
+/* 11. Строка T1 в таблице VRS */
+.vrs-table tr.team-1-row td:first-child {
+    background-color: var(--team1-color-bg);
+    color: var(--team1-color-accent);
+    border-left: 4px solid var(--team1-color-accent);
+}
+
+/* 12. Строка T2 в таблице VRS */
+.vrs-table tr.team-2-row td:first-child {
+    background-color: var(--team2-color-bg);
+    color: var(--team2-color-accent);
+    border-left: 4px solid var(--team2-color-accent);
+}
 .vrs-table tr:hover td { background-color: rgba(var(--rgb-primary), 0.05); }
 .vrs-input { width: 100%; padding: var(--spacing-xs); font-size: 0.85rem; text-align: center; }
 
@@ -714,8 +785,18 @@ label i {
     margin-right: var(--spacing-xs); 
     color: var(--color-mapveto-th-icon); 
 }
-#vetoTable th.team-1-text-accent { color: var(--color-team1-accent); text-shadow: var(--text-shadow-primary); }
-#vetoTable th.team-2-text-accent { color: var(--color-team2-accent); text-shadow: var(--text-shadow-secondary); }
+
+/* 13. Заголовок T1 в таблице Veto */
+#vetoTable th.team-1-text-accent {
+    color: var(--team1-color-accent);
+    text-shadow: var(--team1-text-shadow);
+}
+
+/* 14. Заголовок T2 в таблице Veto */
+#vetoTable th.team-2-text-accent {
+    color: var(--team2-color-accent);
+    text-shadow: var(--team2-text-shadow);
+}
 
 #vetoTable select { font-weight: var(--font-weight-medium); }
 
@@ -749,9 +830,19 @@ label i {
     border-color: var(--color-veto-side-t-border) !important;
 }
 
-#vetoTable .veto-team.team-1-selected-veto { border-color: var(--color-team1-accent) !important; background-color: var(--color-team1-accent-bg) !important; color: var(--color-team1-accent) !important; }
-#vetoTable .veto-team.team-2-selected-veto { border-color: var(--color-team2-accent) !important; background-color: var(--color-team2-accent-bg) !important; color: var(--color-team2-accent) !important; }
-#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
+/* 15. Выбранная команда T1 в селекте Veto */
+#vetoTable .veto-team.team-1-selected-veto {
+    border-color: var(--team1-color-accent) !important;
+    background-color: var(--team1-color-bg) !important;
+    color: var(--team1-color-accent) !important;
+}
+
+/* 16. Выбранная команда T2 в селекте Veto */
+#vetoTable .veto-team.team-2-selected-veto {
+    border-color: var(--team2-color-accent) !important;
+    background-color: var(--team2-color-bg) !important;
+    color: var(--team2-color-accent) !important;
+}#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
 
 /* Pause Tab */
 .pause-section { margin-top: 0; border-top: none; }
