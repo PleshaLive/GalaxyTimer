@@ -336,21 +336,48 @@ export function attachStatusChangeHandlers() {
  * в зависимости от выбранного значения.
  * @param {HTMLSelectElement} sel - Элемент селекта статуса.
  */
-export function updateStatusColor(sel) {
-    if (!sel) return; // Проверка на null
-    const v = sel.value.toUpperCase(); // Получаем выбранное значение
-    let color;
-    // Определяем цвет фона на основе значения
-    switch (v) {
-        case "UPCOM":    color = "var(--color-upcom)"; break;
-        case "LIVE":     color = "var(--color-live)"; break;
-        case "FINISHED": color = "var(--color-text-muted)"; break;
-        default:         color = "var(--color-surface-light)"; // Цвет по умолчанию
-    }
-    // Применяем стили
-    sel.style.backgroundColor = color;
-    sel.style.color = '#fff'; // Белый текст для лучшей читаемости
-    sel.style.borderColor = color; // Окрашиваем рамку в тот же цвет
+export function updateStatusColor(selectElement) {
+  // Проверка, что элемент select существует
+  if (!selectElement) {
+      console.warn("[updateStatusColor] Element not provided.");
+      return;
+  }
+  
+  const selectedValue = selectElement.value.toUpperCase(); // Получаем значение: UPCOM, LIVE, FINISHED
+
+  // Сначала удаляем все классы статусов, которые могли быть добавлены ранее
+  selectElement.classList.remove(
+      'status-upcom-selected',
+      'status-live-selected',
+      'status-finished-selected'
+  );
+
+  // Также сбрасываем инлайновые стили, если они были добавлены старой версией функции
+  // Это важно, чтобы стили из CSS файла применялись корректно
+  selectElement.style.backgroundColor = '';
+  selectElement.style.color = '';
+  selectElement.style.borderColor = '';
+
+  // Теперь добавляем нужный класс в зависимости от выбранного значения
+  switch (selectedValue) {
+      case "UPCOM":
+          selectElement.classList.add('status-upcom-selected');
+          // console.log(`[Style Update] Added class 'status-upcom-selected' to`, selectElement); // Для отладки
+          break;
+      case "LIVE":
+          selectElement.classList.add('status-live-selected');
+          // console.log(`[Style Update] Added class 'status-live-selected' to`, selectElement); // Для отладки
+          break;
+      case "FINISHED":
+          selectElement.classList.add('status-finished-selected');
+          // console.log(`[Style Update] Added class 'status-finished-selected' to`, selectElement); // Для отладки
+          break;
+      default:
+          // console.log(`[Style Update] No status class added for value '${selectedValue}' to`, selectElement); // Для отладки
+          // Если выбрано значение по умолчанию или неизвестное, никакой класс не добавляется,
+          // и будут применяться базовые стили из CSS для .status-select / .control-select
+          break;
+  }
 }
 
 
