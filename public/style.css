@@ -83,13 +83,13 @@
     --color-mapveto-td-text: var(--color-text-secondary); /* Основной текст в td (если не переопределен стилем селекта) */
 
     /* Действие BAN */
-    --color-veto-ban-bg: #ef4444;        /* Фон (исходный: --color-error) */
+    --color-veto-ban-bg: #582c2c;        /* Фон (исходный: --color-error) */
     --color-veto-ban-text: #ffffff;       /* Текст (исходный: --color-text-on-accent) */
     --color-veto-ban-border: #dc2626;     /* Рамка (исходный: --color-error-dark) */
     --glow-veto-ban: 0 0 12px rgba(239, 68, 68, 0.7), 0 0 24px rgba(239, 68, 68, 0.4); /* Свечение (исходный: --glow-error) */
 
     /* Действие PICK */
-    --color-veto-pick-bg: #22c55e;       /* Фон (исходный: --color-success) */
+    --color-veto-pick-bg: #25722f;       /* Фон (исходный: --color-success) */
     --color-veto-pick-text: #ffffff;      /* Текст (исходный: --color-text-on-primary) */
     --color-veto-pick-border: #16a34a;    /* Рамка (исходный: --color-success-dark) */
     --glow-veto-pick: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение (исходный: --glow-success) */
