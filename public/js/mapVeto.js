@@ -18,7 +18,7 @@ function styleVetoTeamSelect(selectElement) {
 * Применяет классы к селекту действия (BAN/PICK/DECIDER) в Veto для стилизации.
 * @param {HTMLSelectElement} selectElement - Элемент селекта.
 */
-export function styleVetoActionSelect(selectElement) { // Экспортируем, чтобы main.js мог использовать
+export function styleVetoActionSelect(selectElement) {
   if (!selectElement) return;
   selectElement.classList.remove('action-is-ban', 'action-is-pick', 'action-is-decider');
   const currentValue = selectElement.value;
@@ -141,8 +141,6 @@ rows.forEach(row => {
   const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
   const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
   
-  // ИСПРАВЛЕННАЯ СТРОКА: Убедитесь, что здесь используются шаблонные литералы
-  // и переменные action и mapName содержат корректные значения.
   const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
   
   let sideIMG = "";
@@ -160,7 +158,7 @@ rows.forEach(row => {
     teamLogo: realTeamLogo,
     map: mapName,
     side,
-    vetoIMG, // Эта строка теперь должна содержать правильный путь
+    vetoIMG,
     sideIMG
   });
 });
