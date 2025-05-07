@@ -561,7 +561,7 @@ app.delete("/api/casters/:id", async (req, res) => {
 app.get("/api/selected-casters", (req, res) => {
     console.log("[API][GET] /api/selected-casters - Sending formatted selected casters");
     const formattedData = getFormattedSelectedCasters();
-    res.json(formattedData); // Отправляем объект. Если нужен массив [{...}], то res.json([formattedData]);
+    res.json([formattedData]); // Отправляем объект. Если нужен массив [{...}], то res.json([formattedData]);
 });
 
 app.post("/api/selected-casters", async (req, res) => {
