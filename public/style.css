@@ -28,9 +28,9 @@
     --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
     --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
 
-    --color-secondary-base: #e99c0e; /* Яркий голубой */
-    --color-secondary-light: #f8ab38;
-    --color-secondary-dark: #c77802;
+    --color-secondary-base: #a58a59; /* Яркий голубой */
+    --color-secondary-light: #80663f;
+    --color-secondary-dark: #6d5736;
     --rgb-secondary: 14, 165, 233;
     --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
     --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
