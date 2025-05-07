@@ -297,8 +297,8 @@ function getTeamLogoPath(match, teamKey, matchIndex) {
 
 /** Формирует данные VRS для ответа API /api/vrs/:id */
 function getVRSResponse(matchId) {
-    const rawVrsData = savedVRS[matchId] || { ...defaultVrsStructure }; // Гарантируем объект
-    const match = savedMatches[matchId - 1] || { ...defaultMatchStructure }; // Гарантируем объект
+    const rawVrsData = savedVRS[matchId] || { ...defaultVrsStructure };
+    const match = savedMatches[matchId - 1] || { ...defaultMatchStructure };
 
     const team1Logo = getTeamLogoPath(match, 'TEAM1', matchId);
     const team2Logo = getTeamLogoPath(match, 'TEAM2', matchId);
@@ -315,8 +315,8 @@ function getVRSResponse(matchId) {
     const isFinished = match.FINISHED_MATCH_STATUS === "FINISHED";
     const isUpcomingOrLive = !isFinished;
 
-    const team1Vrs = rawVrsData.TEAM1 || defaultVrsStructure.TEAM1; // Гарантируем объект
-    const team2Vrs = rawVrsData.TEAM2 || defaultVrsStructure.TEAM2; // Гарантируем объект
+    const team1Vrs = rawVrsData.TEAM1 || defaultVrsStructure.TEAM1;
+    const team2Vrs = rawVrsData.TEAM2 || defaultVrsStructure.TEAM2;
 
     if (isUpcomingOrLive) {
          upcomData = {
@@ -342,7 +342,7 @@ function getVRSResponse(matchId) {
                 TEAM2: { winPoints: formatWinPoints(team2Vrs.winPoints), losePoints: "", rank: team2Vrs.rank ?? "", currentPoints_win: formatPointsWithPt(team2Vrs.currentPoints), currentPoints_lose: "", logo: team2Logo }
             };
         } else {
-            finishedData = { ...emptyBlock }; // Если победителя нет, возвращаем пустые данные для FINISHED
+            finishedData = { ...emptyBlock };
         }
     }
     return { UPCOM: upcomData, FINISHED: finishedData, WIN_BG_TEAM_1: winBgTeam1, WIN_BG_TEAM_2: winBgTeam2 };
@@ -350,35 +350,18 @@ function getVRSResponse(matchId) {
 
 /**
  * Формирует объект с выбранными кастерами и их социальными сетями.
- * @returns {object} Объект вида { caster1: string|null, caster1soc: string|null, caster2: string|null, caster2soc: string|null }
  */
 function getFormattedSelectedCasters() {
-    const result = {
-        caster1: null,
-        caster1soc: null,
-        caster2: null,
-        caster2soc: null
-    };
-
+    const result = { caster1: null, caster1soc: null, caster2: null, caster2soc: null };
     if (savedSelectedCasters.caster1) {
         const caster1Data = savedCasters.find(c => c.caster === savedSelectedCasters.caster1);
-        if (caster1Data) {
-            result.caster1 = caster1Data.caster;
-            result.caster1soc = caster1Data.social;
-        } else {
-            console.warn(`[Server] Ранее выбранный caster1 "${savedSelectedCasters.caster1}" не найден в общем списке кастеров. Очищаем выбор.`);
-            // Не изменяем savedSelectedCasters здесь напрямую, чтобы избежать побочных эффектов без сохранения
-        }
+        if (caster1Data) { result.caster1 = caster1Data.caster; result.caster1soc = caster1Data.social; }
+        else { console.warn(`[Server] Ранее выбранный caster1 "${savedSelectedCasters.caster1}" не найден.`); }
     }
-
     if (savedSelectedCasters.caster2) {
         const caster2Data = savedCasters.find(c => c.caster === savedSelectedCasters.caster2);
-        if (caster2Data) {
-            result.caster2 = caster2Data.caster;
-            result.caster2soc = caster2Data.social;
-        } else {
-            console.warn(`[Server] Ранее выбранный caster2 "${savedSelectedCasters.caster2}" не найден в общем списке кастеров. Очищаем выбор.`);
-        }
+        if (caster2Data) { result.caster2 = caster2Data.caster; result.caster2soc = caster2Data.social; }
+        else { console.warn(`[Server] Ранее выбранный caster2 "${savedSelectedCasters.caster2}" не найден.`); }
     }
     return result;
 }
@@ -496,17 +479,11 @@ app.get("/api/casters", (req, res) => {
 app.post("/api/casters", async (req, res) => {
     const casterName = req.body.caster?.trim();
     const casterSocial = req.body.social?.trim() || "";
-    if (!casterName) {
-        return res.status(400).json({ message: "Имя кастера не может быть пустым." });
-    }
+    if (!casterName) { return res.status(400).json({ message: "Имя кастера не может быть пустым." }); }
     if (savedCasters.some(c => c.caster.toLowerCase() === casterName.toLowerCase())) {
         return res.status(409).json({ message: `Кастер с именем "${casterName}" уже существует.` });
     }
-    const newCaster = {
-        id: `caster_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-        caster: casterName,
-        social: casterSocial
-    };
+    const newCaster = { id: `caster_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`, caster: casterName, social: casterSocial };
     savedCasters.push(newCaster);
     console.log(`[API][POST] /api/casters - Added new caster: ID ${newCaster.id}, Name: ${casterName}`);
     await saveDbDataAsync();
@@ -515,22 +492,57 @@ app.post("/api/casters", async (req, res) => {
     res.status(201).json(newCaster);
 });
 
+// ЭНДПОИНТ ДЛЯ РЕДАКТИРОВАНИЯ (PUT)
+app.put("/api/casters/:id", async (req, res) => {
+    const casterId = req.params.id;
+    const { caster: newNameRaw, social: newSocialRaw } = req.body;
+    const newName = newNameRaw?.trim();
+    const newSocial = newSocialRaw?.trim() || "";
+    if (!newName) { return res.status(400).json({ message: "Имя кастера не может быть пустым." }); }
+    const casterIndex = savedCasters.findIndex(c => c.id === casterId);
+    if (casterIndex === -1) { return res.status(404).json({ message: `Кастер с ID ${casterId} не найден.` }); }
+    const originalCaster = savedCasters[casterIndex];
+    const originalName = originalCaster.caster;
+    if (newName.toLowerCase() !== originalName.toLowerCase() &&
+        savedCasters.some(c => c.id !== casterId && c.caster.toLowerCase() === newName.toLowerCase())) {
+        return res.status(409).json({ message: `Кастер с именем "${newName}" уже существует.` });
+    }
+    savedCasters[casterIndex].caster = newName;
+    savedCasters[casterIndex].social = newSocial;
+    console.log(`[API][PUT] /api/casters/${casterId} - Updated caster. Name: ${originalName} -> ${newName}, Social updated.`);
+    let selectedCastersChanged = false;
+    if (originalName === savedSelectedCasters.caster1 && newName !== originalName) {
+        savedSelectedCasters.caster1 = newName; selectedCastersChanged = true;
+        console.log(`[Data] Updated selectedCasters.caster1 due to name change: ${originalName} -> ${newName}`);
+    }
+    if (originalName === savedSelectedCasters.caster2 && newName !== originalName) {
+        savedSelectedCasters.caster2 = newName; selectedCastersChanged = true;
+        console.log(`[Data] Updated selectedCasters.caster2 due to name change: ${originalName} -> ${newName}`);
+    }
+    await saveDbDataAsync();
+    io.emit('castersUpdate', savedCasters);
+    console.log("[SOCKET] Emitted 'castersUpdate' after editing caster.");
+    if (selectedCastersChanged) {
+        const formattedSelected = getFormattedSelectedCasters();
+        io.emit('selectedCastersUpdate', formattedSelected);
+        console.log("[SOCKET] Emitted 'selectedCastersUpdate' after editing caster (name changed).");
+    }
+    res.status(200).json(savedCasters[casterIndex]);
+});
+
+
 app.delete("/api/casters/:id", async (req, res) => {
     const casterId = req.params.id;
     const casterToDelete = savedCasters.find(c => c.id === casterId);
-    if (!casterToDelete) {
-        return res.status(404).json({ message: `Кастер с ID ${casterId} не найден.` });
-    }
+    if (!casterToDelete) { return res.status(404).json({ message: `Кастер с ID ${casterId} не найден.` }); }
     const casterName = casterToDelete.caster;
     savedCasters = savedCasters.filter(c => c.id !== casterId);
     let selectedCastersChanged = false;
     if (savedSelectedCasters.caster1 === casterName) {
-        savedSelectedCasters.caster1 = null;
-        selectedCastersChanged = true;
+        savedSelectedCasters.caster1 = null; selectedCastersChanged = true;
     }
     if (savedSelectedCasters.caster2 === casterName) {
-        savedSelectedCasters.caster2 = null;
-        selectedCastersChanged = true;
+        savedSelectedCasters.caster2 = null; selectedCastersChanged = true;
     }
     console.log(`[API][DELETE] /api/casters/${casterId} - Deleted caster '${casterName}'.`);
     await saveDbDataAsync();
@@ -544,28 +556,20 @@ app.delete("/api/casters/:id", async (req, res) => {
     res.status(204).send();
 });
 
+
 // API для выбранных кастеров
 app.get("/api/selected-casters", (req, res) => {
     console.log("[API][GET] /api/selected-casters - Sending formatted selected casters");
     const formattedData = getFormattedSelectedCasters();
-    res.json(formattedData); // Если нужен массив [{...}], то res.json([formattedData]);
+    res.json(formattedData); // Отправляем объект. Если нужен массив [{...}], то res.json([formattedData]);
 });
 
 app.post("/api/selected-casters", async (req, res) => {
     const { caster1, caster2 } = req.body;
-    if (caster1 && !savedCasters.some(c => c.caster === caster1)) {
-        return res.status(400).json({ message: `Выбранный Кастер 1 ("${caster1}") не найден в общем списке.` });
-    }
-    if (caster2 && !savedCasters.some(c => c.caster === caster2)) {
-        return res.status(400).json({ message: `Выбранный Кастер 2 ("${caster2}") не найден в общем списке.` });
-    }
-    if (caster1 && caster2 && caster1 === caster2) {
-        return res.status(400).json({ message: "Кастер 1 и Кастер 2 не могут быть одинаковыми." });
-    }
-    savedSelectedCasters = {
-        caster1: caster1 || null,
-        caster2: caster2 || null,
-    };
+    if (caster1 && !savedCasters.some(c => c.caster === caster1)) { return res.status(400).json({ message: `Выбранный Кастер 1 ("${caster1}") не найден.` }); }
+    if (caster2 && !savedCasters.some(c => c.caster === caster2)) { return res.status(400).json({ message: `Выбранный Кастер 2 ("${caster2}") не найден.` }); }
+    if (caster1 && caster2 && caster1 === caster2) { return res.status(400).json({ message: "Кастер 1 и Кастер 2 не могут быть одинаковыми." }); }
+    savedSelectedCasters = { caster1: caster1 || null, caster2: caster2 || null };
     console.log("[API][POST] /api/selected-casters - Updated selected caster names in storage:", savedSelectedCasters);
     await saveDbDataAsync();
     const formattedData = getFormattedSelectedCasters();
@@ -576,10 +580,7 @@ app.post("/api/selected-casters", async (req, res) => {
 
 // Отдельный JSON эндпоинт /casters для публичного использования
 app.get("/casters", (req, res) => {
-    const castersForPublicJson = savedCasters.map(c => ({
-        caster: c.caster,
-        social: c.social
-    }));
+    const castersForPublicJson = savedCasters.map(c => ({ caster: c.caster, social: c.social }));
     console.log("[API][GET] /casters - Sending public JSON of casters");
     res.json(castersForPublicJson);
 });
@@ -597,7 +598,7 @@ io.on("connection", (socket) => {
     socket.emit("teamsUpdate", dataJsonContent.teams);
     socket.emit("pauseUpdate", savedPauseData);
     socket.emit("castersUpdate", savedCasters);
-    socket.emit("selectedCastersUpdate", getFormattedSelectedCasters());
+    socket.emit("selectedCastersUpdate", getFormattedSelectedCasters()); // Отправляем в новом формате
 
     socket.on("disconnect", (reason) => { console.log(`[SOCKET] Client disconnected: ${socket.id}, Reason: ${reason}`); });
     socket.on('error', (error) => { console.error(`[SOCKET] Socket error for ${socket.id}:`, error); });
