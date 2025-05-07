@@ -73,8 +73,8 @@ label { display: block; font-size: 0.75rem; font-weight: var(--font-weight-norma
 .app-button, button { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.85rem; font-weight: var(--font-weight-medium); border-radius: var(--border-radius-md); border: 1px solid var(--color-primary); background-color: var(--color-primary); color: var(--color-text-on-accent); cursor: pointer; transition: var(--transition-base); text-align: center; line-height: 1.4; min-width: 100px; box-shadow: none; }
 .app-button:hover, button:hover { background-color: var(--color-primary-light); border-color: var(--color-primary-light); color: var(--color-background); transform: none; box-shadow: none; }
 .app-button:active, button:active { background-color: var(--color-primary-dark); border-color: var(--color-primary-dark); transform: none; box-shadow: var(--shadow-inset); }
-.app-button.tertiary-button { background-color: transparent; color: var(--color-primary); border-color: var(--color-primary); }
-.app-button.tertiary-button:hover { background-color: rgba(var(--rgb-primary), 0.1); color: var(--color-primary-light); border-color: var(--color-primary-light); }
+.app-button.tertiary { background-color: transparent; color: var(--color-primary); border-color: var(--color-primary); } /* Renamed for consistency */
+.app-button.tertiary:hover { background-color: rgba(var(--rgb-primary), 0.1); color: var(--color-primary-light); border-color: var(--color-primary-light); }
 .action-button { background-color: transparent; color: var(--color-primary-light); border: none; padding: var(--spacing-xs); font-size: 0.8rem; min-width: auto; margin-left: var(--spacing-sm); font-weight: var(--font-weight-normal); box-shadow: none; text-transform: none; letter-spacing: normal; }
 .action-button:hover { text-decoration: none; color: var(--color-primary); transform: none; box-shadow: none; }
 .action-button.delete-button { color: var(--color-error); }
@@ -123,12 +123,12 @@ label { display: block; font-size: 0.75rem; font-weight: var(--font-weight-norma
 .winner-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xs); padding: 0 var(--spacing-md) var(--spacing-sm); }
 .winner-btn { background-color: var(--color-surface-secondary); border: 1px solid var(--color-border); color: var(--color-text-secondary); padding: var(--spacing-xs); font-size: 0.75rem; border-radius: var(--border-radius-sm); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: none; }
 .winner-btn:hover { transform: none; box-shadow: none; background-color: var(--color-surface-tertiary); }
-.winner-btn.team-1-bg-accent { border-color: var(--color-team1-accent); color: var(--color-team1-accent); }
-.winner-btn.team-1-bg-accent:hover { background-color: var(--color-team1-accent-bg); }
-.winner-btn.team-1-bg-accent.winner-selected { background-color: var(--color-team1-accent); color: var(--color-team1-text-on-accent); border-color: var(--color-team1-accent); }
-.winner-btn.team-2-bg-accent { border-color: var(--color-team2-accent); color: var(--color-team2-accent); }
-.winner-btn.team-2-bg-accent:hover { background-color: var(--color-team2-accent-bg); }
-.winner-btn.team-2-bg-accent.winner-selected { background-color: var(--color-team2-accent); color: var(--color-team2-text-on-accent); border-color: var(--color-team2-accent); }
+.winner-btn.team-1-accent-border { border-color: var(--color-team1-accent); color: var(--color-team1-accent); }
+.winner-btn.team-1-accent-border:hover { background-color: var(--color-team1-accent-bg); }
+.winner-btn.team-1-accent-border.winner-selected { background-color: var(--color-team1-accent); color: var(--color-team1-text-on-accent); border-color: var(--color-team1-accent); }
+.winner-btn.team-2-accent-border { border-color: var(--color-team2-accent); color: var(--color-team2-accent); }
+.winner-btn.team-2-accent-border:hover { background-color: var(--color-team2-accent-bg); }
+.winner-btn.team-2-accent-border.winner-selected { background-color: var(--color-team2-accent); color: var(--color-team2-text-on-accent); border-color: var(--color-team2-accent); }
 .maps { padding: var(--spacing-sm) var(--spacing-md); border-top: 1px solid var(--color-divider); }
 .maps h3 { font-size: 0.8rem; margin-bottom: var(--spacing-xs); color: var(--color-text-muted); font-weight: var(--font-weight-normal); text-transform: uppercase; }
 .map-row { display: flex; gap: var(--spacing-xs); margin-bottom: var(--spacing-xs); align-items: center; }
@@ -180,7 +180,7 @@ label { display: block; font-size: 0.75rem; font-weight: var(--font-weight-norma
 #vetoTable .veto-team.team-2-selected-veto option[value="TEAM2"] { font-weight: var(--font-weight-medium); color: var(--color-team2-accent); }
 #saveMapVetoButton { display: block; margin: var(--spacing-md) auto 0; min-width: 180px; }
 .json-output-container { margin-top: var(--spacing-lg); padding: var(--spacing-sm); }
-.json-output-container #toggleJsonOutput { margin-bottom: var(--spacing-sm); }
+/* .json-output-container #toggleJsonOutput { margin-bottom: var(--spacing-sm); } - Кнопка убрана из HTML */
 .json-output { background: #0f1115; color: #abb2bf; padding: var(--spacing-md); border-radius: var(--border-radius-md); white-space: pre-wrap; font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; font-size: 0.8rem; border: 1px solid var(--color-border); max-height: 300px; overflow-y: auto; text-align: left; box-shadow: var(--shadow-inset); }
 .app-button.saving, button.saving, .app-button:disabled, button:disabled { background-color: var(--color-secondary-dark) !important; border-color: var(--color-secondary-dark) !important; cursor: wait !important; color: var(--color-text-muted) !important; opacity: 0.65; transform: none; box-shadow: var(--shadow-inset); }
 .app-button.saved, button.saved { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; color: var(--color-text-on-accent) !important; }
@@ -197,3 +197,4 @@ label { display: block; font-size: 0.75rem; font-weight: var(--font-weight-norma
 @media (max-width: 992px) { .container { padding: var(--spacing-sm); } .header-controls, .pause-section { flex-direction: column; align-items: stretch; } .header-group, .pause-fields-grid { flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-xs); } .header-group .header-input, .header-group .date-input, .pause-fields-grid .header-input { width: 100%; } #saveHeaderButton, .pause-controls-standalone .app-button { width: 100%; margin-top: var(--spacing-sm); } .tournament-day { text-align: center; padding: var(--spacing-xs) 0; margin-left: 0; } .pause-section .section-title { text-align: center; } .page-title-container { flex-direction: column; gap: var(--spacing-sm); align-items: center; text-align: center; } .teams-link { display: inline-block; width: auto; } .map-veto-header { flex-direction: column; align-items: stretch; } #matchSelect { width: 100%; max-width: none; } .tabs-nav { flex-direction: column; border-bottom: none; } .tabs-nav .tab-link { border-bottom: 1px solid var(--color-divider); margin-bottom: 0; text-align: center; } .tabs-nav .tab-link.active { border-bottom: 3px solid var(--color-primary); } }
 @media (max-width: 768px) { body { font-size: 13px; } .matches { grid-template-columns: 1fr; } .match-header { flex-direction: column; align-items: stretch; gap: var(--spacing-xs); } .match-header .status-select, .match-header .time-input { width: 100%; } .match-teams { flex-direction: column; align-items: stretch; gap: var(--spacing-xs); } .vs-indicator { margin: var(--spacing-xs) 0; text-align: center;} .winner-buttons { grid-template-columns: 1fr; } }
 @media (max-width: 480px) { h1 { font-size: 1.5rem; } h2 { font-size: 1.1rem; } .header-input, .control-select, .team-select, .map-name-select, .map-score-input, .time-input, .status-select, .veto-action, .veto-map, .veto-team, .veto-side { padding: var(--spacing-xs) var(--spacing-sm); font-size: 0.8rem; } .app-button, button { padding: var(--spacing-xs) var(--spacing-sm); font-size: 0.8rem; } .map-row { flex-direction: column; align-items: stretch; } .map-row .map-name-select, .map-row .map-score-input { width: 100%; } .map-row .map-score-input { margin-top: var(--spacing-xs); } .header-group { gap: var(--spacing-xs); } .header-group .header-input { min-width: 0;} }
+

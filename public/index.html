@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Интерфейс матчей v2.5 - Вкладки</title>
+  <title>Интерфейс матчей - Чистый дизайн</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -24,12 +27,12 @@
       <div class="header-group">
         <input type="text" id="groupStageInput" placeholder="GROUP STAGE" class="header-input">
       </div>
-      <button id="saveHeaderButton" class="app-button">Save Header</button>
+      <button id="saveHeaderButton" class="app-button primary">Save Header</button>
     </header>
 
     <div class="page-title-container">
         <h1>Интерфейс матчей</h1>
-        <a href="/teams" class="teams-link">Управление командами</a>
+        <a href="/teams" class="teams-link app-button tertiary">Управление командами</a>
     </div>
 
     <div class="tabs-container card-style">
@@ -42,8 +45,7 @@
 
         <div class="tabs-content">
             <div id="tab-matches" class="tab-panel active">
-                <div class="dashboard">
-                  <div class="matches">
+                <div class="matches">
                     {/* Match 1 Column */}
                     <div class="match-column card-style" data-match="1" data-winner="">
                       <div class="match-header">
@@ -67,8 +69,8 @@
                         </div>
                       </div>
                       <div class="winner-buttons">
-                        <button class="winner-btn team-1-bg-accent" data-team="TEAM1">Победитель: Team1</button>
-                        <button class="winner-btn team-2-bg-accent" data-team="TEAM2">Победитель: Team2</button>
+                        <button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: Team1</button>
+                        <button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: Team2</button>
                       </div>
                       <div class="maps">
                         <h3>Карты</h3>
@@ -92,9 +94,9 @@
                         </div>
                       </div>
                       <div class="vrs-block-wrapper">
-                        <div class="vrs-block" id="vrsBlock1">{/* Содержимое VRS будет здесь сгенерировано JS */}</div>
+                        <div class="vrs-block" id="vrsBlock1"></div>
                       </div>
-                      <button class="save-match-button app-button" data-match-index="1">Save Match 1</button>
+                      <button class="save-match-button app-button primary" data-match-index="1">Save Match 1</button>
                     </div>
 
                     {/* Match 2 Column */}
@@ -116,8 +118,8 @@
                             </div>
                           </div>
                           <div class="winner-buttons">
-                            <button class="winner-btn team-1-bg-accent" data-team="TEAM1">Победитель: Team1</button>
-                            <button class="winner-btn team-2-bg-accent" data-team="TEAM2">Победитель: Team2</button>
+                            <button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: Team1</button>
+                            <button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: Team2</button>
                           </div>
                           <div class="maps">
                             <h3>Карты</h3>
@@ -137,7 +139,7 @@
                           <div class="vrs-block-wrapper">
                             <div class="vrs-block" id="vrsBlock2"></div>
                           </div>
-                          <button class="save-match-button app-button" data-match-index="2">Save Match 2</button>
+                          <button class="save-match-button app-button primary" data-match-index="2">Save Match 2</button>
                     </div>
 
                     {/* Match 3 Column */}
@@ -159,8 +161,8 @@
                             </div>
                           </div>
                           <div class="winner-buttons">
-                            <button class="winner-btn team-1-bg-accent" data-team="TEAM1">Победитель: Team1</button>
-                            <button class="winner-btn team-2-bg-accent" data-team="TEAM2">Победитель: Team2</button>
+                            <button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: Team1</button>
+                            <button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: Team2</button>
                           </div>
                           <div class="maps">
                             <h3>Карты</h3>
@@ -180,7 +182,7 @@
                           <div class="vrs-block-wrapper">
                             <div class="vrs-block" id="vrsBlock3"></div>
                           </div>
-                          <button class="save-match-button app-button" data-match-index="3">Save Match 3</button>
+                          <button class="save-match-button app-button primary" data-match-index="3">Save Match 3</button>
                     </div>
 
                     {/* Match 4 Column */}
@@ -202,8 +204,8 @@
                             </div>
                           </div>
                           <div class="winner-buttons">
-                            <button class="winner-btn team-1-bg-accent" data-team="TEAM1">Победитель: Team1</button>
-                            <button class="winner-btn team-2-bg-accent" data-team="TEAM2">Победитель: Team2</button>
+                            <button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: Team1</button>
+                            <button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: Team2</button>
                           </div>
                           <div class="maps">
                             <h3>Карты</h3>
@@ -223,10 +225,10 @@
                           <div class="vrs-block-wrapper">
                             <div class="vrs-block" id="vrsBlock4"></div>
                           </div>
-                          <button class="save-match-button app-button" data-match-index="4">Save Match 4</button>
+                          <button class="save-match-button app-button primary" data-match-index="4">Save Match 4</button>
                     </div>
                   </div> {/* /.matches */}
-                </div> {/* /.dashboard */}
+                </div> {/* /.dashboard - возможно, этот div лишний, если .matches уже в .tab-panel */}
             </div> {/* /#tab-matches */}
 
             <div id="tab-mapveto" class="tab-panel">
@@ -235,7 +237,7 @@
                       <h1>MAP VETO</h1>
                       <div class="map-veto-header">
                         <label for="matchSelect">Матч для Veto:</label>
-                        <select id="matchSelect" class="control-select">{/* Опции добавятся JS */}</select>
+                        <select id="matchSelect" class="control-select"></select>
                       </div>
                       <div class="table-wrapper">
                         <table id="vetoTable">
@@ -255,7 +257,7 @@
                           </tbody>
                         </table>
                       </div>
-                      <button id="saveMapVetoButton" class="app-button">Save Map Veto</button>
+                      <button id="saveMapVetoButton" class="app-button primary">Save Map Veto</button>
                     </div>
                   </div>
             </div> {/* /#tab-mapveto */}
@@ -274,7 +276,7 @@
                                 <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
                             </div>
                         </div>
-                        <button id="savePauseButton" class="app-button">Save Pause</button>
+                        <button id="savePauseButton" class="app-button primary">Save Pause</button>
                     </div>
                 </section>
             </div> {/* /#tab-pause */}
@@ -291,6 +293,7 @@
 
   </div> {/* /.container */}
 
+  <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>

@@ -1,19 +1,14 @@
 // public/js/main.js
-// Импортируем необходимые функции из других модулей
 import { initMatches, gatherSingleMatchData, updateWinnerButtonLabels, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor } from "./matches.js";
 import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionSelect } from "./mapVeto.js";
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 
-// Инициализация Socket.IO клиента
 const socket = io();
 
-// ========== Инициализация модулей ==========
 const initPromise = initMatches();
 initMapVeto();
 initVRS();
-
-// ========== Socket.io подписки ==========
 
 socket.on("jsonUpdate", async (matches) => {
   console.log("[SOCKET] Received jsonUpdate:", matches);
@@ -68,8 +63,6 @@ socket.on("pauseUpdate", (pauseData) => {
     if (timeInput) timeInput.value = "";
   }
 });
-
-// ========== Функции обновления UI ==========
 
 function updateMatchesUI(matches) {
   console.log("[UI] Updating matches UI...");
@@ -309,7 +302,6 @@ function updateCustomFieldsUI(fields) {
   console.log("[UI] Custom fields UI update finished.");
 }
 
-// ========== Загрузка данных с сервера ==========
 async function loadMatchesFromServer() {
   console.log("[Data] Loading matches data from server...");
   try {
@@ -343,7 +335,6 @@ async function loadMapVetoFromServer() {
     const mapVetoData = await response.json();
     console.log("[Data] Map veto data loaded:", mapVetoData);
     updateMapVetoUI(mapVetoData);
-
     if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined') {
         const matchSelectElement = document.getElementById("matchSelect");
         if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
@@ -392,7 +383,6 @@ async function loadPauseDataFromServer() {
   }
 }
 
-// ========== Вспомогательные функции ==========
 function calculateTournamentDay() {
   const startDateInput = document.getElementById("tournamentStart")?.value;
   const endDateInput = document.getElementById("tournamentEnd")?.value;
@@ -431,7 +421,6 @@ const tournamentEndInput = document.getElementById("tournamentEnd");
 if (tournamentStartInput) tournamentStartInput.addEventListener("change", updateTournamentDay);
 if (tournamentEndInput) tournamentEndInput.addEventListener("change", updateTournamentDay);
 
-// ========== Функции сбора данных ==========
 function gatherCustomFieldsData() {
   updateTournamentDay();
   return {
@@ -449,7 +438,6 @@ function gatherPauseData() {
   return { pause: message, lastUpd: time };
 }
 
-// ========== Функции сохранения данных ==========
 function setButtonState(button, state, message = null) {
   if (!button) return;
   const originalText = button.dataset.originalText || button.textContent || 'SAVE';
@@ -564,7 +552,6 @@ async function savePauseData(buttonElement) {
   }
 }
 
-// ========== Привязка обработчиков к кнопкам и селектам ==========
 function setupListeners() {
   document.querySelectorAll('.save-match-button').forEach(button => {
     if (!button.dataset.originalText) button.dataset.originalText = button.textContent;
@@ -617,7 +604,6 @@ function setupListeners() {
   console.log("[Init] All button and select listeners attached.");
 }
 
-// ========== ЛОГИКА ДЛЯ ВКЛАДОК ==========
 function initTabs() {
     const tabsNav = document.querySelector('.tabs-nav');
     const tabLinks = document.querySelectorAll('.tabs-nav .tab-link');
@@ -628,8 +614,6 @@ function initTabs() {
         return;
     }
 
-    // Устанавливаем первую вкладку активной по умолчанию, если ни одна не активна
-    // (хотя это уже должно быть сделано классами 'active' в HTML)
     const activeTab = document.querySelector('.tabs-nav .tab-link.active');
     if (!activeTab && tabLinks.length > 0) {
         tabLinks[0].classList.add('active');
@@ -638,11 +622,10 @@ function initTabs() {
         if (firstPanel) firstPanel.classList.add('active');
     }
 
-
     tabsNav.addEventListener('click', (event) => {
         const clickedTab = event.target.closest('.tab-link');
-        if (!clickedTab) return; // Клик не по ссылке вкладки
-        if (clickedTab.classList.contains('active')) return; // Не делаем ничего, если вкладка уже активна
+        if (!clickedTab) return;
+        if (clickedTab.classList.contains('active')) return;
 
         event.preventDefault();
 
@@ -662,7 +645,6 @@ function initTabs() {
     console.log("[Init] Tabs initialized.");
 }
 
-// ========== Инициализация при загрузке страницы ==========
 window.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded: Starting initialization...");
   try {
@@ -678,13 +660,12 @@ window.addEventListener("DOMContentLoaded", async () => {
     ]);
     
     setupListeners();
-    initTabs(); // Инициализируем вкладки
+    initTabs();
 
     const matchSelectElement = document.getElementById("matchSelect");
     if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
         updateVetoTeamOptions(matchSelectElement.value);
     }
-    // Применим стили к .veto-action селектам после загрузки всего
     document.querySelectorAll('#vetoTable .veto-action').forEach(actionSelect => {
         if (typeof styleVetoActionSelect === 'function') {
             styleVetoActionSelect(actionSelect);
