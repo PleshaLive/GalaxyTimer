@@ -28,9 +28,9 @@
     --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
     --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
 
-    --color-secondary-base: #a58a59; /* Яркий голубой */
-    --color-secondary-light: #80663f;
-    --color-secondary-dark: #6d5736;
+    --color-secondary-base: #0ea5e9; /* Яркий голубой */
+    --color-secondary-light: #38bdf8;
+    --color-secondary-dark: #0284c7;
     --rgb-secondary: 14, 165, 233;
     --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
     --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
@@ -55,26 +55,61 @@
     --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error) */
 
     /* --- START: Status Specific Colors --- */
-    /* Эти цвета можно изменять независимо друг от друга и от основных цветов темы */
-
     /* UPCOM Status Colors */
-    --color-status-upcom-bg: #4f46e5;       /* Фон для UPCOM */
-    --color-status-upcom-text: #ffffff;     /* Текст для UPCOM */
-    --color-status-upcom-border: #4f46e5;   /* Рамка для UPCOM */
-    --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5); /* Свечение для UPCOM */
+    --color-status-upcom-bg: #4f46e5;
+    --color-status-upcom-text: #ffffff;
+    --color-status-upcom-border: #4f46e5;
+    --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5);
 
     /* LIVE Status Colors */
-    --color-status-live-bg: #df3618;        /* Фон для LIVE */
-    --color-status-live-text: #1f2937;      /* Текст для LIVE */
-    --color-status-live-border: #df3618;    /* Рамка для LIVE */
-    --glow-status-live: 0 0 12px rgba(177, 21, 21, 0.7), 0 0 24px rgba(161, 23, 23, 0.4); /* Свечение для LIVE */
+    --color-status-live-bg: #f59e0b;
+    --color-status-live-text: #1f2937;
+    --color-status-live-border: #f59e0b;
+    --glow-status-live: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
 
     /* FINISHED Status Colors */
-    --color-status-finished-bg: #828282;    /* Фон для FINISHED */
-    --color-status-finished-text: #ffffff;  /* Текст для FINISHED */
-    --color-status-finished-border: #828282;/* Рамка для FINISHED */
-    --glow-status-finished: 0 0 12px rgb(130, 130, 130), 0 0 24px rgba(199, 199, 199, 0.4); /* Свечение для FINISHED */
+    --color-status-finished-bg: #22c55e;
+    --color-status-finished-text: #ffffff;
+    --color-status-finished-border: #22c55e;
+    --glow-status-finished: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4);
     /* --- END: Status Specific Colors --- */
+
+    /* === MAP VETO TABLE SPECIFIC COLORS === */
+    /* Заголовки таблицы Map Veto */
+    --color-mapveto-th-text: var(--color-text-primary); /* Текст в th */
+    --color-mapveto-th-icon: var(--color-primary-light); /* Цвет иконок в th */
+    
+    /* Ячейки таблицы Map Veto */
+    --color-mapveto-td-text: var(--color-text-secondary); /* Основной текст в td (если не переопределен стилем селекта) */
+
+    /* Действие BAN */
+    --color-veto-ban-bg: #ef4444;        /* Фон (исходный: --color-error) */
+    --color-veto-ban-text: #ffffff;       /* Текст (исходный: --color-text-on-accent) */
+    --color-veto-ban-border: #dc2626;     /* Рамка (исходный: --color-error-dark) */
+    --glow-veto-ban: 0 0 12px rgba(239, 68, 68, 0.7), 0 0 24px rgba(239, 68, 68, 0.4); /* Свечение (исходный: --glow-error) */
+
+    /* Действие PICK */
+    --color-veto-pick-bg: #22c55e;       /* Фон (исходный: --color-success) */
+    --color-veto-pick-text: #ffffff;      /* Текст (исходный: --color-text-on-primary) */
+    --color-veto-pick-border: #16a34a;    /* Рамка (исходный: --color-success-dark) */
+    --glow-veto-pick: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение (исходный: --glow-success) */
+
+    /* Действие DECIDER (Нейтральный, но настраиваемый) */
+    --color-veto-decider-bg: var(--color-surface-secondary); /* Фон */
+    --color-veto-decider-text: var(--color-text-primary);    /* Текст */
+    --color-veto-decider-border: var(--color-border-light);  /* Рамка */
+    --glow-veto-decider: none;                               /* Свечение (по умолчанию нет) */
+
+    /* Сторона CT (Counter-Terrorists) */
+    --color-veto-side-ct-bg: #3182ce;     /* Синий фон */
+    --color-veto-side-ct-text: #ffffff;   /* Белый текст */
+    --color-veto-side-ct-border: #2c5282; /* Темно-синяя рамка */
+
+    /* Сторона T (Terrorists) */
+    --color-veto-side-t-bg: #dd6b20;      /* Оранжевый фон */
+    --color-veto-side-t-text: #ffffff;    /* Белый текст */
+    --color-veto-side-t-border: #c05621;  /* Темно-оранжевая рамка */
+    /* === END MAP VETO TABLE SPECIFIC COLORS === */
 
     --color-team1-accent: var(--color-primary-base);
     --color-team1-accent-glow: var(--glow-primary);
@@ -102,7 +137,7 @@
     --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
     --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
     --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.4);
-    --shadow-neumorphic: 5px 5px 10px #070a10, -5px -5px 10px #131824; /* Для эффекта неморфизма */
+    --shadow-neumorphic: 5px 5px 10px #070a10, -5px -5px 10px #131824;
     --shadow-neumorphic-inset: inset 3px 3px 6px #070a10, inset -3px -3px 6px #131824;
 
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -161,20 +196,20 @@ h1 {
     font-weight: var(--font-weight-bold);
     margin-bottom: var(--spacing-lg);
 }
-h2 { /* Заголовки Match 1, Match 2 и т.д. */
-    font-size: 1.25rem; /* Уменьшил для заголовков матчей */
+h2 { 
+    font-size: 1.25rem; 
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-h3 { /* Заголовки Карты, VRS Статистика, Выбрать Кастеров и т.д. */
+h3 { 
     font-size: 1rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-sm);
 }
-.section-title { /* Если будет использоваться для больших секций */
+.section-title { 
     font-size: 1.6rem;
     color: var(--color-secondary-light);
     margin-bottom: var(--spacing-md);
@@ -183,7 +218,7 @@ h3 { /* Заголовки Карты, VRS Статистика, Выбрать 
     font-weight: var(--font-weight-semibold);
     text-shadow: var(--text-shadow-secondary);
 }
-.tab-title { /* Заголовки вкладок типа MAP VETO, Управление Паузой */
+.tab-title { 
     font-size: 1.8rem;
     color: var(--color-primary-light);
     text-align: center;
@@ -205,13 +240,13 @@ label {
 }
 label i {
     margin-right: var(--spacing-xs);
-    color: var(--color-primary-light); /* Цвет иконки в лейбле */
+    color: var(--color-primary-light);
 }
 
 
 /* Элементы форм (Общие) */
 .header-input, .control-select, .team-select, .map-name-select, .map-score-input, .time-input, .status-select, .veto-action, .veto-map, .veto-team, .veto-side,
-.edit-input /* Новый класс для инпутов в режиме редактирования */
+.edit-input
 {
     background-color: var(--color-surface-tertiary);
     border: 1px solid var(--color-border);
@@ -236,7 +271,7 @@ label i {
 {
     border-color: var(--color-primary-light);
     box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
-    background-color: var(--color-surface); /* Slight change on focus */
+    background-color: var(--color-surface); 
 }
 .header-input::placeholder, .map-score-input::placeholder, .time-input::placeholder,
 .edit-input::placeholder
@@ -244,7 +279,7 @@ label i {
     color: var(--color-text-placeholder);
     opacity: 0.8;
 }
-.styled-select { /* Для кастомного вида селектов */
+.styled-select { 
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -252,7 +287,7 @@ label i {
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     background-size: 16px 12px;
-    padding-right: calc(var(--spacing-md) * 2 + 16px); /* Учитываем размер иконки */
+    padding-right: calc(var(--spacing-md) * 2 + 16px); 
 }
 .styled-select option {
     background-color: var(--color-surface-secondary);
@@ -261,7 +296,7 @@ label i {
 
 
 /* Кнопки */
-.app-button, button { /* Общие стили для всех кнопок, включая кнопки в формах */
+.app-button, button { 
     padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
     font-size: 0.9rem;
     font-weight: var(--font-weight-semibold);
@@ -279,11 +314,11 @@ label i {
     box-shadow: 0 2px 5px rgba(var(--rgb-primary),0.2), 0 0 10px rgba(var(--rgb-primary),0.1) inset;
     position: relative;
     overflow: hidden;
-    z-index: 1; /* Для ::before */
+    z-index: 1; 
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    vertical-align: middle; /* Добавлено для выравнивания с текстом/инпутами */
+    vertical-align: middle; 
 }
 .app-button i, button i {
     margin-right: var(--spacing-sm);
@@ -326,7 +361,7 @@ label i {
 }
 .app-button.tertiary:hover {
     background-color: var(--color-secondary-base);
-    color: var(--color-text-on-accent); /* Текст на акцентном фоне */
+    color: var(--color-text-on-accent); 
     border-color: var(--color-secondary-base);
     box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
 }
@@ -507,10 +542,9 @@ label i {
     border-color: var(--color-primary-base);
 }
 
-/* Используем новые переменные для границ статусов */
+.match-column.status-upcom { border-left: 5px solid var(--color-status-upcom-border); }
 .match-column.status-live { border-left: 5px solid var(--color-status-live-border); }
 .match-column.status-finished { border-left: 5px solid var(--color-status-finished-border); }
-.match-column.status-upcom { border-left: 5px solid var(--color-status-upcom-border); }
 
 
 .match-header {
@@ -544,12 +578,10 @@ label i {
     padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-/* Используем новые переменные для опций в select */
 .status-select option[value="UPCOM"] { background-color: var(--color-status-upcom-bg); color: var(--color-status-upcom-text); }
 .status-select option[value="LIVE"] { background-color: var(--color-status-live-bg); color: var(--color-status-live-text); }
 .status-select option[value="FINISHED"] { background-color: var(--color-status-finished-bg); color: var(--color-status-finished-text); }
 
-/* Используем новые переменные для выбранного состояния select */
 .status-select.status-upcom-selected { background-color: var(--color-status-upcom-bg) !important; color: var(--color-status-upcom-text) !important; border-color: var(--color-status-upcom-border) !important; box-shadow: var(--glow-status-upcom) !important; }
 .status-select.status-live-selected { background-color: var(--color-status-live-bg) !important; color: var(--color-status-live-text) !important; border-color: var(--color-status-live-border) !important; box-shadow: var(--glow-status-live) !important; }
 .status-select.status-finished-selected { background-color: var(--color-status-finished-bg) !important; color: var(--color-status-finished-text) !important; border-color: var(--color-status-finished-border) !important; box-shadow: var(--glow-status-finished) !important; }
@@ -656,16 +688,67 @@ label i {
 
 .table-wrapper { overflow-x: auto; border: 1px solid var(--color-divider); border-radius: var(--border-radius-lg); background-color: var(--color-surface-secondary); box-shadow: var(--shadow-neumorphic-inset); }
 #vetoTable { width: 100%; border-collapse: separate; border-spacing:0; font-size: 0.9rem; min-width: 600px; }
-#vetoTable th, #vetoTable td { border-bottom: 1px solid var(--color-divider); border-right: 1px solid var(--color-divider); padding: var(--spacing-md); text-align: center; white-space: nowrap; }
+
+#vetoTable th { 
+    background-color: var(--color-surface); 
+    font-weight: var(--font-weight-semibold); 
+    color: var(--color-mapveto-th-text); 
+    text-transform: uppercase; 
+    letter-spacing: 0.04em;
+}
+#vetoTable td {
+    color: var(--color-mapveto-td-text); /* Базовый цвет текста для ячеек */
+}
+
+#vetoTable th, #vetoTable td { 
+    border-bottom: 1px solid var(--color-divider); 
+    border-right: 1px solid var(--color-divider); 
+    padding: var(--spacing-md); 
+    text-align: center; 
+    white-space: nowrap; 
+}
 #vetoTable th:last-child, #vetoTable td:last-child { border-right: none; }
 #vetoTable tr:last-child td { border-bottom: none; }
-#vetoTable th { background-color: var(--color-surface); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); text-transform: uppercase; letter-spacing: 0.04em;}
-#vetoTable th i { margin-right: var(--spacing-xs); }
+
+#vetoTable th i { 
+    margin-right: var(--spacing-xs); 
+    color: var(--color-mapveto-th-icon); 
+}
 #vetoTable th.team-1-text-accent { color: var(--color-team1-accent); text-shadow: var(--text-shadow-primary); }
 #vetoTable th.team-2-text-accent { color: var(--color-team2-accent); text-shadow: var(--text-shadow-secondary); }
+
 #vetoTable select { font-weight: var(--font-weight-medium); }
-#vetoTable select.veto-action.action-is-ban { background-color: var(--color-error) !important; color: var(--color-text-on-accent) !important; border-color: var(--color-error-dark) !important; box-shadow: var(--glow-error); }
-#vetoTable select.veto-action.action-is-pick { background-color: var(--color-success) !important; color: var(--color-text-on-primary) !important; border-color: var(--color-success-dark) !important; box-shadow: var(--glow-success); }
+
+#vetoTable select.veto-action.action-is-ban { 
+    background-color: var(--color-veto-ban-bg) !important; 
+    color: var(--color-veto-ban-text) !important; 
+    border-color: var(--color-veto-ban-border) !important; 
+    box-shadow: var(--glow-veto-ban); 
+}
+#vetoTable select.veto-action.action-is-pick { 
+    background-color: var(--color-veto-pick-bg) !important; 
+    color: var(--color-veto-pick-text) !important; 
+    border-color: var(--color-veto-pick-border) !important; 
+    box-shadow: var(--glow-veto-pick); 
+}
+#vetoTable select.veto-action.action-is-decider { /* Предполагается, что JS добавит класс .action-is-decider */
+    background-color: var(--color-veto-decider-bg) !important; 
+    color: var(--color-veto-decider-text) !important; 
+    border-color: var(--color-veto-decider-border) !important; 
+    box-shadow: var(--glow-veto-decider); 
+}
+
+#vetoTable select.veto-side.side-is-ct { /* Предполагается, что JS добавит класс .side-is-ct */
+    background-color: var(--color-veto-side-ct-bg) !important;
+    color: var(--color-veto-side-ct-text) !important;
+    border-color: var(--color-veto-side-ct-border) !important;
+}
+#vetoTable select.veto-side.side-is-t { /* Предполагается, что JS добавит класс .side-is-t */
+    background-color: var(--color-veto-side-t-bg) !important;
+    color: var(--color-veto-side-t-text) !important;
+    border-color: var(--color-veto-side-t-border) !important;
+}
+
 #vetoTable .veto-team.team-1-selected-veto { border-color: var(--color-team1-accent) !important; background-color: var(--color-team1-accent-bg) !important; color: var(--color-team1-accent) !important; }
 #vetoTable .veto-team.team-2-selected-veto { border-color: var(--color-team2-accent) !important; background-color: var(--color-team2-accent-bg) !important; color: var(--color-team2-accent) !important; }
 #saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
@@ -798,7 +881,7 @@ label i {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-sm); /* Отступ между деталями и кнопками */
+    gap: var(--spacing-sm); 
     transition: background-color var(--transition-fast);
 }
 #castersListContainer li:hover {
@@ -811,13 +894,13 @@ label i {
 #castersListContainer .caster-details {
     flex-grow: 1;
     display: flex;
-    align-items: center; /* В режиме редактирования тоже выравниваем по центру */
+    align-items: center; 
     gap: var(--spacing-sm);
     min-width: 0;
 }
-/* Стили для спанов в режиме отображения */
+
 #castersListContainer li:not(.editing) .caster-details {
-     align-items: baseline; /* В режиме просмотра выравниваем по тексту */
+     align-items: baseline; 
 }
 
 #castersListContainer .caster-name {
@@ -826,7 +909,7 @@ label i {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px; /* Ограничение ширины имени */
+    max-width: 150px; 
 }
 
 #castersListContainer .caster-social {
@@ -840,7 +923,7 @@ label i {
 #castersListContainer .caster-actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0; /* Кнопки не сжимаются */
+    flex-shrink: 0; 
 }
 #castersListContainer .caster-actions button {
     margin-left: var(--spacing-sm);
@@ -854,7 +937,7 @@ label i {
     margin-right: 0;
 }
 
-/* Стили для режима редактирования кастера */
+
 #castersListContainer li.editing {
     background-color: rgba(var(--rgb-primary), 0.1);
 }
@@ -876,9 +959,7 @@ label i {
     flex-grow: 1;
     min-width: 100px;
 }
-#castersListContainer li .caster-details .edit-input:focus {
-    /* Стили фокуса уже определены для .edit-input:focus */
-}
+
 
 #castersListContainer .caster-actions .save-caster-btn {
     background-color: var(--color-success);
@@ -991,10 +1072,10 @@ label i {
     .save-match-button { font-size: 0.85rem; }
     .tabs-nav .tab-link { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; }
     #castersListContainer li { flex-direction: column; align-items: stretch; }
-    #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); } /* Инпуты тоже в столбик */
-    #castersListContainer .caster-name { max-width: none; } /* Снимаем ограничение ширины на маленьких экранах */
+    #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); }
+    #castersListContainer .caster-name { max-width: none; } 
     #castersListContainer .caster-social { margin-left: 0; font-size: 0.8rem; }
     #castersListContainer .caster-actions { justify-content: flex-end; }
     #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); }
-    #castersListContainer li .caster-details .edit-input { width: 100% !important; flex-basis: auto !important; margin-right: 0; } /* Инпуты на всю ширину */
+    #castersListContainer li .caster-details .edit-input { width: 100% !important; flex-basis: auto !important; margin-right: 0; }
 }
