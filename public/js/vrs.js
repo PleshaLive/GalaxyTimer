@@ -7,30 +7,31 @@
  * Создает HTML-структуру таблиц VRS для всех 4 матчей.
  */
 export function initVRS() {
+  console.log("[VRS] Initializing VRS blocks...");
   // Проходим по индексам матчей от 1 до 4
   for (let i = 1; i <= 4; i++) {
     // Находим родительский блок для таблицы VRS по ID
-    const vrsBlock = document.getElementById("vrsBlock" + i);
+    const vrsBlock = document.getElementById(`vrsBlock${i}`); // Исправлено: `` вместо "" для интерполяции
     if (vrsBlock) {
       // Генерируем HTML для таблицы и вставляем его в блок
+      // Строки с комментариями "{/* ... */}" были удалены, так как они отображались как текст.
+      // Также удален заголовок <h3>VRS</h3>, так как он дублировал заголовок из index.html.
       vrsBlock.innerHTML = `
-        <h3>VRS</h3>
         <table class="vrs-table">
           <thead>
             <tr>
-              <th>TEAM</th> <th>+P</th>  <th>-P</th>  <th>#</th>   <th>CUR</th> </tr>
+              <th>TEAM</th> <th>+P</th>  <th>-P</th>  <th>#</th>   <th>CUR</th>
+            </tr>
           </thead>
           <tbody>
-            {/* ДОБАВЛЕН КЛАСС "team-1-row" К СТРОКЕ ПЕРВОЙ КОМАНДЫ */}
-            <tr class="team-1-row">
+            <tr class="team-1-row" data-vrs-team="1"> {/* Добавлен data-атрибут для возможного использования */}
               <td id="vrsTeam1Name${i}">TEAM1</td>
               <td><input type="text" class="vrs-input" id="team1WinPoints${i}" placeholder="+P" /></td>
               <td><input type="text" class="vrs-input" id="team1LosePoints${i}" placeholder="-P" /></td>
               <td><input type="text" class="vrs-input" id="team1Rank${i}" placeholder="#" /></td>
               <td><input type="text" class="vrs-input" id="team1CurrentPoints${i}" placeholder="CUR" /></td>
             </tr>
-            {/* ДОБАВЛЕН КЛАСС "team-2-row" К СТРОКЕ ВТОРОЙ КОМАНДЫ */}
-            <tr class="team-2-row">
+            <tr class="team-2-row" data-vrs-team="2"> {/* Добавлен data-атрибут */}
               <td id="vrsTeam2Name${i}">TEAM2</td>
               <td><input type="text" class="vrs-input" id="team2WinPoints${i}" placeholder="+P" /></td>
               <td><input type="text" class="vrs-input" id="team2LosePoints${i}" placeholder="-P" /></td>
@@ -42,11 +43,12 @@ export function initVRS() {
       `;
     } else {
       // Предупреждение, если блок для VRS не найден в HTML
-      console.warn(`Элемент vrsBlock${i} не найден в HTML.`);
+      console.warn(`[VRS] Element vrsBlock${i} not found in HTML.`);
     }
   }
   // Сразу обновляем имена команд в созданных таблицах VRS
   updateVRSTeamNames();
+
   // Добавляем слушатели на селекты команд (в блоках матчей),
   // чтобы обновлять имена в VRS при их изменении
   for (let m = 1; m <= 4; m++) {
@@ -56,6 +58,7 @@ export function initVRS() {
     if (sel1) sel1.addEventListener('change', updateVRSTeamNames);
     if (sel2) sel2.addEventListener('change', updateVRSTeamNames);
   }
+  console.log("[VRS] VRS blocks initialized and listeners attached.");
 }
 
 // ----------------------
@@ -63,9 +66,10 @@ export function initVRS() {
 // ----------------------
 /**
  * Обновляет текстовое содержимое ячеек с именами команд в таблицах VRS,
- * беря текущие значения из соответствующих селектов выбора команд.
+ * беря текущие значения из соответствующих селектов выбора команд из блоков матчей.
  */
 export function updateVRSTeamNames() {
+  // console.log("[VRS] Updating VRS team names..."); // Можно раскомментировать для отладки
   for (let i = 1; i <= 4; i++) {
     const team1Select = document.getElementById(`team1Select${i}`);
     const team2Select = document.getElementById(`team2Select${i}`);
@@ -74,12 +78,18 @@ export function updateVRSTeamNames() {
 
     // Обновляем имя Team 1, если ячейка и селект существуют
     if (vrsTeam1NameCell) {
-      // Используем значение селекта или 'TEAM1' по умолчанию, если селект не выбран или не существует
-      vrsTeam1NameCell.textContent = team1Select?.value || 'TEAM1';
+      // Используем значение селекта, если оно есть и не пустое, иначе 'Команда 1'
+      const team1Name = team1Select && team1Select.value ? team1Select.value : 'Команда 1';
+      if (vrsTeam1NameCell.textContent !== team1Name) {
+        vrsTeam1NameCell.textContent = team1Name;
+      }
     }
     // Обновляем имя Team 2
     if (vrsTeam2NameCell) {
-      vrsTeam2NameCell.textContent = team2Select?.value || 'TEAM2';
+      const team2Name = team2Select && team2Select.value ? team2Select.value : 'Команда 2';
+      if (vrsTeam2NameCell.textContent !== team2Name) {
+        vrsTeam2NameCell.textContent = team2Name;
+      }
     }
   }
 }
@@ -93,32 +103,39 @@ export function updateVRSTeamNames() {
  * @returns {object | null} - Объект с данными VRS для матча или null, если элементы ввода не найдены.
  */
 export function gatherSingleVRSData(matchIndex) {
-  const i = matchIndex;
+  const i = matchIndex; // Для краткости
+
   /**
    * Вспомогательная функция для получения и парсинга значения из input.
    * @param {string} id - ID элемента input.
-   * @returns {number | null} - Числовое значение или null, если поле пустое или не число.
+   * @returns {number | string | null} - Числовое значение, если возможно, иначе строку или null.
+   * В данном случае, по логике, ожидаем числа или null.
    */
   const getValue = (id) => {
     const element = document.getElementById(id);
-    // Получаем значение, удаляем пробелы по краям
-    const value = element ? element.value.trim() : '';
-    // Если значение пустое, возвращаем null
-    if (value === '') return null;
+    const value = element ? element.value.trim() : ''; // Получаем значение, удаляем пробелы
+
+    if (value === '') return null; // Если значение пустое, возвращаем null
+
     // Пытаемся преобразовать в целое число
+    // Если это поле для ранга, которое может быть нечисловым (например, '#'),
+    // можно добавить специальную обработку или возвращать строку.
+    // Для очков предполагаем числовой ввод.
     const parsed = parseInt(value, 10);
+
     // Возвращаем число, если парсинг удался и результат не NaN, иначе null
+    // (или value, если нужно разрешить нечисловые ранги, но тогда тип возврата нужно будет уточнить)
     return Number.isNaN(parsed) ? null : parsed;
   };
 
   // Проверяем, существуют ли элементы ввода для этого матча (достаточно проверить один)
   if (!document.getElementById(`team1WinPoints${i}`)) {
-    console.error(`Элементы VRS для матча ${i} не найдены при сборе данных.`);
+    console.warn(`[VRS] VRS input elements for match ${i} not found during data gathering.`);
     return null; // Возвращаем null, если элементы не найдены
   }
 
   // Собираем данные для обеих команд
-  return {
+  const vrsData = {
     TEAM1: {
       winPoints: getValue(`team1WinPoints${i}`),      // Очки за победу
       losePoints: getValue(`team1LosePoints${i}`),     // Очки за поражение
@@ -132,4 +149,6 @@ export function gatherSingleVRSData(matchIndex) {
       currentPoints: getValue(`team2CurrentPoints${i}`)
     }
   };
+  // console.log(`[VRS] Gathered VRS data for match ${i}:`, vrsData); // Для отладки
+  return vrsData;
 }
