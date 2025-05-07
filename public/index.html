@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Интерфейс матчей - Градиент и Стекломорфизм</title>
+  <title>Интерфейс матчей - Дизайн HUD</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  {/* Дополнительно можно подключить техно-шрифт, например Orbitron:
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+  И использовать его в CSS для заголовков: --font-family-headings: 'Orbitron', sans-serif; */}
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
 
-    <header class="header-controls card-style glassmorphism">
+    <header class="header-controls card-style">
       <div class="header-group">
         <input type="text" id="upcomingMatchesInput" placeholder="UPCOMING MATCHES" class="header-input">
         <input type="text" id="galaxyBattleInput" placeholder="GALAXY BATTLE" class="header-input">
@@ -35,7 +38,7 @@
         <a href="/teams" class="teams-link app-button tertiary">Управление командами</a>
     </div>
 
-    <div class="tabs-container card-style glassmorphism">
+    <div class="tabs-container card-style">
         <ul class="tabs-nav">
             <li class="tab-link active" data-tab="tab-matches">Матчи</li>
             <li class="tab-link" data-tab="tab-mapveto">Map Veto</li>
@@ -50,12 +53,14 @@
                     <div class="match-column card-style" data-match="1" data-winner="">
                       <div class="match-header">
                         <h2>Match 1</h2>
-                        <select class="status-select" id="statusSelect1">
-                          <option value="UPCOM">UPCOM</option>
-                          <option value="LIVE">LIVE</option>
-                          <option value="FINISHED">FINISHED</option>
-                        </select>
-                        <input type="text" class="time-input" id="timeInput1" placeholder="HH:MM" />
+                        <div class="match-meta">
+                            <select class="status-select" id="statusSelect1">
+                              <option value="UPCOM">UPCOM</option>
+                              <option value="LIVE">LIVE</option>
+                              <option value="FINISHED">FINISHED</option>
+                            </select>
+                            <input type="text" class="time-input" id="timeInput1" placeholder="--:--" />
+                        </div>
                       </div>
                       <div class="match-teams">
                         <div class="team-block team-1-block">
@@ -78,19 +83,19 @@
                           <select class="map-name-select">
                             <option value="inferno">inferno</option> <option value="dust2">dust2</option> <option value="mirage">mirage</option> <option value="nuke">nuke</option> <option value="ancient">ancient</option> <option value="anubis">anubis</option> <option value="train">train</option> <option value="vertigo">vertigo</option> <option value="overpass">overpass</option>
                           </select>
-                          <input type="text" class="map-score-input" placeholder="0:0" />
+                          <input type="text" class="map-score-input" placeholder="-:-" />
                         </div>
                         <div class="map-row">
                           <select class="map-name-select">
                               <option value="inferno">inferno</option> <option value="dust2">dust2</option> <option value="mirage">mirage</option> <option value="nuke">nuke</option> <option value="ancient">ancient</option> <option value="anubis">anubis</option> <option value="train">train</option> <option value="vertigo">vertigo</option> <option value="overpass">overpass</option>
                           </select>
-                          <input type="text" class="map-score-input" placeholder="0:0" />
+                          <input type="text" class="map-score-input" placeholder="-:-" />
                         </div>
                         <div class="map-row">
                           <select class="map-name-select">
                               <option value="inferno">inferno</option> <option value="dust2">dust2</option> <option value="mirage">mirage</option> <option value="nuke">nuke</option> <option value="ancient">ancient</option> <option value="anubis">anubis</option> <option value="train">train</option> <option value="vertigo">vertigo</option> <option value="overpass">overpass</option>
                           </select>
-                          <input type="text" class="map-score-input" placeholder="0:0" />
+                          <input type="text" class="map-score-input" placeholder="-:-" />
                         </div>
                       </div>
                       <div class="vrs-block-wrapper">
@@ -103,8 +108,10 @@
                     <div class="match-column card-style" data-match="2" data-winner="">
                         <div class="match-header">
                           <h2>Match 2</h2>
-                          <select class="status-select" id="statusSelect2"><option value="UPCOM">UPCOM</option> <option value="LIVE">LIVE</option> <option value="FINISHED">FINISHED</option></select>
-                          <input type="text" class="time-input" id="timeInput2" placeholder="HH:MM" />
+                           <div class="match-meta">
+                              <select class="status-select" id="statusSelect2"><option value="UPCOM">UPCOM</option> <option value="LIVE">LIVE</option> <option value="FINISHED">FINISHED</option></select>
+                              <input type="text" class="time-input" id="timeInput2" placeholder="--:--" />
+                           </div>
                         </div>
                         <div class="match-teams">
                             <div class="team-block team-1-block">
@@ -125,15 +132,15 @@
                             <h3>Карты</h3>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                           </div>
                           <div class="vrs-block-wrapper">
@@ -146,8 +153,10 @@
                     <div class="match-column card-style" data-match="3" data-winner="">
                         <div class="match-header">
                           <h2>Match 3</h2>
-                          <select class="status-select" id="statusSelect3"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
-                          <input type="text" class="time-input" id="timeInput3" placeholder="HH:MM" />
+                           <div class="match-meta">
+                              <select class="status-select" id="statusSelect3"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
+                              <input type="text" class="time-input" id="timeInput3" placeholder="--:--" />
+                           </div>
                         </div>
                         <div class="match-teams">
                             <div class="team-block team-1-block">
@@ -168,15 +177,15 @@
                             <h3>Карты</h3>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                           </div>
                           <div class="vrs-block-wrapper">
@@ -189,8 +198,10 @@
                     <div class="match-column card-style" data-match="4" data-winner="">
                         <div class="match-header">
                           <h2>Match 4</h2>
-                          <select class="status-select" id="statusSelect4"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
-                          <input type="text" class="time-input" id="timeInput4" placeholder="HH:MM" />
+                           <div class="match-meta">
+                              <select class="status-select" id="statusSelect4"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
+                              <input type="text" class="time-input" id="timeInput4" placeholder="--:--" />
+                           </div>
                         </div>
                         <div class="match-teams">
                             <div class="team-block team-1-block">
@@ -211,15 +222,15 @@
                             <h3>Карты</h3>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                             <div class="map-row">
                               <select class="map-name-select"><option value="inferno">inferno</option><option value="dust2">dust2</option><option value="mirage">mirage</option><option value="nuke">nuke</option><option value="ancient">ancient</option><option value="anubis">anubis</option><option value="train">train</option><option value="vertigo">vertigo</option><option value="overpass">overpass</option></select>
-                              <input type="text" class="map-score-input" placeholder="0:0" />
+                              <input type="text" class="map-score-input" placeholder="-:-" />
                             </div>
                           </div>
                           <div class="vrs-block-wrapper">

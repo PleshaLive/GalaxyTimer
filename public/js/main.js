@@ -449,11 +449,11 @@ function setButtonState(button, state, message = null) {
 
   switch (state) {
     case 'saving':
-      button.textContent = message || 'Сохранение...'; // Обновил текст
+      button.textContent = message || 'Сохранение...';
       button.classList.add('saving');
       break;
     case 'saved':
-      button.textContent = message || 'Сохранено!'; // Обновил текст
+      button.textContent = message || 'Сохранено!';
       button.classList.add('saved');
       setTimeout(() => {
         if (button.classList.contains('saved')) {
@@ -464,7 +464,7 @@ function setButtonState(button, state, message = null) {
       }, 1500);
       break;
     case 'error':
-      button.textContent = message || 'Ошибка!'; // Обновил текст
+      button.textContent = message || 'Ошибка!';
       button.classList.add('error');
       setTimeout(() => {
         if (button.classList.contains('error')) {
