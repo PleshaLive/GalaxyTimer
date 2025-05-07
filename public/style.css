@@ -54,12 +54,27 @@
     --color-text-on-primary: #ffffff;
     --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error) */
 
-    --color-upcom: var(--color-primary-base);
-    --color-live: var(--color-warning);
-    --color-finished: var(--color-success); /* Используем success для finished */
-    --color-info-text: var(--color-text-on-primary); /* Текст на upcom */
-    --color-warning-text-on-bg: var(--color-warning-text); /* Текст на live (желтый) */
-    --color-finished-text-on-bg: var(--color-text-on-accent); /* Текст на finished (зеленый) */
+    /* --- START: Status Specific Colors --- */
+    /* Эти цвета можно изменять независимо друг от друга и от основных цветов темы */
+
+    /* UPCOM Status Colors */
+    --color-status-upcom-bg: #4f46e5;       /* Фон для UPCOM */
+    --color-status-upcom-text: #ffffff;     /* Текст для UPCOM */
+    --color-status-upcom-border: #4f46e5;   /* Рамка для UPCOM */
+    --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5); /* Свечение для UPCOM */
+
+    /* LIVE Status Colors */
+    --color-status-live-bg: #f59e0b;        /* Фон для LIVE */
+    --color-status-live-text: #1f2937;      /* Текст для LIVE */
+    --color-status-live-border: #f59e0b;    /* Рамка для LIVE */
+    --glow-status-live: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4); /* Свечение для LIVE */
+
+    /* FINISHED Status Colors */
+    --color-status-finished-bg: #22c55e;    /* Фон для FINISHED */
+    --color-status-finished-text: #ffffff;  /* Текст для FINISHED */
+    --color-status-finished-border: #22c55e;/* Рамка для FINISHED */
+    --glow-status-finished: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение для FINISHED */
+    /* --- END: Status Specific Colors --- */
 
     --color-team1-accent: var(--color-primary-base);
     --color-team1-accent-glow: var(--glow-primary);
@@ -491,9 +506,12 @@ label i {
     box-shadow: var(--shadow-lg);
     border-color: var(--color-primary-base);
 }
-.match-column.status-live { border-left: 5px solid var(--color-live); }
-.match-column.status-finished { border-left: 5px solid var(--color-finished); }
-.match-column.status-upcom { border-left: 5px solid var(--color-upcom); }
+
+/* Используем новые переменные для границ статусов */
+.match-column.status-live { border-left: 5px solid var(--color-status-live-border); }
+.match-column.status-finished { border-left: 5px solid var(--color-status-finished-border); }
+.match-column.status-upcom { border-left: 5px solid var(--color-status-upcom-border); }
+
 
 .match-header {
     display: flex;
@@ -526,12 +544,15 @@ label i {
     padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-.status-select option[value="UPCOM"] { background-color: var(--color-upcom); color: var(--color-info-text); }
-.status-select option[value="LIVE"] { background-color: var(--color-live); color: var(--color-warning-text-on-bg); }
-.status-select option[value="FINISHED"] { background-color: var(--color-finished); color: var(--color-finished-text-on-bg); }
-.status-select.status-upcom-selected { background-color: var(--color-upcom) !important; color: var(--color-info-text) !important; border-color: var(--color-upcom) !important; box-shadow: var(--glow-primary) !important; }
-.status-select.status-live-selected { background-color: var(--color-live) !important; color: var(--color-warning-text-on-bg) !important; border-color: var(--color-live) !important; box-shadow: var(--glow-warning) !important; }
-.status-select.status-finished-selected { background-color: var(--color-finished) !important; color: var(--color-finished-text-on-bg) !important; border-color: var(--color-finished) !important; box-shadow: var(--glow-success) !important; }
+/* Используем новые переменные для опций в select */
+.status-select option[value="UPCOM"] { background-color: var(--color-status-upcom-bg); color: var(--color-status-upcom-text); }
+.status-select option[value="LIVE"] { background-color: var(--color-status-live-bg); color: var(--color-status-live-text); }
+.status-select option[value="FINISHED"] { background-color: var(--color-status-finished-bg); color: var(--color-status-finished-text); }
+
+/* Используем новые переменные для выбранного состояния select */
+.status-select.status-upcom-selected { background-color: var(--color-status-upcom-bg) !important; color: var(--color-status-upcom-text) !important; border-color: var(--color-status-upcom-border) !important; box-shadow: var(--glow-status-upcom) !important; }
+.status-select.status-live-selected { background-color: var(--color-status-live-bg) !important; color: var(--color-status-live-text) !important; border-color: var(--color-status-live-border) !important; box-shadow: var(--glow-status-live) !important; }
+.status-select.status-finished-selected { background-color: var(--color-status-finished-bg) !important; color: var(--color-status-finished-text) !important; border-color: var(--color-status-finished-border) !important; box-shadow: var(--glow-status-finished) !important; }
 
 
 .match-body { padding: var(--spacing-md); flex-grow: 1; display: flex; flex-direction: column; gap: var(--spacing-md); }
