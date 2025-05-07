@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Интерфейс матчей - Чистый дизайн</title>
+  <title>Интерфейс матчей - Градиент и Стекломорфизм</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
 <body>
   <div class="container">
 
-    <header class="header-controls card-style">
+    <header class="header-controls card-style glassmorphism">
       <div class="header-group">
         <input type="text" id="upcomingMatchesInput" placeholder="UPCOMING MATCHES" class="header-input">
         <input type="text" id="galaxyBattleInput" placeholder="GALAXY BATTLE" class="header-input">
@@ -35,7 +35,7 @@
         <a href="/teams" class="teams-link app-button tertiary">Управление командами</a>
     </div>
 
-    <div class="tabs-container card-style">
+    <div class="tabs-container card-style glassmorphism">
         <ul class="tabs-nav">
             <li class="tab-link active" data-tab="tab-matches">Матчи</li>
             <li class="tab-link" data-tab="tab-mapveto">Map Veto</li>
@@ -228,7 +228,6 @@
                           <button class="save-match-button app-button primary" data-match-index="4">Save Match 4</button>
                     </div>
                   </div> {/* /.matches */}
-                </div> {/* /.dashboard - возможно, этот div лишний, если .matches уже в .tab-panel */}
             </div> {/* /#tab-matches */}
 
             <div id="tab-mapveto" class="tab-panel">

@@ -449,11 +449,11 @@ function setButtonState(button, state, message = null) {
 
   switch (state) {
     case 'saving':
-      button.textContent = message || 'SAVING...';
+      button.textContent = message || 'Сохранение...'; // Обновил текст
       button.classList.add('saving');
       break;
     case 'saved':
-      button.textContent = message || 'SAVED!';
+      button.textContent = message || 'Сохранено!'; // Обновил текст
       button.classList.add('saved');
       setTimeout(() => {
         if (button.classList.contains('saved')) {
@@ -464,7 +464,7 @@ function setButtonState(button, state, message = null) {
       }, 1500);
       break;
     case 'error':
-      button.textContent = message || 'ERROR!';
+      button.textContent = message || 'Ошибка!'; // Обновил текст
       button.classList.add('error');
       setTimeout(() => {
         if (button.classList.contains('error')) {
@@ -495,7 +495,7 @@ async function saveMatchData(matchIndex, buttonElement) {
     setButtonState(buttonElement, 'saved');
   } catch (error) {
     console.error(`[Save] Error saving data for Match ${matchIndex}:`, error);
-    setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    setButtonState(buttonElement, 'error', error.message || 'Ошибка сохранения');
   } finally {
     if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
       setButtonState(buttonElement, 'idle');
@@ -512,7 +512,7 @@ async function saveMapVetoData(buttonElement) {
     setButtonState(buttonElement, 'saved');
   } catch (error) {
     console.error(`[Save] Error saving Map Veto data:`, error);
-    setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    setButtonState(buttonElement, 'error', error.message || 'Ошибка сохранения');
   } finally {
     if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
       setButtonState(buttonElement, 'idle');
@@ -528,7 +528,7 @@ async function saveHeaderData(buttonElement) {
     setButtonState(buttonElement, 'saved');
   } catch (error) {
     console.error(`[Save] Error saving Header data:`, error);
-    setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    setButtonState(buttonElement, 'error', error.message || 'Ошибка сохранения');
   } finally {
     if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
       setButtonState(buttonElement, 'idle');
@@ -544,7 +544,7 @@ async function savePauseData(buttonElement) {
     setButtonState(buttonElement, 'saved');
   } catch (error) {
     console.error(`[Save] Error saving Pause data:`, error);
-    setButtonState(buttonElement, 'error', error.message || 'SAVE ERROR');
+    setButtonState(buttonElement, 'error', error.message || 'Ошибка сохранения');
   } finally {
     if (!buttonElement.classList.contains('saved') && !buttonElement.classList.contains('error')) {
       setButtonState(buttonElement, 'idle');
