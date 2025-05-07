@@ -18,7 +18,7 @@ function styleVetoTeamSelect(selectElement) {
 * Применяет классы к селекту действия (BAN/PICK/DECIDER) в Veto для стилизации.
 * @param {HTMLSelectElement} selectElement - Элемент селекта.
 */
-function styleVetoActionSelect(selectElement) {
+export function styleVetoActionSelect(selectElement) { // Экспортируем, чтобы main.js мог использовать
   if (!selectElement) return;
   selectElement.classList.remove('action-is-ban', 'action-is-pick', 'action-is-decider');
   const currentValue = selectElement.value;
@@ -29,10 +29,11 @@ function styleVetoActionSelect(selectElement) {
   } else if (currentValue === "DECIDER") {
       selectElement.classList.add('action-is-decider');
   }
-  // Можно добавить else для дефолтного стиля, если значения могут быть другими
 }
 
-
+/**
+* Инициализирует селект выбора матча для блока Map Veto.
+*/
 export function initMapVeto() {
 const matchSelect = document.getElementById("matchSelect");
 if (!matchSelect) {
@@ -49,18 +50,17 @@ for (let i = 1; i <= 4; i++) {
 }
 matchSelect.value = "1";
 
-// Привязываем слушатели и начальные стили к селектам команд и действий
 const vetoTableRows = document.querySelectorAll("#vetoTable tbody tr");
 vetoTableRows.forEach(row => {
     const teamSelect = row.querySelector(".veto-team");
     if (teamSelect) {
-        styleVetoTeamSelect(teamSelect); // Начальный стиль
+        styleVetoTeamSelect(teamSelect); 
         teamSelect.addEventListener('change', () => styleVetoTeamSelect(teamSelect));
     }
 
     const actionSelect = row.querySelector(".veto-action");
     if (actionSelect) {
-        styleVetoActionSelect(actionSelect); // Начальный стиль
+        styleVetoActionSelect(actionSelect); 
         actionSelect.addEventListener('change', () => styleVetoActionSelect(actionSelect));
     }
 });
@@ -68,6 +68,11 @@ vetoTableRows.forEach(row => {
 console.log("[MapVeto] Map Veto initialized, listeners and styles for team/action selects attached.");
 }
 
+/**
+* Обновляет опции в селектах выбора команды в таблице Map Veto
+* на основе названий команд, выбранных для указанного матча, и применяет стили.
+* @param {string|number} matchIndex - Индекс матча (1-4), для которого нужно обновить Veto.
+*/
 export function updateVetoTeamOptions(matchIndex) {
 const vetoTeamSelects = document.querySelectorAll("#vetoTable .veto-team");
 if (vetoTeamSelects.length === 0) return;
@@ -76,6 +81,8 @@ const team1SelectElement = document.getElementById(`team1Select${matchIndex}`);
 const team2SelectElement = document.getElementById(`team2Select${matchIndex}`);
 const team1Name = team1SelectElement?.value || "Team 1";
 const team2Name = team2SelectElement?.value || "Team 2";
+
+console.log(`[Veto UI] Updating team options for Veto Match ${matchIndex}: T1=${team1Name}, T2=${team2Name}`);
 
 vetoTeamSelects.forEach(select => {
   const currentValue = select.value;
@@ -96,12 +103,16 @@ vetoTeamSelects.forEach(select => {
   } else {
     select.value = "TEAM1";
   }
-  styleVetoTeamSelect(select); // Обновляем стиль селекта команды
+  styleVetoTeamSelect(select);
 });
 }
 
+
+/**
+* Собирает данные из таблицы Map Veto.
+* @returns {object} - Объект с данными Map Veto.
+*/
 export function gatherMapVetoData() {
-// ... (код без изменений) ...
 const matchSelect = document.getElementById("matchSelect");
 const matchIndex = matchSelect ? parseInt(matchSelect.value, 10) : 1;
 
@@ -119,18 +130,21 @@ rows.forEach(row => {
   const i = parseInt(row.dataset.index, 10);
   const actionSelect = row.querySelector(".veto-action");
   const teamSelect = row.querySelector(".veto-team");
-  const mapSelect = row.querySelector(".veto-map");
+  const mapSelectElement = row.querySelector(".veto-map");
   const sideSelect = row.querySelector(".veto-side");
 
   const action = actionSelect ? actionSelect.value : "BAN";
   const teamKey = teamSelect ? teamSelect.value : "TEAM1";
-  const mapName = mapSelect ? mapSelect.value : "inferno";
+  const mapName = mapSelectElement ? mapSelectElement.value : "inferno";
   const side = sideSelect ? sideSelect.value : "-";
 
   const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
   const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
-
-  const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\<span class="math-inline">\{action\}\\\\</span>{mapName}.png`;
+  
+  // ИСПРАВЛЕННАЯ СТРОКА: Убедитесь, что здесь используются шаблонные литералы
+  // и переменные action и mapName содержат корректные значения.
+  const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
+  
   let sideIMG = "";
   if (side === "CT") {
     sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
@@ -139,8 +153,15 @@ rows.forEach(row => {
   }
 
   vetoArr.push({
-    mapIndex: i, action, team: teamKey, teamName: realTeamName,
-    teamLogo: realTeamLogo, map: mapName, side, vetoIMG, sideIMG
+    mapIndex: i,
+    action,
+    team: teamKey,
+    teamName: realTeamName,
+    teamLogo: realTeamLogo,
+    map: mapName,
+    side,
+    vetoIMG, // Эта строка теперь должна содержать правильный путь
+    sideIMG
   });
 });
 
@@ -153,6 +174,3 @@ return {
   veto: vetoArr
 };
 }
-
-// Экспортируем styleVetoActionSelect, чтобы ее можно было вызвать из main.js
-export { styleVetoActionSelect };
