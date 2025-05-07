@@ -24,14 +24,14 @@ export function initVRS() {
             </tr>
           </thead>
           <tbody>
-            <tr class="team-1-row" data-vrs-team="1"> {/* Добавлен data-атрибут для возможного использования */}
+            <tr class="team-1-row" data-vrs-team="1"> 
               <td id="vrsTeam1Name${i}">TEAM1</td>
               <td><input type="text" class="vrs-input" id="team1WinPoints${i}" placeholder="+P" /></td>
               <td><input type="text" class="vrs-input" id="team1LosePoints${i}" placeholder="-P" /></td>
               <td><input type="text" class="vrs-input" id="team1Rank${i}" placeholder="#" /></td>
               <td><input type="text" class="vrs-input" id="team1CurrentPoints${i}" placeholder="CUR" /></td>
             </tr>
-            <tr class="team-2-row" data-vrs-team="2"> {/* Добавлен data-атрибут */}
+            <tr class="team-2-row" data-vrs-team="2"> 
               <td id="vrsTeam2Name${i}">TEAM2</td>
               <td><input type="text" class="vrs-input" id="team2WinPoints${i}" placeholder="+P" /></td>
               <td><input type="text" class="vrs-input" id="team2LosePoints${i}" placeholder="-P" /></td>
