@@ -8,9 +8,9 @@ let teamsInitializationPromise = null;
 // Инициализация всего
 // ----------------------
 /**
- * Инициализирует блок матчей: загружает список команд, заполняет селекты,
- * привязывает обработчики событий. Возвращает Promise, который разрешается
- * после завершения инициализации.
+ * Инициализирует блок матчей: загружает список команд с ВНЕШНЕГО API,
+ * заполняет селекты, привязывает обработчики событий.
+ * Возвращает Promise, который разрешается после завершения инициализации.
  * @returns {Promise<void>}
  */
 export async function initMatches() {
@@ -21,27 +21,27 @@ export async function initMatches() {
 
   // Создаем новый промис
   teamsInitializationPromise = new Promise(async (resolve, reject) => {
-    console.log("[Matches] Starting teams initialization...");
+    console.log("[Matches] Starting teams initialization from external API...");
     try {
-      // Загружаем список команд с сервера
-      const response = await fetch("https://waywayway-production.up.railway.app/api/teams"); // <--- ИЗМЕНЕННАЯ СТРОКА
+      // Загружаем список команд с ВНЕШНЕГО сервера
+      const response = await fetch("https://waywayway-production.up.railway.app/api/teams");
       if (!response.ok) {
         // Попытка прочитать тело ошибки, если оно есть
-        let errorText = `HTTP error! status: ${response.status}`;
-        try {
-            const errorData = await response.json();
-            if (errorData && errorData.message) {
-                errorText += ` - ${errorData.message}`;
-            } else if (typeof errorData === 'string' && errorData.length > 0) {
-                 errorText += ` - ${errorData.substring(0,100)}`; // Ограничиваем длину, если это просто текст
-            }
-        } catch (e) {
-            // Если тело ответа не JSON или произошла другая ошибка при чтении
-            const textResponse = await response.text().catch(() => ""); // Пытаемся получить текст
-            if(textResponse){
-                 errorText += ` - Server response: ${textResponse.substring(0,100)}`;
-            }
-        }
+        let errorText = `HTTP error! status: ${response.status}`;
+        try {
+            const errorData = await response.json();
+            if (errorData && errorData.message) {
+                errorText += ` - ${errorData.message}`;
+            } else if (typeof errorData === 'string' && errorData.length > 0) {
+                 errorText += ` - ${errorData.substring(0,100)}`; // Ограничиваем длину, если это просто текст
+            }
+        } catch (e) {
+            // Если тело ответа не JSON или произошла другая ошибка при чтении
+            const textResponse = await response.text().catch(() => ""); // Пытаемся получить текст
+            if(textResponse){
+                 errorText += ` - Server response: ${textResponse.substring(0,100)}`;
+            }
+        }
         throw new Error(errorText);
       }
       const data = await response.json(); // Парсим JSON ответ
@@ -49,7 +49,7 @@ export async function initMatches() {
       const teamsList = Array.isArray(data.teams) ? data.teams : (Array.isArray(data) ? data : []);
 
       if (teamsList.length === 0) {
-        console.warn("[Matches] Team list is empty or not received from the new API (https://waywayway-production.up.railway.app/api/teams).");
+        console.warn("[Matches] Team list is empty or not received from the external API (https://waywayway-production.up.railway.app/api/teams).");
       }
 
       // Заполняем селекты команд полученным списком
@@ -71,27 +71,28 @@ export async function initMatches() {
         }
       }
 
-      // --- Слушатель Socket.IO для обновления команд ---
-      // Этот блок кода по-прежнему будет получать обновления по сокету 'teamsUpdate' от вашего локального сервера.
-      // Если вы хотите, чтобы и обновления команд шли с нового API,
-      // то логику обновления через сокеты нужно будет либо удалить, либо адаптировать,
-      // чтобы она периодически опрашивала новый API вместо ожидания события от сокета.
-      // Текущий запрос касается только первоначальной загрузки.
-      if (typeof io !== 'undefined') {
+      /* --- ИЗМЕНЕНИЕ: Слушатель Socket.IO для 'teamsUpdate' ЗАКОММЕНТИРОВАН ---
+       * Чтобы предотвратить перезапись списка команд данными с локального сервера,
+       * мы больше не слушаем событие 'teamsUpdate' от него.
+       * Если нужны обновления команд в реальном времени, их нужно получать
+       * с внешнего API (например, через периодический опрос или WebSocket, если он поддерживается).
+       */
+      /*
+      if (typeof io !== 'undefined') {
           const socket = io(); // Подключаемся к сокету вашего локального сервера
           socket.on('teamsUpdate', (updatedTeams) => {
-              console.log('[SOCKET][Matches] Received teamsUpdate from local server (still listening, may need adjustment if new API is the sole source of truth):', updatedTeams);
-              // Обновляем выпадающие списки новым списком команд (полученных от локального сервера)
-              populateTeamSelects(Array.isArray(updatedTeams) ? updatedTeams : []);
-              // После обновления списков нужно обновить и лейблы кнопок победителей
-              for (let m = 1; m <= 4; m++) {
-                  updateWinnerButtonLabels(m);
-              }
+              console.log('[SOCKET][Matches] Received teamsUpdate from local server (HANDLER DISABLED):', updatedTeams);
+            // populateTeamSelects(Array.isArray(updatedTeams) ? updatedTeams : []); // <--- НЕ ВЫЗЫВАЕМ ОБНОВЛЕНИЕ
+            // for (let m = 1; m <= 4; m++) {
+            //     updateWinnerButtonLabels(m);
+            // }
           });
-          console.log('[Matches] Socket listener for "teamsUpdate" (from local server) attached.');
+          console.log('[Matches] Socket listener for "teamsUpdate" (from local server) attached BUT HANDLER DISABLED.');
       } else {
-          console.warn("[Matches] Socket.IO client not found. Real-time team updates via local socket on this page might not work.");
+          console.warn("[Matches] Socket.IO client not found.");
       }
+      */
+      console.log("[Matches] Socket listener for 'teamsUpdate' is intentionally disabled to rely solely on the external API for team data.");
 
       teamsInitialized = true; // Устанавливаем флаг завершения инициализации
       console.log("[Matches] Teams initialization completed using external API for initial load.");
@@ -100,12 +101,12 @@ export async function initMatches() {
     } catch (err) {
       // Если произошла ошибка при загрузке или обработке
       console.error("[Matches] Error during initialization with external API:", err);
-      // Попытка отобразить ошибку в UI, если это возможно
-      const errorDisplayElement = document.getElementById('teamsLoadingError'); // Предположим, у вас есть такой элемент
-      if (errorDisplayElement) {
-        errorDisplayElement.textContent = `Ошибка загрузки команд: ${err.message}. Пожалуйста, проверьте консоль.`;
-        errorDisplayElement.style.color = 'red';
-      }
+      // Попытка отобразить ошибку в UI, если это возможно
+      const errorDisplayElement = document.getElementById('teamsLoadingError'); // Предположим, у вас есть такой элемент
+      if (errorDisplayElement) {
+        errorDisplayElement.textContent = `Ошибка загрузки команд: ${err.message}. Пожалуйста, проверьте консоль.`;
+        errorDisplayElement.style.color = 'red';
+      }
       reject(err); // Отклоняем промис - инициализация не удалась
     }
   });
@@ -161,25 +162,25 @@ export function populateTeamSelects(teamsList) {
       const opt1 = document.createElement("option");
       opt1.value = team.name;
       opt1.textContent = team.name;
-      // Логика для логотипа:
-      // Если team.logo - это полный URL (начинается с http/https), используем его.
-      // Иначе, если это путь типа "/logos/team.png", формируем путь относительно C:\...
-      // Иначе, используем заглушку.
-      if (team.logo && (team.logo.startsWith('http://') || team.logo.startsWith('https://'))) {
-        opt1.dataset.logo = team.logo;
-      } else if (team.logo && team.logo.startsWith('/logos/')) {
-        opt1.dataset.logo = "C:\\projects\\vMix_score\\public" + team.logo;
-      } else if (team.logo) { // Если это просто имя файла или другой относительный путь
-        // Можно попытаться сделать его относительным к /logos/ или использовать заглушку
-        // Для простоты, если это не абсолютный URL и не /logos/, используем заглушку или специфичный путь
-        // Пример: если team.logo это "team_logo.png", то это будет "C:\...\public\team_logo.png"
-        // Возможно, здесь понадобится более сложная логика в зависимости от формата team.logo из API
-        opt1.dataset.logo = team.logo.startsWith('C:')
-            ? team.logo
-            : "C:\\projects\\vMix_score\\public" + (team.logo.startsWith('/') ? team.logo : '/' + team.logo);
-      } else {
-        opt1.dataset.logo = defaultOption.dataset.logo; // Заглушка
-      }
+      // Логика для логотипа:
+      // Если team.logo - это полный URL (начинается с http/https), используем его.
+      // Иначе, если это путь типа "/logos/team.png", формируем путь относительно C:\...
+      // Иначе, используем заглушку.
+      if (team.logo && (team.logo.startsWith('http://') || team.logo.startsWith('https://'))) {
+        opt1.dataset.logo = team.logo;
+      } else if (team.logo && team.logo.startsWith('/logos/')) {
+        opt1.dataset.logo = "C:\\projects\\vMix_score\\public" + team.logo;
+      } else if (team.logo) { // Если это просто имя файла или другой относительный путь
+        // Можно попытаться сделать его относительным к /logos/ или использовать заглушку
+        // Для простоты, если это не абсолютный URL и не /logos/, используем заглушку или специфичный путь
+        // Пример: если team.logo это "team_logo.png", то это будет "C:\...\public\team_logo.png"
+        // Возможно, здесь понадобится более сложная логика в зависимости от формата team.logo из API
+        opt1.dataset.logo = team.logo.startsWith('C:')
+            ? team.logo
+            : "C:\\projects\\vMix_score\\public" + (team.logo.startsWith('/') ? team.logo : '/' + team.logo);
+      } else {
+        opt1.dataset.logo = defaultOption.dataset.logo; // Заглушка
+      }
       sel1.appendChild(opt1);
 
       const opt2 = opt1.cloneNode(true);
