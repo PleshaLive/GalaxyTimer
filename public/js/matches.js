@@ -71,21 +71,12 @@ export async function initMatches() {
         }
       }
 
-      /* --- ИЗМЕНЕНИЕ: Слушатель Socket.IO для 'teamsUpdate' ЗАКОММЕНТИРОВАН ---
-       * Чтобы предотвратить перезапись списка команд данными с локального сервера,
-       * мы больше не слушаем событие 'teamsUpdate' от него.
-       * Если нужны обновления команд в реальном времени, их нужно получать
-       * с внешнего API (например, через периодический опрос или WebSocket, если он поддерживается).
-       */
+      /* --- Слушатель Socket.IO для 'teamsUpdate' ЗАКОММЕНТИРОВАН --- */
       /*
       if (typeof io !== 'undefined') {
-          const socket = io(); // Подключаемся к сокету вашего локального сервера
+          const socket = io();
           socket.on('teamsUpdate', (updatedTeams) => {
               console.log('[SOCKET][Matches] Received teamsUpdate from local server (HANDLER DISABLED):', updatedTeams);
-            // populateTeamSelects(Array.isArray(updatedTeams) ? updatedTeams : []); // <--- НЕ ВЫЗЫВАЕМ ОБНОВЛЕНИЕ
-            // for (let m = 1; m <= 4; m++) {
-            //     updateWinnerButtonLabels(m);
-            // }
           });
           console.log('[Matches] Socket listener for "teamsUpdate" (from local server) attached BUT HANDLER DISABLED.');
       } else {
@@ -137,6 +128,9 @@ export function populateTeamSelects(teamsList) {
   // Используем дефолтное лого (путь должен быть корректным на сервере или это будет полный URL)
   defaultOption.dataset.logo = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Путь к локальной заглушке
 
+  // Базовый URL внешнего сервера для логотипов
+  const externalApiBaseUrl = "https://waywayway-production.up.railway.app";
+
   // Проходим по всем 4 блокам матчей
   for (let m = 1; m <= 4; m++) {
     const sel1 = document.getElementById("team1Select" + m);
@@ -162,38 +156,40 @@ export function populateTeamSelects(teamsList) {
       const opt1 = document.createElement("option");
       opt1.value = team.name;
       opt1.textContent = team.name;
-      // Логика для логотипа:
-      // Если team.logo - это полный URL (начинается с http/https), используем его.
-      // Иначе, если это путь типа "/logos/team.png", формируем путь относительно C:\...
-      // Иначе, используем заглушку.
-      if (team.logo && (team.logo.startsWith('http://') || team.logo.startsWith('https://'))) {
-        opt1.dataset.logo = team.logo;
-      } else if (team.logo && team.logo.startsWith('/logos/')) {
-        opt1.dataset.logo = "C:\\projects\\vMix_score\\public" + team.logo;
-      } else if (team.logo) { // Если это просто имя файла или другой относительный путь
-        // Можно попытаться сделать его относительным к /logos/ или использовать заглушку
-        // Для простоты, если это не абсолютный URL и не /logos/, используем заглушку или специфичный путь
-        // Пример: если team.logo это "team_logo.png", то это будет "C:\...\public\team_logo.png"
-        // Возможно, здесь понадобится более сложная логика в зависимости от формата team.logo из API
-        opt1.dataset.logo = team.logo.startsWith('C:')
-            ? team.logo
-            : "C:\\projects\\vMix_score\\public" + (team.logo.startsWith('/') ? team.logo : '/' + team.logo);
-      } else {
-        opt1.dataset.logo = defaultOption.dataset.logo; // Заглушка
+
+      // --- ИЗМЕНЕНИЕ: Логика для формирования URL логотипа ---
+      let logoUrl = defaultOption.dataset.logo; // По умолчанию - локальная заглушка
+      if (team.logo) {
+        if (team.logo.startsWith('http://') || team.logo.startsWith('https://')) {
+          logoUrl = team.logo; // Используем полный URL из API как есть
+        } else if (team.logo.startsWith('/')) {
+          // Если путь относительный (начинается с /), добавляем базовый URL внешнего API
+          logoUrl = externalApiBaseUrl + team.logo;
+        } else {
+          // Если это просто имя файла или другой формат, можно попробовать добавить /logos/
+          // или оставить заглушку. Для надежности пока оставим заглушку в этом случае.
+          // console.warn(`[Matches] Unexpected logo format for team ${team.name}: ${team.logo}. Using default.`);
+          // logoUrl = defaultOption.dataset.logo; // Оставляем заглушку
+          // ИЛИ: Попытка сформировать URL, если ожидается, что это имя файла в /logos/
+          // logoUrl = `${externalApiBaseUrl}/logos/${team.logo}`;
+          // Выбираем вариант с заглушкой для большей предсказуемости, если формат неизвестен
+          logoUrl = defaultOption.dataset.logo;
+        }
       }
+      opt1.dataset.logo = logoUrl;
+      // --- КОНЕЦ ИЗМЕНЕНИЯ ---
+
       sel1.appendChild(opt1);
 
       const opt2 = opt1.cloneNode(true);
-      // opt2.textContent = team.name; // Уже установлено при клонировании
       sel2.appendChild(opt2);
     });
 
     // Пытаемся восстановить предыдущее выбранное значение
-    // Проверяем, существует ли еще такая опция
     if (currentVal1 && sel1.querySelector(`option[value="${CSS.escape(currentVal1)}"]`)) {
         sel1.value = currentVal1;
     } else if (sel1.options.length > 0) {
-        sel1.value = ""; // Сбрасываем на дефолтную опцию "-", если старой команды больше нет или не было выбора
+        sel1.value = ""; // Сбрасываем на дефолтную опцию "-"
     }
     if (currentVal2 && sel2.querySelector(`option[value="${CSS.escape(currentVal2)}"]`)) {
         sel2.value = currentVal2;
@@ -201,7 +197,7 @@ export function populateTeamSelects(teamsList) {
         sel2.value = ""; // Сбрасываем на дефолтную опцию "-"
     }
   }
-  console.log("[Matches] Team selects populated/repopulated.");
+  console.log("[Matches] Team selects populated/repopulated with external API URLs.");
 }
 
 // ----------------------
@@ -363,12 +359,13 @@ export function updateStatusColor(sel) {
 // --------------------------------------------------
 /**
  * Собирает все данные для одного матча из соответствующих полей ввода и селектов.
+ * Использует URL логотипов, сохраненные в data-атрибутах селектов.
  * @param {number} matchIndex - Индекс матча (1-4).
  * @returns {object | null} - Объект с данными матча или null, если колонка матча не найдена.
  */
 export function gatherSingleMatchData(matchIndex) {
     const m = matchIndex;
-    const defaultLogoPlaceholder = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Локальная заглушка
+    const defaultLogoPlaceholder = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Локальная заглушка на случай отсутствия лого в data-атрибуте
     const SCORE_REGEX = /^\d+:\d+$/; // Регулярное выражение для счета "число:число"
 
     const column = document.querySelector(`.match-column[data-match="${m}"]`);
@@ -388,14 +385,9 @@ export function gatherSingleMatchData(matchIndex) {
     const team1Name = selTeam1 ? selTeam1.value : "";
     const team2Name = selTeam2 ? selTeam2.value : "";
 
-    // Получаем лого из data-атрибута ВЫБРАННОЙ опции, или дефолтное
-    const team1Logo = selTeam1 && selTeam1.selectedIndex >= 0 && selTeam1.options[selTeam1.selectedIndex]
-        ? selTeam1.options[selTeam1.selectedIndex].dataset.logo || defaultLogoPlaceholder
-        : defaultLogoPlaceholder;
-    const team2Logo = selTeam2 && selTeam2.selectedIndex >= 0 && selTeam2.options[selTeam2.selectedIndex]
-        ? selTeam2.options[selTeam2.selectedIndex].dataset.logo || defaultLogoPlaceholder
-        : defaultLogoPlaceholder;
-
+    // Получаем лого напрямую из data-атрибута выбранной опции
+    const team1Logo = selTeam1?.options[selTeam1.selectedIndex]?.dataset.logo || defaultLogoPlaceholder;
+    const team2Logo = selTeam2?.options[selTeam2.selectedIndex]?.dataset.logo || defaultLogoPlaceholder;
 
     // Сбор данных по картам (имя и счет)
     const maps = {};
@@ -453,10 +445,10 @@ export function gatherSingleMatchData(matchIndex) {
     if (statusText === "FINISHED" && winnerKey) {
       if (winnerKey === "TEAM1" && team1Name) { // Проверяем, что имя команды выбрано
           teamWinner = team1Name;
-          teamWinnerLogo = team1Logo;
+          teamWinnerLogo = team1Logo; // Используем лого, полученное из data-атрибута
       } else if (winnerKey === "TEAM2" && team2Name) {
           teamWinner = team2Name;
-          teamWinnerLogo = team2Logo;
+          teamWinnerLogo = team2Logo; // Используем лого, полученное из data-атрибута
       }
     }
 
@@ -486,8 +478,8 @@ export function gatherSingleMatchData(matchIndex) {
       UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "",
       UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "",
       UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
-      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogoPlaceholder,
-      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogoPlaceholder,
+      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogoPlaceholder, // Используем полученное лого
+      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogoPlaceholder, // Используем полученное лого
       UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "",
       UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
       UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
@@ -508,8 +500,8 @@ export function gatherSingleMatchData(matchIndex) {
       LIVE_TIME: statusText === "LIVE" ? timeVal : "",
       LIVE_TEAM1: statusText === "LIVE" ? team1Name : "",
       LIVE_TEAM2: statusText === "LIVE" ? team2Name : "",
-      LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogoPlaceholder,
-      LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogoPlaceholder,
+      LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogoPlaceholder, // Используем полученное лого
+      LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogoPlaceholder, // Используем полученное лого
       LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "",
       LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "",
       LIVE_MAP2: statusText === "LIVE" ? maps.MAP2 : "",
@@ -529,8 +521,8 @@ export function gatherSingleMatchData(matchIndex) {
       FINISHED_TIME: statusText === "FINISHED" ? (timeVal ? timeVal + " CEST" : "") : "",
       FINISHED_TEAM1: statusText === "FINISHED" ? team1Name : "",
       FINISHED_TEAM2: statusText === "FINISHED" ? team2Name : "",
-      FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogoPlaceholder,
-      FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogoPlaceholder,
+      FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogoPlaceholder, // Используем полученное лого
+      FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogoPlaceholder, // Используем полученное лого
       FINISHED_MAP1: statusText === "FINISHED" ? maps.MAP1 : "",
       FINISHED_MAP1_SCORE: statusText === "FINISHED" ? maps.MAP1_SCORE : "",
       FINISHED_MAP2: statusText === "FINISHED" ? maps.MAP2 : "",
@@ -547,18 +539,18 @@ export function gatherSingleMatchData(matchIndex) {
          const sc = maps[`MAP${i}_SCORE`];
          const isNum = SCORE_REGEX.test(sc);
          const show = (statusText === "LIVE" || statusText === "FINISHED") && isNum;
-         perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogoPlaceholder;
-         perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogoPlaceholder;
+         perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogoPlaceholder; // Используем полученное лого
+         perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogoPlaceholder; // Используем полученное лого
      });
 
     // Динамические логотипы уровня матча
     const matchLogos = {};
     const showFinishedLogos = statusText === "FINISHED";
     const showLiveLogos = statusText === "LIVE";
-    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogoPlaceholder;
-    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogoPlaceholder;
-    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogoPlaceholder;
-    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogoPlaceholder;
+    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogoPlaceholder; // Используем полученное лого
+    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogoPlaceholder; // Используем полученное лого
+    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogoPlaceholder; // Используем полученное лого
+    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogoPlaceholder; // Используем полученное лого
 
     // Собираем итоговый объект матча
     const matchObj = {
@@ -572,7 +564,7 @@ export function gatherSingleMatchData(matchIndex) {
       FIN_Result: finResult,
       FIN_VICTORY: finVictory,
       TEAMWINNER: teamWinner,
-      TEAMWINNER_LOGO: teamWinnerLogo,
+      TEAMWINNER_LOGO: teamWinnerLogo, // Используем полученное лого победителя
       ...matchLogos,
       ...perMapLogos
     };
