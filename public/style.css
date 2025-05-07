@@ -64,16 +64,16 @@
     --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5); /* Свечение для UPCOM */
 
     /* LIVE Status Colors */
-    --color-status-live-bg: #f59e0b;        /* Фон для LIVE */
+    --color-status-live-bg: #df3618;        /* Фон для LIVE */
     --color-status-live-text: #1f2937;      /* Текст для LIVE */
-    --color-status-live-border: #f59e0b;    /* Рамка для LIVE */
-    --glow-status-live: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4); /* Свечение для LIVE */
+    --color-status-live-border: #df3618;    /* Рамка для LIVE */
+    --glow-status-live: 0 0 12px rgba(177, 21, 21, 0.7), 0 0 24px rgba(161, 23, 23, 0.4); /* Свечение для LIVE */
 
     /* FINISHED Status Colors */
-    --color-status-finished-bg: #22c55e;    /* Фон для FINISHED */
+    --color-status-finished-bg: #828282;    /* Фон для FINISHED */
     --color-status-finished-text: #ffffff;  /* Текст для FINISHED */
-    --color-status-finished-border: #22c55e;/* Рамка для FINISHED */
-    --glow-status-finished: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение для FINISHED */
+    --color-status-finished-border: #828282;/* Рамка для FINISHED */
+    --glow-status-finished: 0 0 12px rgb(130, 130, 130), 0 0 24px rgba(199, 199, 199, 0.4); /* Свечение для FINISHED */
     /* --- END: Status Specific Colors --- */
 
     --color-team1-accent: var(--color-primary-base);
