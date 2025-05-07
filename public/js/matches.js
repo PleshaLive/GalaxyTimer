@@ -229,8 +229,8 @@ export function updateWinnerButtonLabels(matchIndex) {
   const btn1 = matchColumn.querySelector('.winner-btn[data-team="TEAM1"]');
   const btn2 = matchColumn.querySelector('.winner-btn[data-team="TEAM2"]');
   // Устанавливаем текст кнопок
-  if (btn1) btn1.textContent = `Победитель: ${name1}`;
-  if (btn2) btn2.textContent = `Победитель: ${name2}`;
+  if (btn1) btn1.textContent = ` ${name1}`;
+  if (btn2) btn2.textContent = ` ${name2}`;
 }
 
 /**
