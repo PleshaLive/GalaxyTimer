@@ -1759,3 +1759,87 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
     color: var(--color-text-placeholder);
     opacity: 0.7; /* Чуть менее заметный плейсхолдер */
 }
+
+/* === Primary Button Enhancements === */
+/* Стили для основного состояния кнопок .app-button.primary */
+.app-button.primary {
+    /* Градиентный фон для большей визуальной привлекательности */
+    background: linear-gradient(145deg, var(--color-primary-light), var(--color-primary-dark));
+    /* Рамка, соответствующая темному оттенку градиента */
+    border: 1px solid var(--color-primary-dark);
+    /* Комбинированная тень: базовая темная и акцентная цветная */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3), /* Основная тень для объема */
+                0 2px 5px rgba(var(--rgb-primary), 0.4); /* Тень с цветом кнопки для акцента */
+    color: var(--color-text-on-primary);
+    /* Легкая тень для текста для улучшения читаемости */
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Плавный переход для анимации иконки */
+.app-button.primary i {
+    transition: transform 0.2s ease-out;
+}
+
+/* Улучшенный стиль при наведении для .app-button.primary */
+/* :not селекторы гарантируют, что этот стиль не применяется к отключенным кнопкам или кнопкам в состоянии сохранения/ошибки */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):hover {
+    /* Тонированный фон для эффекта "стекла", использующий основной цвет кнопки */
+    background-color: rgba(var(--rgb-primary), 0.25);
+    /* Усиленный эффект размытия для "стекломорфизма" */
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    /* Более яркая рамка при наведении */
+    border-color: var(--color-primary-light);
+    color: var(--color-text-primary); /* Цвет текста как у общих кнопок при наведении */
+    /* Более заметный "подъем" и небольшое увеличение кнопки */
+    transform: translateY(-3px) scale(1.02);
+    /* Комплексная тень: основная более рассеянная и эффект свечения */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25), /* Усиленная основная тень */
+                var(--glow-primary); /* Эффект свечения, определенный в :root */
+}
+
+/* Анимация иконки при наведении на .app-button.primary */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):hover i {
+    transform: scale(1.15) rotate(-5deg); /* Иконка увеличивается и слегка поворачивается */
+}
+
+/* Сохранение эффекта блика (из общих стилей .app-button) для .app-button.primary при наведении */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):hover::before {
+    left: 125%; /* Движение блика */
+    opacity: 1; /* Появление блика */
+    /* Плавность анимации блика */
+    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.2s ease-in-out;
+}
+
+/* Стиль при активном нажатии на .app-button.primary */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):active {
+    /* Более темный тонированный фон для "стекла" при нажатии */
+    background-color: rgba(var(--rgb-primary), 0.15);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    /* Легкое "вдавливание" кнопки */
+    transform: translateY(-1px) scale(1);
+    /* Усиленная внутренняя тень и небольшая внешняя цветная тень */
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.4),
+                0 1px 3px rgba(var(--rgb-primary),0.3);
+    border-color: var(--color-primary-dark);
+}
+
+/* Легкое изменение иконки при активном нажатии */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):active i {
+    transform: scale(1.05);
+}
+
+/* Гарантированное скрытие блика при активном нажатии на .app-button.primary */
+.app-button.primary:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
+    opacity: 0;
+    transition: none;
+}
+
+/*
+   Примечание: Существующие стили для состояний :disabled, .saving, .saved, .error
+   в классе .app-button используют !important. Это означает, что они будут
+   корректно переопределять новые стили для .app-button.primary,
+   когда эти состояния активны (что является ожидаемым поведением).
+*/
