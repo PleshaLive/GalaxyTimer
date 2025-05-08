@@ -977,6 +977,25 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 }
 #saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
 
+#vetoTable select.veto-action:hover {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 1px; /* Небольшой отступ, чтобы обводка не накладывалась на границу элемента */
+    cursor: pointer; /* Указываем, что элемент интерактивен */
+}
+
+/* Обводка для селектов команд, ТОЛЬКО ЕСЛИ команда уже выбрана (т.е. применен класс .team-X-selected-veto) */
+#vetoTable select.veto-team.team-1-selected-veto:hover,
+#vetoTable select.veto-team.team-2-selected-veto:hover {
+    outline: 2px solid var(--color-primary-light);
+    outline-offset: 1px;
+    cursor: pointer;
+}
+/* === КОНЕЦ НОВЫХ СТИЛЕЙ === */
+
+
+#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
+
+
 /* Pause Tab */
 .pause-section { margin-top: 0; border-top: none; } /* If it's inside a .tab-panel that has .card-style */
 .pause-controls-standalone { display: flex; flex-direction: column; gap: var(--spacing-lg); background-color: var(--color-surface-secondary); padding: var(--spacing-lg); border-radius: var(--border-radius-lg); }
