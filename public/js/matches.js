@@ -399,8 +399,8 @@ export function gatherSingleMatchData(matchIndex) {
     }
 
     // --- НАЧАЛО ИЗМЕНЕНИЙ ---
-    const localBasePath = "C:\projects\NewTimer\files"; // Ваш базовый локальный путь
-    const toLocal = (fileName) => `${localBasePath}\\${fileName}`;
+    const localBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; // Ваш базовый локальный путь
+    const toLocal = (fileName) => `${localBasePath}\\\\${fileName}`;
 
     // Локальные пути для иконок, которые не являются логотипами
     const localNoneIconPath = toLocal("none.png");
