@@ -1,7 +1,8 @@
 // public/js/main.js
 
 // Импорт необходимых модулей и функций
-import { initMatches, gatherSingleMatchData, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor, updateTeamDisplay } from "./matches.js"; // updateWinnerButtonLabels заменена на updateTeamDisplay
+// Заменяем updateWinnerButtonLabels на updateTeamDisplay
+import { initMatches, gatherSingleMatchData, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor, updateTeamDisplay } from "./matches.js"; 
 import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionSelect } from "./mapVeto.js";
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
@@ -203,10 +204,10 @@ function updateMatchesUI(matches) {
         }
         
         // Обновляем отображение команды (логотипы и текст кнопок) ПОСЛЕ установки значений селектов
+        // <-- ИЗМЕНЕНИЕ: Вызываем updateTeamDisplay -->
         if (typeof updateTeamDisplay === 'function') {
             updateTeamDisplay(matchIndex);
         }
-
 
         // Префикс для карт
         let prefix = "";
@@ -248,11 +249,8 @@ function updateMatchesUI(matches) {
 
         // Обновление победителя
         let winnerTeamKey = "";
-        // Используем актуальные значения из селектов для определения победителя,
-        // так как team1Name и team2Name выше могли быть пустыми, если команда не задана в match data
         const currentTeam1NameVal = team1Select ? team1Select.value : "";
         const currentTeam2NameVal = team2Select ? team2Select.value : "";
-
         if (match.FINISHED_MATCH_STATUS === "FINISHED" && match.TEAMWINNER) {
             if (currentTeam1NameVal && match.TEAMWINNER === currentTeam1NameVal) winnerTeamKey = "TEAM1";
             else if (currentTeam2NameVal && match.TEAMWINNER === currentTeam2NameVal) winnerTeamKey = "TEAM2";
@@ -275,7 +273,6 @@ function updateMatchesUI(matches) {
 
 /**
  * Обновляет интерфейс Map Veto.
- * @param {Object} mapVetoData - Данные по Map Veto.
  */
 function updateMapVetoUI(mapVetoData) {
     console.log("[UI] Attempting to update Map Veto UI. Data:", mapVetoData);
@@ -345,7 +342,6 @@ function updateMapVetoUI(mapVetoData) {
 
 /**
  * Обновляет интерфейс VRS-блоков.
- * @param {Object} rawVrsData - "Сырые" данные VRS по всем матчам.
  */
 function updateVRSUI(rawVrsData) {
     console.log("[UI] Attempting to update VRS UI. Data:", rawVrsData);
@@ -399,7 +395,6 @@ function clearVRSFieldsForMatch(matchIndex) {
 
 /**
  * Обновляет интерфейс кастомных полей (в хедере).
- * @param {Object} fields - Объект с кастомными полями.
  */
 function updateCustomFieldsUI(fields) {
     console.log("[UI] Attempting to update custom fields UI. Data:", fields);
@@ -528,27 +523,20 @@ async function loadPauseDataFromServer() {
 
 // --- Функции для работы с датами турнира ---
 
-/**
- * Рассчитывает и отображает текущий день турнира.
- */
 function calculateTournamentDay() {
     const startDateInput = document.getElementById("tournamentStart")?.value;
     const endDateInput = document.getElementById("tournamentEnd")?.value;
     const displaySpan = document.getElementById("tournamentDayDisplay");
-
     if (!displaySpan) return;
-
     if (!startDateInput) {
         displaySpan.textContent = 'Укажите дату начала';
         displaySpan.style.color = 'var(--color-text-muted)';
         return;
     }
-
     try {
         const start = new Date(startDateInput);
         const end = endDateInput ? new Date(endDateInput) : null;
         const today = new Date();
-
         start.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
         if (end) end.setHours(0, 0, 0, 0);
@@ -572,9 +560,6 @@ function calculateTournamentDay() {
     }
 }
 
-/**
- * Обновляет отображение дня турнира.
- */
 function updateTournamentDay() {
     calculateTournamentDay();
 }
@@ -586,10 +571,6 @@ if (tournamentEndInput) tournamentEndInput.addEventListener("change", updateTour
 
 // --- Функции сбора данных с полей ввода ---
 
-/**
- * Собирает данные из кастомных полей (хедер).
- * @returns {Object} Объект с данными.
- */
 function gatherCustomFieldsData() {
     updateTournamentDay();
     return {
@@ -602,10 +583,6 @@ function gatherCustomFieldsData() {
     };
 }
 
-/**
- * Собирает данные из полей управления паузой.
- * @returns {Object} Объект с данными паузы.
- */
 function gatherPauseData() {
     const message = document.getElementById("pauseMessageInput")?.value ?? "";
     const time = document.getElementById("pauseTimeInput")?.value ?? "";
@@ -614,27 +591,16 @@ function gatherPauseData() {
 
 // --- Управление состоянием кнопок сохранения ---
 
-/**
- * Устанавливает состояние кнопки (например, "Сохранение...", "Сохранено!", "Ошибка!").
- * ЭКСПОРТИРУЕМ для использования в других модулях (casters.js)
- * @param {HTMLElement} button - Элемент кнопки.
- * @param {'saving'|'saved'|'error'|'idle'} state - Новое состояние.
- * @param {string|null} message - Сообщение для отображения на кнопке (опционально).
- */
 export function setButtonState(button, state, message = null) {
     if (!button) return;
-
     const originalText = button.dataset.originalText || button.querySelector('i')?.nextSibling?.textContent?.trim() || button.textContent.trim() || 'SAVE';
     if (!button.dataset.originalText) button.dataset.originalText = originalText;
-
     const icon = button.querySelector('i');
     const originalIconClass = icon ? (button.dataset.originalIconClass || icon.className) : null;
     if (icon && !button.dataset.originalIconClass) button.dataset.originalIconClass = originalIconClass;
-
     button.disabled = (state === 'saving');
     button.classList.remove('saving', 'saved', 'error', 'idle');
     button.style.cursor = (state === 'saving') ? 'wait' : 'pointer';
-
     const setTextAndIcon = (text, iconClass) => {
         if (icon && iconClass) {
             icon.className = iconClass;
@@ -646,7 +612,6 @@ export function setButtonState(button, state, message = null) {
             button.textContent = text;
         }
     };
-
     switch (state) {
         case 'saving':
             setTextAndIcon(message || 'Сохранение...', 'fas fa-spinner fa-spin');
@@ -684,22 +649,18 @@ export function setButtonState(button, state, message = null) {
 
 // --- Функции сохранения данных ---
 
-/** Сохраняет данные одного матча и связанные с ним VRS данные */
 async function saveMatchData(matchIndex, buttonElement) {
     console.log(`[Save] Initiating save for Match ${matchIndex}...`);
     setButtonState(buttonElement, 'saving');
     try {
         const matchData = gatherSingleMatchData(matchIndex);
         if (!matchData) throw new Error(`Не удалось собрать данные для матча ${matchIndex}.`);
-
         const vrsData = gatherSingleVRSData(matchIndex);
         if (!vrsData) throw new Error(`Не удалось собрать VRS данные для матча ${matchIndex}.`);
-
         await Promise.all([
             saveData(`/api/matchdata/${matchIndex}`, matchData, 'PUT'),
             saveData(`/api/vrs/${matchIndex}`, vrsData, 'PUT')
         ]);
-
         setButtonState(buttonElement, 'saved');
         console.log(`[Save] Data for Match ${matchIndex} saved successfully.`);
     } catch (error) {
@@ -708,14 +669,12 @@ async function saveMatchData(matchIndex, buttonElement) {
     }
 }
 
-/** Сохраняет данные Map Veto */
 async function saveMapVetoData(buttonElement) {
     console.log(`[Save] Initiating save for Map Veto data...`);
     setButtonState(buttonElement, 'saving');
     try {
         const mapVetoData = gatherMapVetoData();
         if (!mapVetoData) throw new Error("Не удалось собрать данные Map Veto.");
-
         await saveData('/api/mapveto', mapVetoData, 'POST');
         setButtonState(buttonElement, 'saved');
         console.log(`[Save] Map Veto data saved successfully.`);
@@ -725,7 +684,6 @@ async function saveMapVetoData(buttonElement) {
     }
 }
 
-/** Сохраняет данные из хедера (кастомные поля) */
 async function saveHeaderData(buttonElement) {
     console.log(`[Save] Initiating save for Header (custom fields) data...`);
     setButtonState(buttonElement, 'saving');
@@ -740,7 +698,6 @@ async function saveHeaderData(buttonElement) {
     }
 }
 
-/** Сохраняет данные паузы */
 async function savePauseData(buttonElement) {
     console.log(`[Save] Initiating save for Pause data...`);
     setButtonState(buttonElement, 'saving');
@@ -766,7 +723,6 @@ function setupListeners() {
             button.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : button.textContent.trim();
             if (icon && !button.dataset.originalIconClass) button.dataset.originalIconClass = icon.className;
         }
-
         const matchIndex = button.dataset.matchIndex;
         if (matchIndex) {
             button.addEventListener('click', () => saveMatchData(parseInt(matchIndex, 10), button));
@@ -893,12 +849,9 @@ function initTabs() {
     tabsNav.addEventListener('click', (event) => {
         const clickedTab = event.target.closest('.tab-link');
         if (!clickedTab || clickedTab.classList.contains('active')) return;
-
         event.preventDefault();
-
         tabLinks.forEach(link => link.classList.remove('active'));
         tabPanels.forEach(panel => panel.classList.remove('active'));
-
         clickedTab.classList.add('active');
         const targetTabId = clickedTab.dataset.tab;
         const targetPanel = document.getElementById(targetTabId);
@@ -926,7 +879,6 @@ window.addEventListener("DOMContentLoaded", async () => {
             loadCustomFieldsFromServer(),
             loadMapVetoFromServer(),
             loadPauseDataFromServer()
-            // Данные кастеров и выбранных кастеров загружаются внутри initCasters()
         ]);
         console.log("DOMContentLoaded: All initial data loaded from server.");
 
@@ -948,8 +900,6 @@ window.addEventListener("DOMContentLoaded", async () => {
             if (teamSelect.value === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
             if (teamSelect.value === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
         });
-        // Первоначальная стилизация для side вызывается из updateMapVetoUI, которая вызывается в loadMapVetoFromServer
-
         updateTournamentDay();
 
         console.log("DOMContentLoaded: Full application initialization complete. UI is ready.");

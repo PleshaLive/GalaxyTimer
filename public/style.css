@@ -144,7 +144,7 @@
     --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
     --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.5);
     /* Нейморфные тени, настроенные под фон #0E0A1C */
-    --shadow-neumorphic: 5px 5px 10px #080611, -5px -5px 10px #140E27; 
+    --shadow-neumorphic: 5px 5px 10px #080611, -5px -5px 10px #140E27;
     --shadow-neumorphic-inset: inset 3px 3px 6px #080611, inset -3px -3px 6px #140E27;
 
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -203,20 +203,20 @@ h1 {
     font-weight: var(--font-weight-bold);
     margin-bottom: var(--spacing-lg);
 }
-h2 { 
-    font-size: 1.25rem; 
+h2 {
+    font-size: 1.25rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-h3 { 
+h3 {
     font-size: 1rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-sm);
 }
-.section-title { 
+.section-title {
     font-size: 1.6rem;
     color: var(--color-secondary-light);
     margin-bottom: var(--spacing-md);
@@ -225,7 +225,7 @@ h3 {
     font-weight: var(--font-weight-semibold);
     text-shadow: var(--text-shadow-secondary);
 }
-.tab-title { 
+.tab-title {
     font-size: 1.8rem;
     color: var(--color-primary-light);
     text-align: center;
@@ -278,7 +278,7 @@ label i {
 {
     border-color: var(--color-primary-light);
     box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
-    background-color: var(--color-surface); 
+    background-color: var(--color-surface);
 }
 .header-input::placeholder, .map-score-input::placeholder, .time-input::placeholder,
 .edit-input::placeholder
@@ -286,7 +286,7 @@ label i {
     color: var(--color-text-placeholder);
     opacity: 0.8;
 }
-.styled-select { 
+.styled-select { /* Стили для стандартных select */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -294,7 +294,7 @@ label i {
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     background-size: 16px 12px;
-    padding-right: calc(var(--spacing-md) * 2 + 16px); 
+    padding-right: calc(var(--spacing-md) * 2 + 16px);
 }
 .styled-select option {
     background-color: var(--color-surface-secondary);
@@ -303,7 +303,7 @@ label i {
 
 
 /* Кнопки */
-.app-button, button { 
+.app-button, button {
     padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
     font-size: 0.9rem;
     font-weight: var(--font-weight-semibold);
@@ -321,11 +321,11 @@ label i {
     box-shadow: 0 2px 5px rgba(var(--rgb-primary),0.2), 0 0 10px rgba(var(--rgb-primary),0.1) inset;
     position: relative;
     overflow: hidden;
-    z-index: 1; 
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    vertical-align: middle; 
+    vertical-align: middle;
 }
 .app-button i, button i {
     margin-right: var(--spacing-sm);
@@ -368,7 +368,7 @@ label i {
 }
 .app-button.tertiary:hover {
     background-color: var(--color-secondary-base);
-    color: var(--color-text-on-accent); 
+    color: var(--color-text-on-accent);
     border-color: var(--color-secondary-base);
     box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
 }
@@ -598,21 +598,23 @@ label i {
 
 .match-teams {
     display: flex;
-    align-items: stretch; /* Changed from center to stretch for team-block height */
+    align-items: stretch;
     justify-content: space-between;
     gap: var(--spacing-sm);
 }
 .team-block {
     flex: 1;
     display: flex;
-    flex-direction: column; /* To stack team-info-header and select */
+    flex-direction: column;
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-md);
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
 }
 
-/* НОВЫЕ СТИЛИ ДЛЯ ЛОГОТИПОВ И ИНФОРМАЦИИ О КОМАНДЕ */
+/* ======================================================== */
+/* == СТИЛИ ДЛЯ ЛОГОТИПОВ КОМАНД НАД ВЫПАДАЮЩИМ СПИСКОМ == */
+/* ======================================================== */
 .team-info-header {
     display: flex;
     align-items: center; /* Вертикальное выравнивание логотипа и метки */
@@ -620,28 +622,27 @@ label i {
 }
 
 .team-logo {
-    width: 24px;   /* Размер логотипа, можно изменить */
-    height: 24px;  /* Размер логотипа, можно изменить */
+    width: 24px;   /* Размер логотипа */
+    height: 24px;  /* Размер логотипа */
     margin-right: var(--spacing-sm); /* Отступ справа от логотипа */
     object-fit: contain; /* Сохраняет пропорции логотипа */
     border-radius: var(--border-radius-sm); /* Опционально: скругленные углы */
     background-color: rgba(var(--rgb-primary), 0.05); /* Легкий фон для прозрачных PNG или во время загрузки */
     border: 1px solid var(--color-border); /* Опционально: тонкая рамка */
-    flex-shrink: 0; /* Предотвращает сжатие логотипа, если метка длинная */
+    flex-shrink: 0; /* Предотвращает сжатие логотипа */
 }
 
-.team-block label { /* Стили для label внутри .team-block, которая теперь в .team-info-header */
-    margin-bottom: 0; /* Убираем стандартный отступ метки, т.к. отступ теперь у .team-info-header */
+.team-block label { /* Стили для label внутри .team-block */
+    margin-bottom: 0; /* Убираем стандартный отступ метки */
     flex-grow: 1; /* Позволяет метке занимать доступное пространство */
-    /* white-space: nowrap; /* Если нужно, чтобы текст "Команда 1" не переносился */
-    /* overflow: hidden; */
-    /* text-overflow: ellipsis; */
 }
 
 .team-block .team-select { /* Убедимся, что select занимает всю ширину */
     width: 100%;
 }
-/* КОНЕЦ НОВЫХ СТИЛЕЙ */
+/* ======================================================== */
+/* ============ КОНЕЦ СТИЛЕЙ ДЛЯ ЛОГОТИПОВ ================ */
+/* ======================================================== */
 
 
 /* 1. Блок Команды 1 */
@@ -672,7 +673,7 @@ label i {
     font-weight: var(--font-weight-bold);
     color: var(--color-text-muted);
     font-size: 1.1rem;
-    align-self: center; /* Оставляем по центру, т.к. match-teams теперь align-items: stretch */
+    align-self: center;
     padding: 0 var(--spacing-xs);
     border: 1px dashed var(--color-divider);
     border-radius: var(--border-radius-round);
@@ -790,30 +791,30 @@ label i {
 .table-wrapper { overflow-x: auto; border: 1px solid var(--color-divider); border-radius: var(--border-radius-lg); background-color: var(--color-surface-secondary); box-shadow: var(--shadow-neumorphic-inset); }
 #vetoTable { width: 100%; border-collapse: separate; border-spacing:0; font-size: 0.9rem; min-width: 600px; }
 
-#vetoTable th { 
-    background-color: var(--color-surface); 
-    font-weight: var(--font-weight-semibold); 
-    color: var(--color-mapveto-th-text); 
-    text-transform: uppercase; 
+#vetoTable th {
+    background-color: var(--color-surface);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-mapveto-th-text);
+    text-transform: uppercase;
     letter-spacing: 0.04em;
 }
 #vetoTable td {
     color: var(--color-mapveto-td-text); /* Базовый цвет текста для ячеек */
 }
 
-#vetoTable th, #vetoTable td { 
-    border-bottom: 1px solid var(--color-divider); 
-    border-right: 1px solid var(--color-divider); 
-    padding: var(--spacing-md); 
-    text-align: center; 
-    white-space: nowrap; 
+#vetoTable th, #vetoTable td {
+    border-bottom: 1px solid var(--color-divider);
+    border-right: 1px solid var(--color-divider);
+    padding: var(--spacing-md);
+    text-align: center;
+    white-space: nowrap;
 }
 #vetoTable th:last-child, #vetoTable td:last-child { border-right: none; }
 #vetoTable tr:last-child td { border-bottom: none; }
 
-#vetoTable th i { 
-    margin-right: var(--spacing-xs); 
-    color: var(--color-mapveto-th-icon); 
+#vetoTable th i {
+    margin-right: var(--spacing-xs);
+    color: var(--color-mapveto-th-icon);
 }
 
 /* 13. Заголовок T1 в таблице Veto */
@@ -830,23 +831,23 @@ label i {
 
 #vetoTable select { font-weight: var(--font-weight-medium); }
 
-#vetoTable select.veto-action.action-is-ban { 
-    background-color: var(--color-veto-ban-bg) !important; 
-    color: var(--color-veto-ban-text) !important; 
-    border-color: var(--color-veto-ban-border) !important; 
-    box-shadow: var(--glow-veto-ban); 
+#vetoTable select.veto-action.action-is-ban {
+    background-color: var(--color-veto-ban-bg) !important;
+    color: var(--color-veto-ban-text) !important;
+    border-color: var(--color-veto-ban-border) !important;
+    box-shadow: var(--glow-veto-ban);
 }
-#vetoTable select.veto-action.action-is-pick { 
-    background-color: var(--color-veto-pick-bg) !important; 
-    color: var(--color-veto-pick-text) !important; 
-    border-color: var(--color-veto-pick-border) !important; 
-    box-shadow: var(--glow-veto-pick); 
+#vetoTable select.veto-action.action-is-pick {
+    background-color: var(--color-veto-pick-bg) !important;
+    color: var(--color-veto-pick-text) !important;
+    border-color: var(--color-veto-pick-border) !important;
+    box-shadow: var(--glow-veto-pick);
 }
 #vetoTable select.veto-action.action-is-decider { /* Предполагается, что JS добавит класс .action-is-decider */
-    background-color: var(--color-veto-decider-bg) !important; 
-    color: var(--color-veto-decider-text) !important; 
-    border-color: var(--color-veto-decider-border) !important; 
-    box-shadow: var(--glow-veto-decider); 
+    background-color: var(--color-veto-decider-bg) !important;
+    color: var(--color-veto-decider-text) !important;
+    border-color: var(--color-veto-decider-border) !important;
+    box-shadow: var(--glow-veto-decider);
 }
 
 #vetoTable select.veto-side.side-is-ct { /* Предполагается, что JS добавит класс .side-is-ct */
@@ -1003,7 +1004,7 @@ label i {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-sm); 
+    gap: var(--spacing-sm);
     transition: background-color var(--transition-fast);
 }
 #castersListContainer li:hover {
@@ -1016,13 +1017,13 @@ label i {
 #castersListContainer .caster-details {
     flex-grow: 1;
     display: flex;
-    align-items: center; 
+    align-items: center;
     gap: var(--spacing-sm);
     min-width: 0;
 }
 
 #castersListContainer li:not(.editing) .caster-details {
-     align-items: baseline; 
+     align-items: baseline;
 }
 
 #castersListContainer .caster-name {
@@ -1031,7 +1032,7 @@ label i {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px; 
+    max-width: 150px;
 }
 
 #castersListContainer .caster-social {
@@ -1045,7 +1046,7 @@ label i {
 #castersListContainer .caster-actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0; 
+    flex-shrink: 0;
 }
 #castersListContainer .caster-actions button {
     margin-left: var(--spacing-sm);
@@ -1195,7 +1196,7 @@ label i {
     .tabs-nav .tab-link { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; }
     #castersListContainer li { flex-direction: column; align-items: stretch; }
     #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); }
-    #castersListContainer .caster-name { max-width: none; } 
+    #castersListContainer .caster-name { max-width: none; }
     #castersListContainer .caster-social { margin-left: 0; font-size: 0.8rem; }
     #castersListContainer .caster-actions { justify-content: flex-end; }
     #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); }
