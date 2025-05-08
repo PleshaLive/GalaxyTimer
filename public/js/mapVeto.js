@@ -54,13 +54,13 @@ const vetoTableRows = document.querySelectorAll("#vetoTable tbody tr");
 vetoTableRows.forEach(row => {
     const teamSelect = row.querySelector(".veto-team");
     if (teamSelect) {
-        styleVetoTeamSelect(teamSelect); 
+        styleVetoTeamSelect(teamSelect);
         teamSelect.addEventListener('change', () => styleVetoTeamSelect(teamSelect));
     }
 
     const actionSelect = row.querySelector(".veto-action");
     if (actionSelect) {
-        styleVetoActionSelect(actionSelect); 
+        styleVetoActionSelect(actionSelect);
         actionSelect.addEventListener('change', () => styleVetoActionSelect(actionSelect));
     }
 });
@@ -140,9 +140,9 @@ rows.forEach(row => {
 
   const realTeamName = teamKey === "TEAM1" ? team1Name : team2Name;
   const realTeamLogo = teamKey === "TEAM1" ? team1Logo : team2Logo;
-  
+
   const vetoIMG = `D:\\Broadcast\\BroadcastElements\\Map_veto\\${action}\\${mapName}.png`;
-  
+
   let sideIMG = "";
   if (side === "CT") {
     sideIMG = "D:\\Broadcast\\BroadcastElements\\Map_veto\\side\\ct.png";
@@ -172,3 +172,74 @@ return {
   veto: vetoArr
 };
 }
+
+// ======== НОВАЯ ФУНКЦИЯ ДОБАВЛЕНА СЮДА С КЛЮЧЕВЫМ СЛОВОМ EXPORT ========
+// Путь к лого по умолчанию (убедитесь, что он совпадает с тем, что в matches.js)
+const defaultLogoPathVeto = "/logos/none.png"; // Убедитесь, что этот файл существует в public/logos/
+/**
+ * Обновляет отображение названий и логотипов команд над таблицей Map Veto.
+ * @param {string|number} matchIndex - Индекс матча (1-4), для которого нужно отобразить команды.
+ */
+export function updateMapVetoDisplay(matchIndex) {
+    const displayContainer = document.getElementById('mapVetoTeamDisplay');
+    // Если элемента для отображения нет, ничего не делаем
+    if (!displayContainer) {
+        // console.warn(`[Veto Display] Element #mapVetoTeamDisplay not found.`);
+        return;
+    }
+
+    // Находим элементы для отображения лого и имен
+    const logo1Elem = document.getElementById('mapVetoTeam1Logo');
+    const name1Elem = document.getElementById('mapVetoTeam1Name');
+    const logo2Elem = document.getElementById('mapVetoTeam2Logo');
+    const name2Elem = document.getElementById('mapVetoTeam2Name');
+
+    // --- Получаем данные команд из селектов на вкладке "Матчи" ---
+    const team1Select = document.getElementById(`team1Select${matchIndex}`);
+    const team2Select = document.getElementById(`team2Select${matchIndex}`);
+
+    let team1Name = "Команда 1"; // Имя по умолчанию
+    let team1Logo = defaultLogoPathVeto; // Лого по умолчанию
+    let team2Name = "Команда 2"; // Имя по умолчанию
+    let team2Logo = defaultLogoPathVeto; // Лого по умолчанию
+
+    // Получаем данные для Команды 1, если она выбрана
+    if (team1Select && team1Select.value) {
+        const selectedOption1 = team1Select.options[team1Select.selectedIndex];
+        team1Name = team1Select.value;
+        // Берем лого из data-атрибута выбранной опции
+        // Важно: в matches.js лого добавляется в data-logo для option
+        team1Logo = selectedOption1?.dataset.logo || defaultLogoPathVeto;
+    }
+
+    // Получаем данные для Команды 2, если она выбрана
+    if (team2Select && team2Select.value) {
+         const selectedOption2 = team2Select.options[team2Select.selectedIndex];
+        team2Name = team2Select.value;
+        // Берем лого из data-атрибута выбранной опции
+        team2Logo = selectedOption2?.dataset.logo || defaultLogoPathVeto;
+    }
+
+    // --- Обновляем элементы отображения на вкладке "Map Veto" ---
+    if (logo1Elem) {
+        logo1Elem.src = team1Logo;
+        logo1Elem.alt = `${team1Name} Logo`;
+        // Обработчик на случай, если лого не загрузится
+        logo1Elem.onerror = () => { if (logo1Elem.src !== defaultLogoPathVeto) logo1Elem.src = defaultLogoPathVeto; };
+    }
+    if (name1Elem) {
+        name1Elem.textContent = team1Name;
+    }
+
+    if (logo2Elem) {
+        logo2Elem.src = team2Logo;
+        logo2Elem.alt = `${team2Name} Logo`;
+        // Обработчик на случай, если лого не загрузится
+        logo2Elem.onerror = () => { if (logo2Elem.src !== defaultLogoPathVeto) logo2Elem.src = defaultLogoPathVeto; };
+    }
+    if (name2Elem) {
+        name2Elem.textContent = team2Name;
+    }
+    // console.log(`[Veto Display] Updated for Match ${matchIndex}: ${team1Name} vs ${team2Name}`);
+}
+// ======== КОНЕЦ НОВОЙ ФУНКЦИИ ========
