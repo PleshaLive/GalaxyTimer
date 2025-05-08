@@ -39,7 +39,7 @@
     --rgb-secondary: 157, 136, 217;
     --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
     --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
-    
+
     /* Семантические цвета (стандартные) */
     --color-success: #22c55e;
     --color-success-dark: #16a34a;
@@ -56,7 +56,7 @@
     --color-error-dark: #dc2626;
     --rgb-error: 239, 68, 68;
     --glow-error: 0 0 12px rgba(var(--rgb-error), 0.7), 0 0 24px rgba(var(--rgb-error), 0.4);
-    
+
     --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error, secondary) */
 
     /* --- Цвета статусов --- */
@@ -82,7 +82,7 @@
     --color-mapveto-td-text: var(--color-text-secondary);
 
     --color-veto-ban-bg: rgba(var(--rgb-error), 0.2); /* Полупрозрачный фон */
-    --color-veto-ban-text: var(--color-text-primary); 
+    --color-veto-ban-text: var(--color-text-primary);
     --color-veto-ban-border: var(--color-error);
     --glow-veto-ban: var(--glow-error);
 
@@ -94,7 +94,7 @@
     --color-veto-decider-bg:  #4A4458; /* Нейтральный темно-серый с фиолетовым оттенком */
     --color-veto-decider-text:  var(--color-text-primary);
     --color-veto-decider-border:  #605A70;
-    --glow-veto-decider: none; 
+    --glow-veto-decider: none;
 
     /* Сторона CT (предоставлено пользователем) */
     --color-veto-side-ct-bg: #E3D9FF;
@@ -286,7 +286,7 @@ label i {
     color: var(--color-text-placeholder);
     opacity: 0.8;
 }
-.styled-select { /* Стили для стандартных select */
+.styled-select { /* Стили для стандартных select, которые НЕ будут Select2 */
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -415,7 +415,7 @@ label i {
 .date-input {
     width: auto;
     min-width: 150px;
-    color-scheme: dark;
+    color-scheme: dark; /* Helps browser style the date picker */
 }
 .tournament-day {
     font-weight: var(--font-weight-semibold);
@@ -504,7 +504,7 @@ label i {
     color: var(--color-primary-light);
     background-color: var(--color-surface);
     border-color: var(--color-border);
-    border-bottom-color: var(--color-surface);
+    border-bottom-color: var(--color-surface); /* Hide bottom border of active tab */
     font-weight: var(--font-weight-semibold);
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
 }
@@ -513,7 +513,7 @@ label i {
 }
 .tabs-content {
     padding: var(--spacing-lg);
-    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg);
+    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg); /* Adjust top-left radius */
 }
 .tab-panel {
     display: none;
@@ -576,7 +576,7 @@ label i {
     font-weight: var(--font-weight-semibold);
     padding: var(--spacing-xs) var(--spacing-sm);
     text-align: center;
-    text-align-last: center;
+    text-align-last: center; /* For Firefox */
 }
 .match-header .time-input {
     width: 75px;
@@ -585,6 +585,7 @@ label i {
     padding: var(--spacing-xs) var(--spacing-sm);
 }
 
+/* Status Select Colors */
 .status-select option[value="UPCOM"] { background-color: var(--color-status-upcom-bg); color: var(--color-status-upcom-text); }
 .status-select option[value="LIVE"] { background-color: var(--color-status-live-bg); color: var(--color-status-live-text); }
 .status-select option[value="FINISHED"] { background-color: var(--color-status-finished-bg); color: var(--color-status-finished-text); }
@@ -598,7 +599,7 @@ label i {
 
 .match-teams {
     display: flex;
-    align-items: stretch;
+    align-items: stretch; /* Stretch blocks vertically */
     justify-content: space-between;
     gap: var(--spacing-sm);
 }
@@ -612,58 +613,48 @@ label i {
     border: 1px solid var(--color-border);
 }
 
-/* ======================================================== */
-/* == СТИЛИ ДЛЯ ЛОГОТИПОВ КОМАНД НАД ВЫПАДАЮЩИМ СПИСКОМ == */
-/* ======================================================== */
+/* Team Logo above Select2 */
 .team-info-header {
     display: flex;
-    align-items: center; /* Вертикальное выравнивание логотипа и метки */
-    margin-bottom: var(--spacing-xs); /* Отступ снизу перед выпадающим списком */
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
 }
 
 .team-logo {
-    width: 24px;   /* Размер логотипа */
-    height: 24px;  /* Размер логотипа */
-    margin-right: var(--spacing-sm); /* Отступ справа от логотипа */
-    object-fit: contain; /* Сохраняет пропорции логотипа */
-    border-radius: var(--border-radius-sm); /* Опционально: скругленные углы */
-    background-color: rgba(var(--rgb-primary), 0.05); /* Легкий фон для прозрачных PNG или во время загрузки */
-    border: 1px solid var(--color-border); /* Опционально: тонкая рамка */
-    flex-shrink: 0; /* Предотвращает сжатие логотипа */
+    width: 24px;
+    height: 24px;
+    margin-right: var(--spacing-sm);
+    object-fit: contain;
+    border-radius: var(--border-radius-sm);
+    background-color: rgba(var(--rgb-primary), 0.05);
+    border: 1px solid var(--color-border);
+    flex-shrink: 0;
 }
 
-.team-block label { /* Стили для label внутри .team-block */
-    margin-bottom: 0; /* Убираем стандартный отступ метки */
-    flex-grow: 1; /* Позволяет метке занимать доступное пространство */
+.team-block label {
+    margin-bottom: 0;
+    flex-grow: 1;
 }
 
-.team-block .team-select { /* Убедимся, что select занимает всю ширину */
+.team-block .team-select { /* Styles for the original select, now mostly hidden by Select2 */
     width: 100%;
+    margin-top: auto; /* Push Select2 down if needed */
 }
-/* ======================================================== */
-/* ============ КОНЕЦ СТИЛЕЙ ДЛЯ ЛОГОТИПОВ ================ */
-/* ======================================================== */
 
 
-/* 1. Блок Команды 1 */
+/* Team Block Specific Styles */
 .team-1-block {
     border-color: var(--team1-color-accent);
     background-color: var(--team1-color-bg);
 }
-
-/* 2. Ховер Блока Команды 1 */
 .team-1-block:hover {
     border-color: var(--team1-color-accent);
     background-color: rgba(var(--team1-color-rgb), 0.25);
 }
-
-/* 3. Блок Команды 2 */
 .team-2-block {
     border-color: var(--team2-color-accent);
     background-color: var(--team2-color-bg);
 }
-
-/* 4. Ховер Блока Команды 2 */
 .team-2-block:hover {
     border-color: var(--team2-color-accent);
     background-color: rgba(var(--team2-color-rgb), 0.25);
@@ -673,11 +664,12 @@ label i {
     font-weight: var(--font-weight-bold);
     color: var(--color-text-muted);
     font-size: 1.1rem;
-    align-self: center;
+    align-self: center; /* Align vertically */
     padding: 0 var(--spacing-xs);
     border: 1px dashed var(--color-divider);
     border-radius: var(--border-radius-round);
     width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; /* Prevent shrinking */
 }
 
 .winner-buttons {
@@ -702,39 +694,29 @@ label i {
     text-transform: none;
 }
 
-/* 5. Кнопка Победитель T1 (база) */
+/* Winner Button Styles */
 .winner-btn.team-1-accent-border {
     border-left: 4px solid var(--team1-color-accent);
     color: var(--team1-color-accent);
 }
-
-/* 6. Кнопка Победитель T1 (ховер) */
 .winner-btn.team-1-accent-border:hover {
     background-color: var(--team1-color-bg);
     box-shadow: var(--team1-glow);
 }
-
-/* 7. Кнопка Победитель T1 (выбрана) */
 .winner-btn.team-1-accent-border.winner-selected {
     background-color: var(--team1-color-accent);
     color: var(--team1-color-text-on-accent);
     box-shadow: var(--team1-glow);
     font-weight: var(--font-weight-bold);
 }
-
-/* 8. Кнопка Победитель T2 (база) */
 .winner-btn.team-2-accent-border {
     border-left: 4px solid var(--team2-color-accent);
     color: var(--team2-color-accent);
 }
-
-/* 9. Кнопка Победитель T2 (ховер) */
 .winner-btn.team-2-accent-border:hover {
     background-color: var(--team2-color-bg);
     box-shadow: var(--team2-glow);
 }
-
-/* 10. Кнопка Победитель T2 (выбрана) */
 .winner-btn.team-2-accent-border.winner-selected {
     background-color: var(--team2-color-accent);
     color: var(--team2-color-text-on-accent);
@@ -757,14 +739,12 @@ label i {
 .vrs-table th, .vrs-table td { border: 1px solid var(--color-border); padding: var(--spacing-sm); text-align: center; color: var(--color-text-secondary); background-color: transparent; }
 .vrs-table th { background-color: var(--color-surface); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
 .vrs-table td:first-child { font-weight: var(--font-weight-semibold); text-align: left; }
-/* 11. Строка T1 в таблице VRS */
+/* VRS Table Team Colors */
 .vrs-table tr.team-1-row td:first-child {
     background-color: var(--team1-color-bg);
     color: var(--team1-color-accent);
     border-left: 4px solid var(--team1-color-accent);
 }
-
-/* 12. Строка T2 в таблице VRS */
 .vrs-table tr.team-2-row td:first-child {
     background-color: var(--team2-color-bg);
     color: var(--team2-color-accent);
@@ -776,7 +756,7 @@ label i {
 .match-footer {
     padding: var(--spacing-md);
     border-top: 1px solid var(--color-divider);
-    background-color: var(--color-surface);
+    background-color: var(--color-surface); /* Match card background */
 }
 .save-match-button { width: 100%; }
 
@@ -799,7 +779,7 @@ label i {
     letter-spacing: 0.04em;
 }
 #vetoTable td {
-    color: var(--color-mapveto-td-text); /* Базовый цвет текста для ячеек */
+    color: var(--color-mapveto-td-text);
 }
 
 #vetoTable th, #vetoTable td {
@@ -817,13 +797,11 @@ label i {
     color: var(--color-mapveto-th-icon);
 }
 
-/* 13. Заголовок T1 в таблице Veto */
+/* Map Veto Team Headers */
 #vetoTable th.team-1-text-accent {
     color: var(--team1-color-accent);
     text-shadow: var(--team1-text-shadow);
 }
-
-/* 14. Заголовок T2 в таблице Veto */
 #vetoTable th.team-2-text-accent {
     color: var(--team2-color-accent);
     text-shadow: var(--team2-text-shadow);
@@ -831,6 +809,7 @@ label i {
 
 #vetoTable select { font-weight: var(--font-weight-medium); }
 
+/* Map Veto Select Styles */
 #vetoTable select.veto-action.action-is-ban {
     background-color: var(--color-veto-ban-bg) !important;
     color: var(--color-veto-ban-text) !important;
@@ -843,32 +822,30 @@ label i {
     border-color: var(--color-veto-pick-border) !important;
     box-shadow: var(--glow-veto-pick);
 }
-#vetoTable select.veto-action.action-is-decider { /* Предполагается, что JS добавит класс .action-is-decider */
+#vetoTable select.veto-action.action-is-decider {
     background-color: var(--color-veto-decider-bg) !important;
     color: var(--color-veto-decider-text) !important;
     border-color: var(--color-veto-decider-border) !important;
     box-shadow: var(--glow-veto-decider);
 }
 
-#vetoTable select.veto-side.side-is-ct { /* Предполагается, что JS добавит класс .side-is-ct */
+#vetoTable select.veto-side.side-is-ct {
     background-color: var(--color-veto-side-ct-bg) !important;
     color: var(--color-veto-side-ct-text) !important;
     border-color: var(--color-veto-side-ct-border) !important;
 }
-#vetoTable select.veto-side.side-is-t { /* Предполагается, что JS добавит класс .side-is-t */
+#vetoTable select.veto-side.side-is-t {
     background-color: var(--color-veto-side-t-bg) !important;
     color: var(--color-veto-side-t-text) !important;
     border-color: var(--color-veto-side-t-border) !important;
 }
 
-/* 15. Выбранная команда T1 в селекте Veto */
+/* Map Veto Team Selects */
 #vetoTable .veto-team.team-1-selected-veto {
     border-color: var(--team1-color-accent) !important;
     background-color: var(--team1-color-bg) !important;
     color: var(--team1-color-accent) !important;
 }
-
-/* 16. Выбранная команда T2 в селекте Veto */
 #vetoTable .veto-team.team-2-selected-veto {
     border-color: var(--team2-color-accent) !important;
     background-color: var(--team2-color-bg) !important;
@@ -888,14 +865,14 @@ label i {
 .json-output-container { margin-top: 0; padding: 0; }
 .json-output {
     background: var(--color-surface-tertiary);
-    color: #b0c4de;
+    color: #b0c4de; /* Lighter color for JSON text */
     padding: var(--spacing-lg);
     border-radius: var(--border-radius-lg);
-    white-space: pre-wrap;
+    white-space: pre-wrap; /* Wrap long lines */
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
     font-size: 0.9rem;
     border: 1px solid var(--color-border);
-    max-height: calc(100vh - 350px);
+    max-height: calc(100vh - 350px); /* Limit height */
     overflow-y: auto;
     box-shadow: var(--shadow-neumorphic-inset);
     line-height: 1.6;
@@ -1019,11 +996,11 @@ label i {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    min-width: 0;
+    min-width: 0; /* Prevent overflow issues */
 }
 
 #castersListContainer li:not(.editing) .caster-details {
-     align-items: baseline;
+     align-items: baseline; /* Align text baseline when not editing */
 }
 
 #castersListContainer .caster-name {
@@ -1032,13 +1009,13 @@ label i {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 150px; /* Limit name width */
 }
 
 #castersListContainer .caster-social {
     font-size: 0.85rem;
     color: var(--color-text-muted);
-    word-break: break-all;
+    word-break: break-all; /* Break long URLs/nicks */
     flex-shrink: 1;
     min-width: 50px;
 }
@@ -1046,7 +1023,7 @@ label i {
 #castersListContainer .caster-actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent buttons wrapping */
 }
 #castersListContainer .caster-actions button {
     margin-left: var(--spacing-sm);
@@ -1057,7 +1034,7 @@ label i {
     box-shadow: none;
 }
 #castersListContainer .caster-actions button i {
-    margin-right: 0;
+    margin-right: 0; /* Remove margin for icon-only buttons */
 }
 
 
@@ -1074,8 +1051,8 @@ label i {
     flex-grow: 1;
 }
 #castersListContainer li .caster-details .caster-name-input {
-   flex-grow: 0;
-   flex-basis: 150px;
+   flex-grow: 0; /* Don't grow */
+   flex-basis: 150px; /* Initial width */
    min-width: 100px;
 }
 #castersListContainer li .caster-details .caster-social-input {
@@ -1108,9 +1085,9 @@ label i {
     color: var(--color-secondary-light);
 }
 #castersListContainer .caster-actions .edit-caster-btn:hover {
-     background-color: var(--color-secondary-base) !important;
-     color: var(--color-text-on-accent) !important;
-     border-color: var(--color-secondary-base) !important;
+      background-color: var(--color-secondary-base) !important;
+      color: var(--color-text-on-accent) !important;
+      border-color: var(--color-secondary-base) !important;
 }
 #castersListContainer .caster-actions .delete-caster-btn {
     background-color: transparent;
@@ -1122,6 +1099,249 @@ label i {
     color: var(--color-text-on-accent) !important;
     border-color: var(--color-error-dark) !important;
 }
+
+/* == Select2 Integration Styles == */
+
+/* Container and Single Selection Field */
+.select2-container {
+    width: 100% !important; /* Force Select2 to take full width like other inputs */
+    font-size: 0.9rem;      /* Match general input font size */
+    font-family: var(--font-family-base);
+    vertical-align: middle; /* Better alignment with adjacent elements */
+}
+.select2-container .select2-selection--single {
+    background-color: var(--color-surface-tertiary); /* Match input background */
+    border: 1px solid var(--color-border);          /* Match input border */
+    border-radius: var(--border-radius-md);         /* Match input border-radius */
+    height: auto; /* Adjust height to content */
+    /* Use padding similar to other inputs, adjust right for arrow */
+    padding: var(--spacing-sm) calc(var(--spacing-sm) + 20px) var(--spacing-sm) var(--spacing-md);
+    box-shadow: var(--shadow-inset);
+    transition: var(--transition-base);
+    outline: none;
+    display: flex; /* Use flex to align items vertically */
+    align-items: center;
+}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+    border-color: var(--color-primary-light);
+    box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
+}
+
+/* Rendered Selection (Text and Logo) */
+.select2-container .select2-selection--single .select2-selection__rendered {
+    color: var(--color-text-primary); /* Match input text color */
+    line-height: normal; /* Reset line-height for flex alignment */
+    padding-left: 0;
+    padding-right: 0; /* Remove default padding */
+    display: flex;    /* Use flex to align logo and text */
+    align-items: center;
+    width: 100%;
+    overflow: hidden; /* Prevent long text from pushing arrow */
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+    color: var(--color-text-placeholder);
+    display: flex; /* Align placeholder text */
+    align-items: center;
+}
+
+/* Arrow */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100%; /* Make arrow container full height */
+    position: absolute;
+    top: 0;
+    right: var(--spacing-sm);
+    width: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border-color: var(--color-text-muted) transparent transparent transparent;
+    border-style: solid;
+    border-width: 5px 4px 0 4px;
+    height: 0;
+    left: 50%;
+    margin-left: -4px;
+    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    width: 0;
+    transition: var(--transition-fast);
+}
+.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+    border-color: transparent transparent var(--color-text-muted) transparent;
+    border-width: 0 4px 5px 4px;
+}
+
+/* Clear Button (X) - Requires allowClear: true */
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    cursor: pointer;
+    float: right; /* Needs float to position correctly */
+    font-weight: bold;
+    height: 100%; /* Take full height for vertical alignment */
+    /* Adjust positioning relative to arrow */
+    position: absolute;
+    top: 0;
+    right: calc(var(--spacing-sm) + 20px); /* Position left of the arrow */
+    padding: 0 var(--spacing-xs);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    line-height: 1; /* Ensure 'x' aligns well */
+    font-size: 1.2em;
+}
+.select2-container--default .select2-selection--single .select2-selection__clear:hover {
+    color: var(--color-error);
+}
+
+
+/* Dropdown */
+.select2-dropdown {
+    background-color: var(--color-surface-secondary); /* Darker background for dropdown */
+    border: 1px solid var(--color-border-light);   /* Slightly lighter border */
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden; /* Ensure rounded corners apply to content */
+    z-index: 1051; /* Ensure dropdown is above other content if needed */
+}
+/* Adjust border radius when dropdown opens below/above */
+.select2-container--default.select2-container--open .select2-dropdown--below {
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+.select2-container--default.select2-container--open .select2-dropdown--above {
+    border-bottom: none;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Search Field inside Dropdown */
+.select2-search--dropdown {
+    padding: var(--spacing-sm);
+    background-color: var(--color-surface); /* Slightly different background for search */
+}
+.select2-search--dropdown .select2-search__field {
+    background-color: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-sm);
+    width: 100%;
+    outline: none;
+}
+.select2-search--dropdown .select2-search__field:focus {
+     border-color: var(--color-primary-light);
+     box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3);
+}
+
+/* Results List */
+.select2-results__options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 250px; /* Limit dropdown height */
+    overflow-y: auto;
+}
+
+/* Individual Result Option */
+.select2-results__option {
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: background-color var(--transition-fast);
+    cursor: pointer;
+    display: flex; /* Needed for team option alignment */
+    align-items: center;
+    color: var(--color-text-secondary); /* Base color for option text */
+}
+.select2-results__option--highlighted[aria-selected] {
+    background-color: var(--color-primary-base);
+    color: var(--color-text-on-primary);
+}
+/* Ensure text within highlighted option is also correct color */
+.select2-results__option--highlighted[aria-selected] .select2-team-name,
+.select2-results__option--highlighted[aria-selected] {
+     color: var(--color-text-on-primary) !important; /* Use important if needed */
+}
+
+.select2-results__option[aria-disabled=true] {
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Loading Indicator */
+.select2-results__option--loading {
+    display: block;
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--spacing-sm);
+}
+
+/* No Results Message */
+.select2-results__message {
+    color: var(--color-text-muted);
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+
+/* Team Logo and Name Styles within Select2 */
+.select2-team-option, .select2-team-selection {
+    display: flex;
+    align-items: center;
+    width: 100%; /* Ensure it takes full width */
+    overflow: hidden; /* Prevent content overflow */
+}
+
+.select2-team-logo, .select2-team-logo-selected {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    border-radius: 4px;
+    object-fit: contain;
+    background-color: rgba(255,255,255,0.1); /* Placeholder bg */
+    flex-shrink: 0; /* Prevent logo shrinking */
+    vertical-align: middle; /* Align better with text if not using flex */
+}
+
+.select2-team-logo-selected {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+}
+
+.select2-team-name, .select2-team-name-selected {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1; /* Allow name to take remaining space */
+    vertical-align: middle;
+    color: inherit; /* Inherit color from parent (.select2-selection__rendered or .select2-results__option) */
+}
+/* Ensure primary text color for name inside options */
+.select2-results__option .select2-team-name {
+    color: var(--color-text-primary);
+}
+
+/* Hide original select styled with .styled-select when Select2 is active */
+/* Target both .team-select and .control-select that might be used with Select2 */
+select.team-select.select2-hidden-accessible,
+select.control-select.select2-hidden-accessible {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: none !important;
+  /* Hide visually and from accessibility tree */
+  position: absolute !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  height: 1px !important;
+  width: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+/* == End Select2 Integration Styles == */
 
 
 /* Адаптивность */
@@ -1174,17 +1394,30 @@ label i {
         justify-content: center;
     }
     .tabs-nav .tab-link.active {
-        border-bottom-color: var(--color-border);
+        border-bottom-color: var(--color-border); /* Keep border consistent when tabs stack */
     }
     .tabs-content {
-        border-radius: var(--border-radius-lg);
+        border-radius: var(--border-radius-lg); /* Apply radius to all corners when tabs stack */
+    }
+    .team-block .select2-container { /* Ensure Select2 takes full width in stacked view */
+        width: 100% !important;
     }
 }
 
 @media (max-width: 480px) {
     h1 { font-size: 1.6rem; }
     h2 { font-size: 1.1rem; }
-    .header-input, .styled-select, .map-score-input, .time-input { padding: var(--spacing-sm); font-size: 0.9rem; }
+    .header-input, .styled-select, .map-score-input, .time-input,
+    .select2-container .select2-selection--single /* Adjust Select2 padding */
+    {
+        padding: var(--spacing-sm);
+        font-size: 0.9rem;
+    }
+    /* Re-adjust Select2 single selection padding for smaller screens */
+    .select2-container .select2-selection--single {
+        padding-right: calc(var(--spacing-sm) + 20px); /* Ensure arrow space */
+    }
+
     .app-button, button { padding: var(--spacing-sm); font-size: 0.9rem; }
     .map-row { flex-direction: column; align-items: stretch; }
     .map-row .map-name-select, .map-row .map-score-input { width: 100%; }
