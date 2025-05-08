@@ -171,39 +171,32 @@ export function populateTeamSelects(teamsList) {
     // console.log("[Matches] Team selects populated.");
 }
 
-/**
- * Инициализирует Select2 для всех селектов команд.
- */
+// Внутри функции initSelect2ForTeams в matches.js
 function initSelect2ForTeams() {
     for (let m = 1; m <= 4; m++) {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
-        // ПРАВИЛЬНО ПОЛУЧАЕМ РОДИТЕЛЕЙ
         const parent1 = sel1.parent();
         const parent2 = sel2.parent();
 
         const commonSelect2Options = {
             templateResult: formatTeamOption,
             templateSelection: formatTeamSelection,
-            // width: '100%', // ЗАКОММЕНТИРУЙТЕ ИЛИ УДАЛИТЕ ЭТУ СТРОКУ (если она есть в JS)
-            width: 'resolve', // <<<< ПОПРОБУЙТЕ ЭТУ ОПЦИЮ
+            // width: 'resolve', // << УБРАТЬ ИЛИ ЗАКОММЕНТИРОВАТЬ
+            // width: '100%', // << УБЕДИТЬСЯ, ЧТО ЭТОЙ ОПЦИИ ТОЖЕ НЕТ ИЛИ ОНА ЗАКОММЕНТИРОВАНА
             placeholder: "-",
             allowClear: false,
-             // ПРОВЕРЬТЕ, ЧТО dropdownParent ПЕРЕДАЕТСЯ КОРРЕКТНО, ЕСЛИ ОН НУЖЕН
-            // dropdownParent: parent1 // Пример для sel1 (или parent2 для sel2)
-            // Если dropdownParent не нужен, закомментируйте эту строку
+            // dropdownParent: parent1 // << УКАЗАТЬ КОРРЕКТНО ИЛИ ЗАКОММЕНТИРОВАТЬ
         };
 
         if (sel1.length) {
-            // Передаем корректный dropdownParent, если он используется
-            sel1.select2({...commonSelect2Options, dropdownParent: parent1 });
+            sel1.select2({...commonSelect2Options, dropdownParent: parent1 }); // Используем скорректированный parent1
         }
         if (sel2.length) {
-             // Передаем корректный dropdownParent, если он используется
-            sel2.select2({...commonSelect2Options, dropdownParent: parent2 });
+            sel2.select2({...commonSelect2Options, dropdownParent: parent2 }); // Используем скорректированный parent2
         }
     }
-     // console.log("[Matches] Select2 initialized for team selects.");
+    // console.log("[Matches] Select2 initialized for team selects.");
 }
 
 /**
