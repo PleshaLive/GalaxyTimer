@@ -8,39 +8,39 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-    /* Основные цвета темы */
+    /* Основные цвета темы (предоставлены пользователем) */
     --color-background: #0E0A1C;
     --color-surface: #151127;
     --color-surface-secondary: #221C3B;
-    --color-surface-tertiary: #151127;
-    --color-border: #3B325C;
+    --color-surface-tertiary: #151127; /* Фон для инпутов, совпадает с --color-surface */
+    --color-border: #3B325C; /* Немного светлее и насыщеннее, чем surface-secondary */
     --color-border-light: #50467A;
-    --color-divider: #1D1733;
+    --color-divider: #1D1733; /* Для тонких разделителей */
 
     /* Текстовые цвета */
-    --color-text-primary: #F0F2F5;
-    --color-text-secondary: #B0B8C5;
-    --color-text-muted: #808A9A;
-    --color-text-placeholder: #606A7A;
+    --color-text-primary: #F0F2F5; /* Очень светлый для контраста */
+    --color-text-secondary: #B0B8C5; /* Светло-серый */
+    --color-text-muted: #808A9A;    /* Средне-серый */
+    --color-text-placeholder: #606A7A; /* Для плейсхолдеров */
 
-    /* Основной акцент */
+    /* Основной акцент (используем #7A64B9 от Team1 как общий) */
     --color-primary-base: #7A64B9;
-    --color-primary-light: #9370DB;
-    --color-primary-dark: #6A5ACD;
+    --color-primary-light: #9370DB; /* Чуть светлее */
+    --color-primary-dark: #6A5ACD;  /* Чуть темнее */
     --rgb-primary: 122, 100, 185;
     --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
     --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
-    --color-text-on-primary: #FFFFFF;
+    --color-text-on-primary: #FFFFFF; /* Белый текст на фиолетовом */
 
     /* Вторичный акцент */
-    --color-secondary-base: #9D88D9;
+    --color-secondary-base: #9D88D9; /* Светло-фиолетовый, гармонирует с основным */
     --color-secondary-light: #B0A0E0;
     --color-secondary-dark: #8A70C8;
     --rgb-secondary: 157, 136, 217;
     --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
     --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
 
-    /* Семантические цвета */
+    /* Семантические цвета (стандартные) */
     --color-success: #22c55e;
     --color-success-dark: #16a34a;
     --rgb-success: 34, 197, 94;
@@ -48,7 +48,7 @@
 
     --color-warning: #f59e0b;
     --color-warning-dark: #d97706;
-    --color-warning-text: #1f2937;
+    --color-warning-text: #1f2937; /* Темный текст для желтого фона */
     --rgb-warning: 245, 158, 11;
     --glow-warning: 0 0 12px rgba(var(--rgb-warning), 0.7), 0 0 24px rgba(var(--rgb-warning), 0.4);
 
@@ -57,84 +57,96 @@
     --rgb-error: 239, 68, 68;
     --glow-error: 0 0 12px rgba(var(--rgb-error), 0.7), 0 0 24px rgba(var(--rgb-error), 0.4);
 
-    --color-text-on-accent: #ffffff;
+    --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error, secondary) */
 
-    /* Цвета статусов */
-    --color-status-upcom-bg: var(--color-primary-base);
+    /* --- Цвета статусов --- */
+    --color-status-upcom-bg: var(--color-primary-base); /* Используем основной акцент */
     --color-status-upcom-text: var(--color-text-on-primary);
     --color-status-upcom-border: var(--color-primary-dark);
     --glow-status-upcom: var(--glow-primary);
+
     --color-status-live-bg: var(--color-warning);
     --color-status-live-text: var(--color-warning-text);
     --color-status-live-border: var(--color-warning-dark);
     --glow-status-live: var(--glow-warning);
+
     --color-status-finished-bg: var(--color-success);
     --color-status-finished-text: #ffffff;
     --color-status-finished-border: var(--color-success-dark);
     --glow-status-finished: var(--glow-success);
+    /* --- END: Status Specific Colors --- */
 
-    /* Цвета таблицы Map Veto */
+    /* === Цвета таблицы Map Veto === */
     --color-mapveto-th-text: var(--color-text-primary);
     --color-mapveto-th-icon: var(--color-primary-light);
     --color-mapveto-td-text: var(--color-text-secondary);
-    --color-veto-ban-bg: rgba(var(--rgb-error), 0.2);
+
+    --color-veto-ban-bg: rgba(var(--rgb-error), 0.2); /* Полупрозрачный фон */
     --color-veto-ban-text: var(--color-text-primary);
     --color-veto-ban-border: var(--color-error);
     --glow-veto-ban: var(--glow-error);
-    --color-veto-pick-bg: rgba(var(--rgb-success), 0.2);
+
+    --color-veto-pick-bg: rgba(var(--rgb-success), 0.2); /* Полупрозрачный фон */
     --color-veto-pick-text: var(--color-text-primary);
     --color-veto-pick-border: var(--color-success);
     --glow-veto-pick: var(--glow-success);
-    --color-veto-decider-bg:  #4A4458;
+
+    --color-veto-decider-bg:  #4A4458; /* Нейтральный темно-серый с фиолетовым оттенком */
     --color-veto-decider-text:  var(--color-text-primary);
     --color-veto-decider-border:  #605A70;
     --glow-veto-decider: none;
-    --color-veto-side-ct-bg: #E3D9FF;
-    --color-veto-side-ct-text: #221C3B;
-    --color-veto-side-ct-border: #B0A0E0;
-    --color-veto-side-t-bg: #DFC9AA;
-    --color-veto-side-t-text: #5A4F3F;
-    --color-veto-side-t-border: #C8B08E;
 
-    /* Цвета Команды 1 */
-    --team1-color-accent: #C3ADFF;
+    /* Сторона CT (предоставлено пользователем) */
+    --color-veto-side-ct-bg: #E3D9FF;
+    --color-veto-side-ct-text: #221C3B; /* Темный текст на светлом фоне */
+    --color-veto-side-ct-border: #B0A0E0; /* Темнее лавандовый для рамки */
+
+    /* Сторона T (предоставлено пользователем) */
+    --color-veto-side-t-bg: #DFC9AA;
+    --color-veto-side-t-text: #5A4F3F; /* Темный текст на светлом фоне */
+    --color-veto-side-t-border: #C8B08E; /* Темнее для рамки */
+    /* === END MAP VETO TABLE SPECIFIC COLORS === */
+
+    /* === Цвета Команды 1 (предоставлены пользователем) === */
+    --team1-color-accent: #C3ADFF; /* Светло-фиолетовый */
     --team1-color-rgb: 195, 173, 255;
-    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15);
-    --team1-color-text-on-accent: #221C3B;
+    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
+    --team1-color-text-on-accent: #221C3B; /* Темный текст на светло-фиолетовом */
     --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5);
     --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8);
+    /* Второй цвет для Team1 #7A64B9 используется как --color-primary-base */
+    /* === END: Team 1 Specific Colors === */
 
-    /* Цвета Команды 2 */
-    --team2-color-accent: #EADAA5;
+    /* === Цвета Команды 2 (предоставлены пользователем) === */
+    --team2-color-accent: #EADAA5; /* Светло-бежево-золотой */
     --team2-color-rgb: 234, 218, 165;
-    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15);
-    --team2-color-text-on-accent: #726952;
+    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
+    --team2-color-text-on-accent: #726952; /* Темный текст (второй цвет команды) на светло-золотом */
     --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5);
     --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8);
+    /* Второй цвет для Team2 #726952 можно использовать для --team2-color-darker-bg или границ при необходимости */
+    /* === END: Team 2 Specific Colors === */
 
-    /* Отступы */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
 
-    /* Радиусы скругления */
     --border-radius-sm: 6px;
     --border-radius-md: 8px;
     --border-radius-lg: 12px;
     --border-radius-xl: 16px;
     --border-radius-round: 50%;
 
-    /* Тени */
     --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
     --shadow-md: 0 5px 15px rgba(0,0,0,0.5);
     --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
     --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.5);
+    /* Нейморфные тени, настроенные под фон #0E0A1C */
     --shadow-neumorphic: 5px 5px 10px #080611, -5px -5px 10px #140E27;
     --shadow-neumorphic-inset: inset 3px 3px 6px #080611, inset -3px -3px 6px #140E27;
 
-    /* Переходы */
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-fast: all 0.15s ease-out;
 }
@@ -177,13 +189,7 @@ body {
 }
 
 /* Типографика */
-h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-family-base);
-    font-weight: var(--font-weight-semibold);
-    line-height: 1.4;
-    margin-bottom: var(--spacing-md);
-    color: var(--color-text-primary);
-}
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-family-base); font-weight: var(--font-weight-semibold); line-height: 1.4; margin-bottom: var(--spacing-md); color: var(--color-text-primary); }
 h1 { font-size: 2rem; color: var(--color-primary-light); text-shadow: var(--text-shadow-primary); font-weight: var(--font-weight-bold); margin-bottom: var(--spacing-lg); }
 h2 { font-size: 1.25rem; font-weight: var(--font-weight-medium); color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
 h3 { font-size: 1rem; font-weight: var(--font-weight-medium); color: var(--color-text-secondary); margin-bottom: var(--spacing-sm); }
@@ -198,110 +204,32 @@ label i { margin-right: var(--spacing-xs); color: var(--color-primary-light); }
 .header-input:hover, .control-select:hover, .team-select:hover, .map-name-select:hover, .map-score-input:hover, .time-input:hover, .status-select:hover, .veto-action:hover, .veto-map:hover, .veto-team:hover, .veto-side:hover, .edit-input:hover { border-color: var(--color-primary-light); }
 .header-input:focus, .control-select:focus, .team-select:focus, .map-name-select:focus, .map-score-input:focus, .time-input:focus, .status-select:focus, .veto-action:focus, .veto-map:focus, .veto-team:focus, .veto-side:focus, .edit-input:focus { border-color: var(--color-primary-light); box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset); background-color: var(--color-surface); }
 .header-input::placeholder, .map-score-input::placeholder, .time-input::placeholder, .edit-input::placeholder { color: var(--color-text-placeholder); opacity: 0.8; }
-/* Стили для стандартных select, которые НЕ будут Select2 */
 .styled-select { appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a0aec0' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right var(--spacing-md) center; background-size: 16px 12px; padding-right: calc(var(--spacing-md) * 2 + 16px); }
 .styled-select option { background-color: var(--color-surface-secondary); color: var(--color-text-primary); }
 
 /* === Кнопки === */
-.app-button, button {
-    padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
-    font-size: 0.9rem;
-    font-weight: var(--font-weight-semibold);
-    border-radius: var(--border-radius-md);
-    border: 1px solid var(--color-primary-dark);
-    background: var(--color-primary-base);
-    color: var(--color-text-on-primary);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 -1px 1px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: background 0.4s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease, transform 0.3s ease, backdrop-filter 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    text-align: center;
-    line-height: 1.5;
-    letter-spacing: 0.03em;
-    min-width: 140px;
-    text-transform: uppercase;
-}
-.app-button i, button i,
-.app-button span, button span {
-    position: relative;
-    z-index: 2;
-}
-.app-button i, button i {
-    margin-right: var(--spacing-sm);
-    font-size: 0.95em;
-}
-
+.app-button, button { padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg); font-size: 0.9rem; font-weight: var(--font-weight-semibold); border-radius: var(--border-radius-md); border: 1px solid var(--color-primary-dark); background: var(--color-primary-base); color: var(--color-text-on-primary); box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 -1px 1px rgba(0,0,0,0.2); cursor: pointer; transition: background 0.4s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.4s ease, transform 0.3s ease, backdrop-filter 0.3s ease; position: relative; overflow: hidden; z-index: 1; display: inline-flex; align-items: center; justify-content: center; vertical-align: middle; text-align: center; line-height: 1.5; letter-spacing: 0.03em; min-width: 140px; text-transform: uppercase; }
+.app-button i, button i, .app-button span, button span { position: relative; z-index: 2; }
+.app-button i, button i { margin-right: var(--spacing-sm); font-size: 0.95em; }
 /* Псевдоэлемент для блика */
-.app-button::before, button::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -85%;
-    width: 60%;
-    height: 100%;
-    background: linear-gradient( 75deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100% );
-    transform: skewX(-25deg);
-    opacity: 0;
-    transition: left 0.55s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease-in-out;
-    z-index: 1;
-}
-
+.app-button::before, button::before { content: ""; position: absolute; top: 0; left: -85%; width: 60%; height: 100%; background: linear-gradient( 75deg, transparent 0%, rgba(255, 255, 255, 0.5) 50%, transparent 100% ); transform: skewX(-25deg); opacity: 0; transition: left 0.55s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.4s ease-in-out; z-index: 1; }
 /* Hover Effect (кроме спец. кнопок) */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover,
-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary-light);
-    color: var(--color-text-on-primary);
-    box-shadow: 0 0 18px 6px rgba(var(--rgb-primary), 0.6), /* Внешнее свечение */
-                inset 0 0 10px rgba(255, 255, 255, 0.25), /* Внутренний блик */
-                0 6px 18px rgba(0,0,0,0.4); /* Усиленная тень */
-    transform: translateY(-3px) scale(1.03); /* Эффект подъема и увеличения */
-}
-
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover, button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover { background: var(--color-primary-light); border-color: var(--color-primary-light); color: var(--color-text-on-primary); box-shadow: 0 0 18px 6px rgba(var(--rgb-primary), 0.6), inset 0 0 10px rgba(255, 255, 255, 0.25), 0 6px 18px rgba(0,0,0,0.4); transform: translateY(-3px) scale(1.03); }
 /* Активация блика при наведении (кроме спец. кнопок) */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover::before,
-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover::before {
-    left: 125%;
-    opacity: 1;
-    transition: left 0.55s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-in-out;
-}
-
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover::before, button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):hover::before { left: 125%; opacity: 1; transition: left 0.55s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s ease-in-out; }
 /* Active State (кроме спец. кнопок) */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active,
-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active {
-    background: var(--color-primary-dark);
-    transform: translateY(0px) scale(1);
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.4);
-    border-color: var(--color-primary-dark);
-}
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active, button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active { background: var(--color-primary-dark); transform: translateY(0px) scale(1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.4); border-color: var(--color-primary-dark); }
 /* Скрываем блик при нажатии */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active::before,
-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active::before {
-    opacity: 0;
-    transition: none;
-}
-
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active::before, button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):active::before { opacity: 0; transition: none; }
 /* Кнопка Tertiary (особые стили, без блика) */
 .app-button.tertiary { background-color: transparent; border-color: var(--color-secondary-light); color: var(--color-secondary-light); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .app-button.tertiary::before { content: none; }
 .app-button.tertiary:hover { background-color: var(--color-secondary-base); color: var(--color-text-on-accent); border-color: var(--color-secondary-base); box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset; transform: translateY(-2px) scale(1.02); -webkit-backdrop-filter: none; backdrop-filter: none; }
-
 /* Состояния Saving, Saved, Error, Disabled */
-.app-button.saving, button.saving,
-.app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) { background-color: var(--color-text-muted) !important; border-color: var(--color-text-muted) !important; border-width: 1px !important; color: var(--color-surface) !important; cursor: wait !important; opacity: 0.7; transform: none !important; box-shadow: var(--shadow-inset) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.app-button.saving, button.saving, .app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) { background-color: var(--color-text-muted) !important; border-color: var(--color-text-muted) !important; border-width: 1px !important; color: var(--color-surface) !important; cursor: wait !important; opacity: 0.7; transform: none !important; box-shadow: var(--shadow-inset) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .app-button.saved, button.saved { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; border-width: 1px !important; color: var(--color-text-on-primary) !important; box-shadow: var(--glow-success) !important; transform: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .app-button.error, button.error { background-color: var(--color-error) !important; border-color: var(--color-error-dark) !important; border-width: 1px !important; color: var(--color-text-on-accent) !important; box-shadow: var(--glow-error) !important; transform: none !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
-/* Убираем блик для этих состояний */
-.app-button.saving::before, button.saving::before,
-.app-button:disabled:not(.winner-btn)::before, button:disabled:not(.winner-btn)::before,
-.app-button.saved::before, button.saved::before,
-.app-button.error::before, button.error::before { content: none !important; }
+.app-button.saving::before, button.saving::before, .app-button:disabled:not(.winner-btn)::before, button:disabled:not(.winner-btn)::before, .app-button.saved::before, button.saved::before, .app-button.error::before, button.error::before { content: none !important; }
 
 /* Кнопки выбора победителя */
 .winner-btn { background-color: var(--color-surface-tertiary); border: 1px solid var(--color-border); color: var(--color-text-secondary); padding: var(--spacing-sm); font-size: 0.85rem; border-radius: var(--border-radius-md); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: none; transition: var(--transition-fast); min-width: auto; text-transform: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
@@ -314,13 +242,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):acti
 .winner-btn.team-2-accent-border.winner-selected { background-color: var(--team2-color-accent) !important; color: var(--team2-color-text-on-accent) !important; border-color: var(--team2-color-accent) !important; border-left-color: var(--team2-color-accent) !important; box-shadow: var(--team2-glow) !important; }
 .winner-btn.winner-selected:hover { filter: brightness(1.15); cursor: pointer; transform: none !important; }
 
-/* === Остальные стили === */
+/* === Остальные стили (Начало) === */
 .site-header { display: flex; flex-wrap: wrap; gap: var(--spacing-md); align-items: center; padding: var(--spacing-md) var(--spacing-lg); background: linear-gradient(145deg, var(--color-surface), var(--color-surface-secondary)); border-bottom: 2px solid var(--color-primary-dark); }
 .header-group { display: flex; flex-wrap: nowrap; gap: var(--spacing-sm); align-items: center; flex-grow: 1; }
 .header-group .header-icon { color: var(--color-primary-light); font-size: 1.2rem; }
 .header-group label { margin-bottom: 0; margin-right: var(--spacing-xs); white-space: nowrap; }
 .header-group .header-input { min-width: 180px; }
-.tournament-dates { flex-grow: 1.5; gap: var(--spacing-md); display: flex; align-items: center; flex-wrap: wrap; } /* Added display:flex, align-items:center, flex-wrap:wrap */
+.tournament-dates { flex-grow: 1.5; gap: var(--spacing-md); display: flex; align-items: center; flex-wrap: wrap; }
 .date-group { display: flex; align-items: center; gap: var(--spacing-xs); }
 .date-input { width: auto; min-width: 150px; color-scheme: dark; }
 .tournament-day { font-weight: var(--font-weight-semibold); color: var(--color-secondary-light); margin-left: var(--spacing-sm); font-size: 1rem; white-space: nowrap; padding: var(--spacing-sm); background-color: var(--color-surface-secondary); border-radius: var(--border-radius-sm); border: 1px solid var(--color-border); }
@@ -339,13 +267,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):not(.winner-btn):acti
 .tabs-nav .tab-link:hover i { color: var(--color-primary-light); transform: scale(1.1); }
 .tabs-nav .tab-link.active { color: var(--color-primary-light); background-color: var(--color-surface); border-color: var(--color-border); border-bottom-color: var(--color-surface); font-weight: var(--font-weight-semibold); box-shadow: 0 -2px 5px rgba(0,0,0,0.1); }
 .tabs-nav .tab-link.active i { color: var(--color-primary-base); }
-.tabs-content { padding: var(--spacing-lg); border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg); background-color: var(--color-surface); } /* Added background */
+.tabs-content { padding: var(--spacing-lg); border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg); background-color: var(--color-surface); }
 .tab-panel { display: none; animation: fadeIn 0.5s ease-out forwards; }
 .tab-panel.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
 .matches-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: var(--spacing-lg); }
-.match-column { background-color: var(--color-surface-secondary); border-radius: var(--border-radius-lg); /* overflow: hidden; */ display: flex; flex-direction: column; border: 1px solid var(--color-border); transition: var(--transition-base); box-shadow: var(--shadow-sm); }
+.match-column { background-color: var(--color-surface-secondary); border-radius: var(--border-radius-lg); display: flex; flex-direction: column; border: 1px solid var(--color-border); transition: var(--transition-base); box-shadow: var(--shadow-sm); }
 .match-column:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: var(--color-primary-base); }
 .match-column.status-upcom { border-left: 5px solid var(--color-status-upcom-border); }
 .match-column.status-live { border-left: 5px solid var(--color-status-live-border); }
@@ -506,64 +434,8 @@ select.team-select.select2-hidden-accessible, select.control-select.select2-hidd
 /* == End Select2 Integration Styles == */
 
 /* Адаптивность */
-@media (max-width: 1400px) {
-    .matches-grid { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); }
-    .site-header { gap: var(--spacing-sm); }
-}
-@media (max-width: 1200px) {
-    .container { padding: var(--spacing-md); }
-    .site-header { flex-direction: column; align-items: stretch; }
-    .header-group { flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-sm); }
-    .header-group .header-input, .header-group .date-input { width: 100%; }
-    #saveHeaderButton { width: 100%; margin-top: var(--spacing-md); }
-    .tournament-day { text-align: left; padding: var(--spacing-sm); margin-left: 0; width: 100%; }
-    .pause-section { flex-direction: column; align-items: stretch; }
-    .pause-fields-grid { flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-sm); }
-    .pause-controls-standalone .header-input { width: 100%; }
-    .pause-controls-standalone .app-button { width: 100%; margin-top: var(--spacing-md); }
-    .tabs-nav { flex-wrap: wrap; }
-    .tabs-nav .tab-link { margin-bottom: var(--spacing-xs); }
-}
-@media (max-width: 992px) {
-    .page-title-container { flex-direction: column; gap: var(--spacing-md); align-items: center; text-align: center; }
-    .teams-link { display: inline-block; width: auto; }
-    .map-veto-header { flex-direction: column; align-items: stretch; }
-    #matchSelect { width: 100%; max-width: none; }
-    .matches-grid { grid-template-columns: 1fr; }
-    .casters-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 768px) {
-    body { font-size: 13.5px; }
-    .match-header { flex-direction: column; align-items: stretch; gap: var(--spacing-sm); }
-    .match-header .status-select, .match-header .time-input { width: 100%; }
-    .match-teams { flex-direction: column; align-items: stretch; gap: var(--spacing-sm); }
-    .vs-indicator { margin: var(--spacing-sm) 0; text-align: center; width: auto; height: auto; border-radius: var(--border-radius-md); padding: var(--spacing-xs); }
-    .winner-buttons { grid-template-columns: 1fr; }
-    .tabs-nav { flex-direction: column; margin: 0; }
-    .tabs-nav .tab-link { border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; margin-right: 0; margin-bottom: 2px; justify-content: center; }
-    .tabs-nav .tab-link.active { border-bottom-color: var(--color-border); }
-    .tabs-content { border-radius: var(--border-radius-lg); }
-    .team-block .select2-container { width: 100% !important; }
-}
-@media (max-width: 480px) {
-    h1 { font-size: 1.6rem; }
-    h2 { font-size: 1.1rem; }
-    .header-input, .styled-select, .map-score-input, .time-input, .select2-container .select2-selection--single { padding: var(--spacing-sm); font-size: 0.9rem; }
-    .select2-container .select2-selection--single { padding-right: calc(var(--spacing-sm) + 20px); }
-    .app-button, button { padding: var(--spacing-sm); font-size: 0.9rem; }
-    .map-row { flex-direction: column; align-items: stretch; }
-    .map-row .map-name-select, .map-row .map-score-input { width: 100%; }
-    .map-row .map-score-input { margin-top: var(--spacing-xs); }
-    .header-group { gap: var(--spacing-sm); }
-    .header-group .header-input { min-width: 0;}
-    .match-body { padding: var(--spacing-sm); }
-    .save-match-button { font-size: 0.85rem; }
-    .tabs-nav .tab-link { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; }
-    #castersListContainer li { flex-direction: column; align-items: stretch; }
-    #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); }
-    #castersListContainer .caster-name { max-width: none; }
-    #castersListContainer .caster-social { margin-left: 0; font-size: 0.8rem; }
-    #castersListContainer .caster-actions { justify-content: flex-end; }
-    #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); }
-    #castersListContainer li .caster-details .edit-input { width: 100% !important; flex-basis: auto !important; margin-right: 0; }
-}
+@media (max-width: 1400px) { .matches-grid { grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); } .site-header { gap: var(--spacing-sm); } }
+@media (max-width: 1200px) { .container { padding: var(--spacing-md); } .site-header { flex-direction: column; align-items: stretch; } .header-group { flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-sm); } .header-group .header-input, .header-group .date-input { width: 100%; } #saveHeaderButton { width: 100%; margin-top: var(--spacing-md); } .tournament-day { text-align: left; padding: var(--spacing-sm); margin-left: 0; width: 100%; } .pause-section { flex-direction: column; align-items: stretch; } .pause-fields-grid { flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-sm); } .pause-controls-standalone .header-input { width: 100%; } .pause-controls-standalone .app-button { width: 100%; margin-top: var(--spacing-md); } .tabs-nav { flex-wrap: wrap; } .tabs-nav .tab-link { margin-bottom: var(--spacing-xs); } }
+@media (max-width: 992px) { .page-title-container { flex-direction: column; gap: var(--spacing-md); align-items: center; text-align: center; } .teams-link { display: inline-block; width: auto; } .map-veto-header { flex-direction: column; align-items: stretch; } #matchSelect { width: 100%; max-width: none; } .matches-grid { grid-template-columns: 1fr; } .casters-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { body { font-size: 13.5px; } .match-header { flex-direction: column; align-items: stretch; gap: var(--spacing-sm); } .match-header .status-select, .match-header .time-input { width: 100%; } .match-teams { flex-direction: column; align-items: stretch; gap: var(--spacing-sm); } .vs-indicator { margin: var(--spacing-sm) 0; text-align: center; width: auto; height: auto; border-radius: var(--border-radius-md); padding: var(--spacing-xs); } .winner-buttons { grid-template-columns: 1fr; } .tabs-nav { flex-direction: column; margin: 0; } .tabs-nav .tab-link { border-radius: var(--border-radius-md) var(--border-radius-md) 0 0; margin-right: 0; margin-bottom: 2px; justify-content: center; } .tabs-nav .tab-link.active { border-bottom-color: var(--color-border); } .tabs-content { border-radius: var(--border-radius-lg); } .team-block .select2-container { width: 100% !important; } }
+@media (max-width: 480px) { h1 { font-size: 1.6rem; } h2 { font-size: 1.1rem; } .header-input, .styled-select, .map-score-input, .time-input, .select2-container .select2-selection--single { padding: var(--spacing-sm); font-size: 0.9rem; } .select2-container .select2-selection--single { padding-right: calc(var(--spacing-sm) + 20px); } .app-button, button { padding: var(--spacing-sm); font-size: 0.9rem; } .map-row { flex-direction: column; align-items: stretch; } .map-row .map-name-select, .map-row .map-score-input { width: 100%; } .map-row .map-score-input { margin-top: var(--spacing-xs); } .header-group { gap: var(--spacing-sm); } .header-group .header-input { min-width: 0;} .match-body { padding: var(--spacing-sm); } .save-match-button { font-size: 0.85rem; } .tabs-nav .tab-link { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; } #castersListContainer li { flex-direction: column; align-items: stretch; } #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); } #castersListContainer .caster-name { max-width: none; } #castersListContainer .caster-social { margin-left: 0; font-size: 0.8rem; } #castersListContainer .caster-actions { justify-content: flex-end; } #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); } #castersListContainer li .caster-details .edit-input { width: 100% !important; flex-basis: auto !important; margin-right: 0; } }
