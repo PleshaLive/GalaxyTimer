@@ -1,7 +1,7 @@
 // public/js/main.js
 
 // Импорт необходимых модулей и функций
-import { initMatches, gatherSingleMatchData, updateWinnerButtonLabels, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor } from "./matches.js";
+import { initMatches, gatherSingleMatchData, refreshWinnerHighlight, areTeamsInitialized, updateStatusColor, updateTeamDisplay } from "./matches.js"; // updateWinnerButtonLabels заменена на updateTeamDisplay
 import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionSelect } from "./mapVeto.js";
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
@@ -163,19 +163,17 @@ function updateMatchesUI(matches) {
 
             if (newStatus && statusSelect.value !== newStatus) {
                 statusSelect.value = newStatus;
-                if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect); // Обновляем цвет селекта
+                if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
                 matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
                 matchColumn.classList.add(`status-${newStatus.toLowerCase()}`);
             } else if (!newStatus && statusSelect.value !== "" && statusSelect.options.length > 0 && statusSelect.value !== statusSelect.options[0].value) {
-                // Сброс на дефолт, если статус не определен
                 statusSelect.value = statusSelect.options[0].value;
-                if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect); // Обновляем цвет селекта
+                if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
                 matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
                 if (statusSelect.options[0].value) {
-                     matchColumn.classList.add(`status-${statusSelect.options[0].value.toLowerCase()}`);
+                    matchColumn.classList.add(`status-${statusSelect.options[0].value.toLowerCase()}`);
                 }
             } else if (statusSelect.value === newStatus) {
-                // Если статус не изменился, все равно обновим цвет на случай перезагрузки стилей
                  if (typeof updateStatusColor === 'function') updateStatusColor(statusSelect);
             }
         }
@@ -184,25 +182,31 @@ function updateMatchesUI(matches) {
         const team1Select = document.getElementById(`team1Select${matchIndex}`);
         const team1Name = match.UPCOM_TEAM1 || match.LIVE_TEAM1 || match.FINISHED_TEAM1 || "";
         if (team1Select) {
-             const optionExists = Array.from(team1Select.options).some(opt => opt.value === team1Name);
-             if (team1Name && optionExists) {
-                 if (team1Select.value !== team1Name) team1Select.value = team1Name;
-             } else if (team1Select.value !== "" && team1Select.options.length > 0) {
-                 team1Select.value = team1Select.options[0].value;
-             }
+            const optionExists = Array.from(team1Select.options).some(opt => opt.value === team1Name);
+            if (team1Name && optionExists) {
+                if (team1Select.value !== team1Name) team1Select.value = team1Name;
+            } else if (team1Select.value !== "" && team1Select.options.length > 0) {
+                team1Select.value = team1Select.options[0].value; // Default to "-"
+            }
         }
 
         // Обновление Команды 2
         const team2Select = document.getElementById(`team2Select${matchIndex}`);
         const team2Name = match.UPCOM_TEAM2 || match.LIVE_TEAM2 || match.FINISHED_TEAM2 || "";
         if (team2Select) {
-             const optionExists = Array.from(team2Select.options).some(opt => opt.value === team2Name);
-             if (team2Name && optionExists) {
-                 if (team2Select.value !== team2Name) team2Select.value = team2Name;
-             } else if (team2Select.value !== "" && team2Select.options.length > 0) {
-                 team2Select.value = team2Select.options[0].value;
-             }
+            const optionExists = Array.from(team2Select.options).some(opt => opt.value === team2Name);
+            if (team2Name && optionExists) {
+                if (team2Select.value !== team2Name) team2Select.value = team2Name;
+            } else if (team2Select.value !== "" && team2Select.options.length > 0) {
+                team2Select.value = team2Select.options[0].value; // Default to "-"
+            }
         }
+        
+        // Обновляем отображение команды (логотипы и текст кнопок) ПОСЛЕ установки значений селектов
+        if (typeof updateTeamDisplay === 'function') {
+            updateTeamDisplay(matchIndex);
+        }
+
 
         // Префикс для карт
         let prefix = "";
@@ -220,32 +224,35 @@ function updateMatchesUI(matches) {
             const mapValue = match[mapKey];
 
             if (mapSelect) {
-                 if (typeof mapValue !== 'undefined' && mapValue !== null) {
-                      const optionExists = Array.from(mapSelect.options).some(opt => opt.value === mapValue);
-                     if (mapValue && optionExists) {
-                         if (mapSelect.value !== mapValue) mapSelect.value = mapValue;
-                     } else if (mapSelect.options.length > 0) {
-                          if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
-                     }
-                 } else if (mapSelect.options.length > 0) {
+                if (typeof mapValue !== 'undefined' && mapValue !== null) {
+                    const optionExists = Array.from(mapSelect.options).some(opt => opt.value === mapValue);
+                    if (mapValue && optionExists) {
+                        if (mapSelect.value !== mapValue) mapSelect.value = mapValue;
+                    } else if (mapSelect.options.length > 0) {
+                         if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
+                    }
+                } else if (mapSelect.options.length > 0) {
                      if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
-                 }
+                }
             }
 
             const scoreValue = match[scoreKey];
             if (scoreInput) {
-                  if (typeof scoreValue !== 'undefined' && scoreValue !== null) {
-                      if (scoreInput.value !== scoreValue) scoreInput.value = scoreValue;
-                  } else {
-                      if (scoreInput.value !== "") scoreInput.value = "";
-                  }
+                if (typeof scoreValue !== 'undefined' && scoreValue !== null) {
+                    if (scoreInput.value !== scoreValue) scoreInput.value = scoreValue;
+                } else {
+                    if (scoreInput.value !== "") scoreInput.value = "";
+                }
             }
         });
 
         // Обновление победителя
         let winnerTeamKey = "";
+        // Используем актуальные значения из селектов для определения победителя,
+        // так как team1Name и team2Name выше могли быть пустыми, если команда не задана в match data
         const currentTeam1NameVal = team1Select ? team1Select.value : "";
         const currentTeam2NameVal = team2Select ? team2Select.value : "";
+
         if (match.FINISHED_MATCH_STATUS === "FINISHED" && match.TEAMWINNER) {
             if (currentTeam1NameVal && match.TEAMWINNER === currentTeam1NameVal) winnerTeamKey = "TEAM1";
             else if (currentTeam2NameVal && match.TEAMWINNER === currentTeam2NameVal) winnerTeamKey = "TEAM2";
@@ -253,8 +260,7 @@ function updateMatchesUI(matches) {
         if (winnerTeamKey) matchColumn.setAttribute("data-winner", winnerTeamKey);
         else matchColumn.removeAttribute("data-winner");
 
-        // Обновление кнопок и подсветки
-        if (typeof updateWinnerButtonLabels === 'function') updateWinnerButtonLabels(matchIndex);
+        // Обновление подсветки победителя
         if (typeof refreshWinnerHighlight === 'function') refreshWinnerHighlight(matchIndex);
     });
 
@@ -275,17 +281,14 @@ function updateMapVetoUI(mapVetoData) {
     console.log("[UI] Attempting to update Map Veto UI. Data:", mapVetoData);
     if (!mapVetoData || !mapVetoData.veto || !Array.isArray(mapVetoData.veto)) {
         console.warn("[UI] Invalid or empty data received for updateMapVetoUI:", mapVetoData);
-        // Можно добавить логику очистки таблицы
         return;
     }
     const matchSelectElement = document.getElementById("matchSelect");
 
-    // Установка выбранного матча
     if (matchSelectElement && typeof mapVetoData.matchIndex !== 'undefined' && matchSelectElement.value != mapVetoData.matchIndex) {
         matchSelectElement.value = mapVetoData.matchIndex;
     }
 
-    // Обновление строк таблицы Veto
     mapVetoData.veto.forEach((vetoItem, idx) => {
         const rowIndex = idx + 1;
         const row = document.querySelector(`#vetoTable tr[data-index="${rowIndex}"]`);
@@ -293,54 +296,47 @@ function updateMapVetoUI(mapVetoData) {
             const actionSelect = row.querySelector(".veto-action");
             const mapSelectInRow = row.querySelector(".veto-map");
             const teamSelect = row.querySelector(".veto-team");
-            const sideSelect = row.querySelector(".veto-side"); // Находим селект стороны
+            const sideSelect = row.querySelector(".veto-side");
 
-            // Действие
             if (actionSelect) {
                 const actionValueFromData = vetoItem.action || 'BAN';
                 if (actionSelect.value !== actionValueFromData) {
                     actionSelect.value = actionValueFromData;
                 }
                 if (typeof styleVetoActionSelect === 'function') {
-                    styleVetoActionSelect(actionSelect); // Применяем стили для BAN/PICK/DECIDER
+                    styleVetoActionSelect(actionSelect);
                 }
             }
 
-            // Карта
             if (mapSelectInRow) {
-                 const mapValueFromData = vetoItem.map || (mapSelectInRow.options.length > 0 ? mapSelectInRow.options[0].value : "");
-                 if (mapSelectInRow.value !== mapValueFromData) {
-                     mapSelectInRow.value = mapValueFromData;
-                 }
+                const mapValueFromData = vetoItem.map || (mapSelectInRow.options.length > 0 ? mapSelectInRow.options[0].value : "");
+                if (mapSelectInRow.value !== mapValueFromData) {
+                    mapSelectInRow.value = mapValueFromData;
+                }
             }
 
-            // Команда
             if (teamSelect) {
                 const teamValueFromData = vetoItem.team || 'TEAM1';
                 if (teamSelect.value !== teamValueFromData) {
                     teamSelect.value = teamValueFromData;
                 }
-                // Стилизация команды
-                 teamSelect.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
-                 if (teamValueFromData === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
-                 if (teamValueFromData === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
+                teamSelect.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
+                if (teamValueFromData === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
+                if (teamValueFromData === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
             }
 
-            // Сторона
             if (sideSelect) {
                 const sideValueFromData = vetoItem.side || '-';
                 if (sideSelect.value !== sideValueFromData) {
                     sideSelect.value = sideValueFromData;
                 }
-                // *** ВЫЗОВ ФУНКЦИИ СТИЛИЗАЦИИ СТОРОНЫ ***
-                updateSideSelectStyle(sideSelect); // Применяем стиль CT/T сразу после установки значения
+                updateSideSelectStyle(sideSelect);
             }
         } else {
             console.warn(`[UI] Row ${rowIndex} in Map Veto table not found.`);
         }
     });
 
-    // Обновляем опции команд в Veto после обновления таблицы
     if (matchSelectElement?.value && typeof mapVetoData.matchIndex !== 'undefined' && typeof updateVetoTeamOptions === 'function') {
         updateVetoTeamOptions(matchSelectElement.value);
     }
@@ -376,7 +372,6 @@ function updateVRSUI(rawVrsData) {
             clearVRSFieldsForMatch(i);
         }
     }
-    // Обновляем имена команд в VRS таблицах
     if (typeof updateVRSTeamNames === 'function') {
         updateVRSTeamNames();
     }
@@ -386,7 +381,7 @@ function updateVRSUI(rawVrsData) {
 /** Вспомогательная функция для обновления одного поля ввода VRS. */
 function updateVRSInputField(elementId, value) {
     const element = document.getElementById(elementId);
-    const valueToSet = (value === null || typeof value === 'undefined') ? '' : String(value); // Преобразуем в строку или пустую строку
+    const valueToSet = (value === null || typeof value === 'undefined') ? '' : String(value);
     if (element && element.value !== valueToSet) {
         element.value = valueToSet;
     }
@@ -410,7 +405,6 @@ function updateCustomFieldsUI(fields) {
     console.log("[UI] Attempting to update custom fields UI. Data:", fields);
     if (!fields || typeof fields !== 'object') {
         console.warn("[UI] Invalid data for updateCustomFieldsUI. Clearing fields.", fields);
-        // Очищаем поля
         const upcoming = document.getElementById("upcomingMatchesInput");
         const galaxy = document.getElementById("galaxyBattleInput");
         const startDate = document.getElementById("tournamentStart");
@@ -425,7 +419,6 @@ function updateCustomFieldsUI(fields) {
         return;
     }
 
-    // Обновляем каждое поле
     const upcoming = document.getElementById("upcomingMatchesInput");
     if (upcoming && upcoming.value !== (fields.upcomingMatches || "")) upcoming.value = fields.upcomingMatches || "";
 
@@ -441,7 +434,7 @@ function updateCustomFieldsUI(fields) {
     const groupStage = document.getElementById("groupStageInput");
     if (groupStage && groupStage.value !== (fields.groupStage || "")) groupStage.value = fields.groupStage || "";
 
-    updateTournamentDay(); // Обновляем день турнира после обновления дат
+    updateTournamentDay();
     console.log("[UI] Custom fields UI update finished.");
 }
 
@@ -454,8 +447,8 @@ async function loadMatchesFromServer() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const matches = await response.json();
         console.log("[Data] Matches data loaded successfully:", matches);
-        await initPromise; // Убеждаемся, что основная инициализация (команды) завершена
-        updateMatchesUI(matches); // Обновляем UI с полученными данными
+        await initPromise;
+        updateMatchesUI(matches);
     } catch (error) {
         console.error("[Data] Error loading matchdata:", error);
     }
@@ -481,8 +474,7 @@ async function loadMapVetoFromServer() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const mapVetoData = await response.json();
         console.log("[Data] Map veto data loaded successfully:", mapVetoData);
-        updateMapVetoUI(mapVetoData); // Эта функция теперь также применит стили для sideSelect
-        // Обновляем опции команд, если матч уже был выбран
+        updateMapVetoUI(mapVetoData);
         if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined') {
             const matchSelectElement = document.getElementById("matchSelect");
             if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
@@ -499,18 +491,17 @@ async function loadCustomFieldsFromServer() {
     try {
         const response = await fetch("/api/customfields");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const dataArray = await response.json(); // Ожидаем массив
+        const dataArray = await response.json();
         console.log("[Data] Custom fields data loaded successfully:", dataArray);
-        // Обычно кастомные поля хранятся как один объект в массиве
         if (dataArray && dataArray.length > 0 && typeof dataArray[0] === 'object') {
             updateCustomFieldsUI(dataArray[0]);
         } else {
             console.warn("[Data] Custom fields data is empty or not in expected format. Using empty object.");
-            updateCustomFieldsUI({}); // Если данных нет, используем пустой объект
+            updateCustomFieldsUI({});
         }
     } catch (err) {
         console.error("[Data] Error loading custom fields:", err);
-        updateCustomFieldsUI({}); // В случае ошибки, используем пустой объект
+        updateCustomFieldsUI({});
     }
 }
 
@@ -519,7 +510,7 @@ async function loadPauseDataFromServer() {
     try {
         const response = await fetch("/api/pause");
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const dataArray = await response.json(); // Ожидаем массив
+        const dataArray = await response.json();
         console.log("[Data] Pause data loaded successfully:", dataArray);
         const pauseData = (dataArray && dataArray.length > 0) ? dataArray[0] : {};
         const msgInput = document.getElementById('pauseMessageInput');
@@ -528,7 +519,6 @@ async function loadPauseDataFromServer() {
         if (timeInput) timeInput.value = pauseData.lastUpd || "";
     } catch (err) {
         console.error("[Data] Error loading pause data:", err);
-        // В случае ошибки, очищаем поля
         const msgInput = document.getElementById('pauseMessageInput');
         const timeInput = document.getElementById('pauseTimeInput');
         if (msgInput) msgInput.value = "";
@@ -559,7 +549,6 @@ function calculateTournamentDay() {
         const end = endDateInput ? new Date(endDateInput) : null;
         const today = new Date();
 
-        // Нормализация дат
         start.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
         if (end) end.setHours(0, 0, 0, 0);
@@ -590,7 +579,6 @@ function updateTournamentDay() {
     calculateTournamentDay();
 }
 
-// Добавляем слушатели на изменение дат
 const tournamentStartInput = document.getElementById("tournamentStart");
 const tournamentEndInput = document.getElementById("tournamentEnd");
 if (tournamentStartInput) tournamentStartInput.addEventListener("change", updateTournamentDay);
@@ -603,13 +591,13 @@ if (tournamentEndInput) tournamentEndInput.addEventListener("change", updateTour
  * @returns {Object} Объект с данными.
  */
 function gatherCustomFieldsData() {
-    updateTournamentDay(); // Обновляем день турнира перед сбором
+    updateTournamentDay();
     return {
         upcomingMatches: document.getElementById("upcomingMatchesInput")?.value ?? "",
         galaxyBattle: document.getElementById("galaxyBattleInput")?.value ?? "",
         tournamentStart: document.getElementById("tournamentStart")?.value ?? "",
         tournamentEnd: document.getElementById("tournamentEnd")?.value ?? "",
-        tournamentDay: document.getElementById("tournamentDayDisplay")?.textContent ?? "", // Сохраняем рассчитанный день
+        tournamentDay: document.getElementById("tournamentDayDisplay")?.textContent ?? "",
         groupStage: document.getElementById("groupStageInput")?.value ?? ""
     };
 }
@@ -636,7 +624,6 @@ function gatherPauseData() {
 export function setButtonState(button, state, message = null) {
     if (!button) return;
 
-    // Сохраняем исходный текст и иконку, если они еще не сохранены
     const originalText = button.dataset.originalText || button.querySelector('i')?.nextSibling?.textContent?.trim() || button.textContent.trim() || 'SAVE';
     if (!button.dataset.originalText) button.dataset.originalText = originalText;
 
@@ -644,27 +631,21 @@ export function setButtonState(button, state, message = null) {
     const originalIconClass = icon ? (button.dataset.originalIconClass || icon.className) : null;
     if (icon && !button.dataset.originalIconClass) button.dataset.originalIconClass = originalIconClass;
 
-
     button.disabled = (state === 'saving');
     button.classList.remove('saving', 'saved', 'error', 'idle');
     button.style.cursor = (state === 'saving') ? 'wait' : 'pointer';
 
-    // Функция для установки текста и иконки
     const setTextAndIcon = (text, iconClass) => {
         if (icon && iconClass) {
             icon.className = iconClass;
-            // Удаляем только текстовые узлы
             Array.from(button.childNodes).forEach(node => {
                 if (node.nodeType === Node.TEXT_NODE) node.remove();
             });
-            // Добавляем текст после иконки (с пробелом)
             button.appendChild(document.createTextNode(` ${text}`));
         } else {
-            // Если иконки нет или класс не задан, просто меняем текст
             button.textContent = text;
         }
     };
-
 
     switch (state) {
         case 'saving':
@@ -674,11 +655,9 @@ export function setButtonState(button, state, message = null) {
         case 'saved':
             setTextAndIcon(message || 'Сохранено!', 'fas fa-check');
             button.classList.add('saved');
-            // Возврат в исходное состояние через таймаут
             setTimeout(() => {
-                // Проверяем, что состояние не изменилось за время таймаута
                 if (button.classList.contains('saved')) {
-                    setTextAndIcon(originalText, originalIconClass || ''); // Восстанавливаем
+                    setTextAndIcon(originalText, originalIconClass || '');
                     button.classList.remove('saved');
                     button.classList.add('idle');
                 }
@@ -687,10 +666,9 @@ export function setButtonState(button, state, message = null) {
         case 'error':
             setTextAndIcon(message || 'Ошибка!', 'fas fa-times-circle');
             button.classList.add('error');
-             // Возврат в исходное состояние через таймаут
             setTimeout(() => {
                 if (button.classList.contains('error')) {
-                    setTextAndIcon(originalText, originalIconClass || ''); // Восстанавливаем
+                    setTextAndIcon(originalText, originalIconClass || '');
                     button.classList.remove('error');
                     button.classList.add('idle');
                 }
@@ -698,7 +676,7 @@ export function setButtonState(button, state, message = null) {
             break;
         case 'idle':
         default:
-            setTextAndIcon(originalText, originalIconClass || ''); // Восстанавливаем
+            setTextAndIcon(originalText, originalIconClass || '');
             button.classList.add('idle');
             break;
     }
@@ -717,10 +695,9 @@ async function saveMatchData(matchIndex, buttonElement) {
         const vrsData = gatherSingleVRSData(matchIndex);
         if (!vrsData) throw new Error(`Не удалось собрать VRS данные для матча ${matchIndex}.`);
 
-        // Параллельная отправка данных матча и VRS
         await Promise.all([
-             saveData(`/api/matchdata/${matchIndex}`, matchData, 'PUT'),
-             saveData(`/api/vrs/${matchIndex}`, vrsData, 'PUT')
+            saveData(`/api/matchdata/${matchIndex}`, matchData, 'PUT'),
+            saveData(`/api/vrs/${matchIndex}`, vrsData, 'PUT')
         ]);
 
         setButtonState(buttonElement, 'saved');
@@ -783,9 +760,7 @@ async function savePauseData(buttonElement) {
 function setupListeners() {
     console.log("[Init] Setting up event listeners...");
 
-    // Слушатели для кнопок сохранения каждого матча
     document.querySelectorAll('.save-match-button').forEach(button => {
-        // Сохраняем исходный текст и иконку при инициализации
         if (!button.dataset.originalText) {
             const icon = button.querySelector('i');
             button.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : button.textContent.trim();
@@ -800,23 +775,21 @@ function setupListeners() {
         }
     });
 
-    // Слушатель для кнопки сохранения Map Veto
     const saveVetoButton = document.getElementById('saveMapVetoButton');
     if (saveVetoButton) {
         if (!saveVetoButton.dataset.originalText) {
-             const icon = saveVetoButton.querySelector('i');
-             saveVetoButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : saveVetoButton.textContent.trim();
-             if (icon && !saveVetoButton.dataset.originalIconClass) saveVetoButton.dataset.originalIconClass = icon.className;
+            const icon = saveVetoButton.querySelector('i');
+            saveVetoButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : saveVetoButton.textContent.trim();
+            if (icon && !saveVetoButton.dataset.originalIconClass) saveVetoButton.dataset.originalIconClass = icon.className;
         }
         saveVetoButton.addEventListener('click', () => saveMapVetoData(saveVetoButton));
     } else {
         console.warn("[Init] Save Map Veto button (id='saveMapVetoButton') not found.");
     }
 
-    // Слушатель для кнопки сохранения данных хедера
     const saveHeaderButton = document.getElementById('saveHeaderButton');
     if (saveHeaderButton) {
-         if (!saveHeaderButton.dataset.originalText) {
+        if (!saveHeaderButton.dataset.originalText) {
             const icon = saveHeaderButton.querySelector('i');
             saveHeaderButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : saveHeaderButton.textContent.trim();
             if (icon && !saveHeaderButton.dataset.originalIconClass) saveHeaderButton.dataset.originalIconClass = icon.className;
@@ -826,7 +799,6 @@ function setupListeners() {
         console.warn("[Init] Save Header button (id='saveHeaderButton') not found.");
     }
 
-    // Слушатель для кнопки сохранения данных паузы
     const savePauseButton = document.getElementById('savePauseButton');
     if (savePauseButton) {
         if (!savePauseButton.dataset.originalText) {
@@ -839,7 +811,6 @@ function setupListeners() {
         console.warn("[Init] Save Pause button (id='savePauseButton') not found.");
     }
 
-    // Слушатель на изменение выбранного матча в Map Veto (для обновления опций команд)
     const matchSelectElement = document.getElementById("matchSelect");
     if (matchSelectElement) {
         matchSelectElement.addEventListener('change', () => {
@@ -849,57 +820,49 @@ function setupListeners() {
         });
     }
 
-    // Слушатели на изменение команд в колонках матчей (для обновления опций в Map Veto и VRS)
     for (let i = 1; i <= 4; i++) {
         const team1Sel = document.getElementById(`team1Select${i}`);
         const team2Sel = document.getElementById(`team2Select${i}`);
         const listener = () => {
             const currentVetoMatchIndex = document.getElementById("matchSelect")?.value;
-            // Если измененные команды относятся к матчу, выбранному в Map Veto
             if (currentVetoMatchIndex && currentVetoMatchIndex == i) {
                 if (typeof updateVetoTeamOptions === 'function') {
                     updateVetoTeamOptions(String(i));
                 }
             }
-            // Также обновляем имена команд в VRS блоках при изменении команд в матче
             if (typeof updateVRSTeamNames === 'function') updateVRSTeamNames();
         };
         if (team1Sel) team1Sel.addEventListener('change', listener);
         if (team2Sel) team2Sel.addEventListener('change', listener);
     }
 
-    // *** ДОБАВЛЕНО: Слушатели для селектов выбора стороны в Map Veto ***
     document.querySelectorAll('#vetoTable .veto-side').forEach(selectElement => {
-        // Добавляем листенер только если его еще нет
         if (!selectElement.hasAttribute('data-side-listener-added')) {
-             selectElement.addEventListener('change', () => {
-                 updateSideSelectStyle(selectElement); // Вызываем функцию стилизации при изменении
-             });
-             selectElement.setAttribute('data-side-listener-added', 'true'); // Помечаем, что листенер добавлен
+            selectElement.addEventListener('change', () => {
+                updateSideSelectStyle(selectElement);
+            });
+            selectElement.setAttribute('data-side-listener-added', 'true');
         }
     });
-    // *** КОНЕЦ ДОБАВЛЕННОГО БЛОКА ***
 
-    // Слушатели для селектов выбора действия (BAN/PICK/DECIDER) для стилизации
-     document.querySelectorAll('#vetoTable .veto-action').forEach(selectElement => {
+    document.querySelectorAll('#vetoTable .veto-action').forEach(selectElement => {
         if (!selectElement.hasAttribute('data-action-listener-added')) {
-             selectElement.addEventListener('change', () => {
-                  if (typeof styleVetoActionSelect === 'function') {
-                     styleVetoActionSelect(selectElement);
-                  }
-             });
-             selectElement.setAttribute('data-action-listener-added', 'true');
+            selectElement.addEventListener('change', () => {
+                if (typeof styleVetoActionSelect === 'function') {
+                    styleVetoActionSelect(selectElement);
+                }
+            });
+            selectElement.setAttribute('data-action-listener-added', 'true');
         }
     });
 
-    // Слушатели для селектов выбора команды (TEAM1/TEAM2) для стилизации
     document.querySelectorAll('#vetoTable .veto-team').forEach(selectElement => {
         if (!selectElement.hasAttribute('data-team-listener-added')) {
             selectElement.addEventListener('change', () => {
-                 selectElement.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
-                 if (selectElement.value === 'TEAM1') selectElement.classList.add('team-1-selected-veto');
-                 if (selectElement.value === 'TEAM2') selectElement.classList.add('team-2-selected-veto');
-             });
+                selectElement.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
+                if (selectElement.value === 'TEAM1') selectElement.classList.add('team-1-selected-veto');
+                if (selectElement.value === 'TEAM2') selectElement.classList.add('team-2-selected-veto');
+            });
             selectElement.setAttribute('data-team-listener-added', 'true');
         }
     });
@@ -919,7 +882,6 @@ function initTabs() {
         return;
     }
 
-    // Активация первой вкладки по умолчанию, если ни одна не активна
     const activeTab = document.querySelector('.tabs-nav .tab-link.active');
     if (!activeTab && tabLinks.length > 0) {
         tabLinks[0].classList.add('active');
@@ -934,11 +896,9 @@ function initTabs() {
 
         event.preventDefault();
 
-        // Деактивация всех
         tabLinks.forEach(link => link.classList.remove('active'));
         tabPanels.forEach(panel => panel.classList.remove('active'));
 
-        // Активация нажатой вкладки и панели
         clickedTab.classList.add('active');
         const targetTabId = clickedTab.dataset.tab;
         const targetPanel = document.getElementById(targetTabId);
@@ -957,51 +917,44 @@ function initTabs() {
 window.addEventListener("DOMContentLoaded", async () => {
     console.log("DOMContentLoaded: Starting application initialization...");
     try {
-        await initPromise; // Дожидаемся завершения инициализации команд
+        await initPromise;
         console.log("DOMContentLoaded: Core module (matches/teams) initialized.");
 
-        // Инициализация остальных модулей (VRS, Veto, Casters) уже произошла синхронно выше
-        // Они сами загружают свои данные асинхронно при инициализации
-
-        // Параллельно загружаем остальные данные, которые не загружаются модулями
         await Promise.all([
-            loadMatchesFromServer(), // Перезагружаем матчи после инициализации команд
-            loadRawVRSData(),        // Загружаем VRS
+            loadMatchesFromServer(),
+            loadRawVRSData(),
             loadCustomFieldsFromServer(),
-            loadMapVetoFromServer(), // Загружаем Veto (применит стили для side/action)
+            loadMapVetoFromServer(),
             loadPauseDataFromServer()
-            // Данные кастеров загружаются в initCasters()
+            // Данные кастеров и выбранных кастеров загружаются внутри initCasters()
         ]);
         console.log("DOMContentLoaded: All initial data loaded from server.");
 
-        setupListeners(); // Настраиваем все слушатели событий
-        initTabs();       // Инициализируем систему вкладок
+        setupListeners();
+        initTabs();
 
-        // Первоначальное обновление зависимых UI элементов
         const matchSelectElement = document.getElementById("matchSelect");
         if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
             updateVetoTeamOptions(matchSelectElement.value);
         }
         
-        // Первоначальная стилизация для Veto селектов (action, team) на случай, если updateMapVetoUI не покрыл все)
         document.querySelectorAll('#vetoTable .veto-action').forEach(actionSelect => {
-             if (typeof styleVetoActionSelect === 'function') {
-                 styleVetoActionSelect(actionSelect);
-             }
+            if (typeof styleVetoActionSelect === 'function') {
+                styleVetoActionSelect(actionSelect);
+            }
         });
-         document.querySelectorAll('#vetoTable .veto-team').forEach(teamSelect => {
+        document.querySelectorAll('#vetoTable .veto-team').forEach(teamSelect => {
             teamSelect.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
             if (teamSelect.value === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
             if (teamSelect.value === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
-         });
-         // Первоначальная стилизация для side - вызывается из updateMapVetoUI
+        });
+        // Первоначальная стилизация для side вызывается из updateMapVetoUI, которая вызывается в loadMapVetoFromServer
 
-        updateTournamentDay(); // Первоначальный расчет дня турнира
+        updateTournamentDay();
 
         console.log("DOMContentLoaded: Full application initialization complete. UI is ready.");
     } catch (error) {
         console.error("DOMContentLoaded: Critical error during initialization:", error);
-        // Здесь можно отобразить сообщение об ошибке пользователю
         document.body.innerHTML = `<div style="color:red; padding: 20px;">Критическая ошибка при инициализации приложения: ${error.message}</div>`;
     }
 });

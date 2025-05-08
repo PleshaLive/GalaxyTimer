@@ -598,19 +598,51 @@ label i {
 
 .match-teams {
     display: flex;
-    align-items: stretch;
+    align-items: stretch; /* Changed from center to stretch for team-block height */
     justify-content: space-between;
     gap: var(--spacing-sm);
 }
 .team-block {
     flex: 1;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* To stack team-info-header and select */
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-md);
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
 }
+
+/* НОВЫЕ СТИЛИ ДЛЯ ЛОГОТИПОВ И ИНФОРМАЦИИ О КОМАНДЕ */
+.team-info-header {
+    display: flex;
+    align-items: center; /* Вертикальное выравнивание логотипа и метки */
+    margin-bottom: var(--spacing-xs); /* Отступ снизу перед выпадающим списком */
+}
+
+.team-logo {
+    width: 24px;   /* Размер логотипа, можно изменить */
+    height: 24px;  /* Размер логотипа, можно изменить */
+    margin-right: var(--spacing-sm); /* Отступ справа от логотипа */
+    object-fit: contain; /* Сохраняет пропорции логотипа */
+    border-radius: var(--border-radius-sm); /* Опционально: скругленные углы */
+    background-color: rgba(var(--rgb-primary), 0.05); /* Легкий фон для прозрачных PNG или во время загрузки */
+    border: 1px solid var(--color-border); /* Опционально: тонкая рамка */
+    flex-shrink: 0; /* Предотвращает сжатие логотипа, если метка длинная */
+}
+
+.team-block label { /* Стили для label внутри .team-block, которая теперь в .team-info-header */
+    margin-bottom: 0; /* Убираем стандартный отступ метки, т.к. отступ теперь у .team-info-header */
+    flex-grow: 1; /* Позволяет метке занимать доступное пространство */
+    /* white-space: nowrap; /* Если нужно, чтобы текст "Команда 1" не переносился */
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+}
+
+.team-block .team-select { /* Убедимся, что select занимает всю ширину */
+    width: 100%;
+}
+/* КОНЕЦ НОВЫХ СТИЛЕЙ */
+
 
 /* 1. Блок Команды 1 */
 .team-1-block {
@@ -640,7 +672,7 @@ label i {
     font-weight: var(--font-weight-bold);
     color: var(--color-text-muted);
     font-size: 1.1rem;
-    align-self: center;
+    align-self: center; /* Оставляем по центру, т.к. match-teams теперь align-items: stretch */
     padding: 0 var(--spacing-xs);
     border: 1px dashed var(--color-divider);
     border-radius: var(--border-radius-round);
@@ -840,7 +872,8 @@ label i {
     border-color: var(--team2-color-accent) !important;
     background-color: var(--team2-color-bg) !important;
     color: var(--team2-color-accent) !important;
-}#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
+}
+#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
 
 /* Pause Tab */
 .pause-section { margin-top: 0; border-top: none; }
