@@ -461,20 +461,19 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
-/* Состояние Saved 123321 */
+/* Состояние Saved */
 .app-button.saved, button.saved {
-    background-color: lime !important; /* Ярко-зеленый для теста */
-    color: black !important;          /* Черный текст для контраста */
-    border: 5px dashed red !important; /* Заметная красная рамка */
-    animation: none !important;        /* Отключаем анимацию */
-    box-shadow: none !important;       /* Отключаем тени */
-    transform: none !important;        /* Отключаем трансформации */
-    opacity: 1 !important;
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success-dark) !important;
+    border-width: 1px !important;
+    color: var(--color-text-on-primary) !important;
+    box-shadow: var(--glow-success) !important; /* Оставляем базовое свечение как основу */
+    /* transform: none !important; */ /* УБРАНО или ЗАКОММЕНТИРОВАНО, чтобы разрешить анимацию transform */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
-}
-.app-button.saved::before, button.saved::before {
-    content: none !important; /* Убираем блик */
+    opacity: 1; /* Убедимся, что непрозрачность установлена на 1 */
+    /* Применяем анимацию */
+    animation: savedPulse 0.6s ease-out forwards; /* Длительность 0.6s, запускается один раз */
 }
 /* Состояние Error */
 .app-button.error, button.error {
