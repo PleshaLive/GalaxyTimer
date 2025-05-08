@@ -713,14 +713,15 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     gap: var(--spacing-sm);
 }
 .team-block {
-    flex: 1;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm);
     border-radius: var(--border-radius-md);
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
-    position: relative; /* Для позиционирования Select2 dropdown */
+    position: relative;
+    overflow: hidden; /* <<<< ДОБАВИТЬ ЭТУ СТРОКУ */
 }
 
 /* Team Logo above Select */
