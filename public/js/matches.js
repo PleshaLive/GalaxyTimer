@@ -22,9 +22,9 @@ function formatTeamOption(team) {
     const logoUrl = team.element && team.element.dataset.logo ? team.element.dataset.logo : defaultLogoPath;
     const $container = $(
         `<span class="select2-team-option">
-           <img src="${logoUrl}" class="select2-team-logo" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
-           <span class="select2-team-name">${team.text}</span>
-         </span>`
+            <img src="${logoUrl}" class="select2-team-logo" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
+            <span class="select2-team-name">${team.text}</span>
+        </span>`
     );
     return $container;
 }
@@ -43,9 +43,9 @@ function formatTeamSelection(team) {
     const $container = $(
         // ВАЖНО: обертка .select2-team-selection нужна для CSS
         `<span class="select2-team-selection">
-           <img src="${logoUrl}" class="select2-team-logo-selected" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
-           <span class="select2-team-name-selected">${team.text}</span>
-         </span>`
+            <img src="${logoUrl}" class="select2-team-logo-selected" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
+            <span class="select2-team-name-selected">${team.text}</span>
+        </span>`
     );
     return $container;
 }
@@ -195,13 +195,10 @@ function initSelect2ForTeams() {
         const commonSelect2Options = {
             templateResult: formatTeamOption,
             templateSelection: formatTeamSelection,
-            width: '100%', // << ВОЗВРАЩАЕМ ЭТУ ОПЦИЮ (или 'style' если 100% не сработает)
-            // width: 'resolve', // Эту опцию убираем, т.к. она скрывала текст
+            width: '100%',
             placeholder: "-",
             allowClear: false,
-            // dropdownParent: parent1 // Передаем родителя для выпадающего списка
-                                      // УБЕДИТЕСЬ, ЧТО ЭТО НЕ ЛОМАЕТ ВЕРСТКУ
-                                      // Если ломает, закомментируйте dropdownParent
+            // dropdownParent: parent1 // Раскомментируйте, если нужно и не ломает верстку
         };
         if (sel1.length) {
              sel1.select2({...commonSelect2Options, dropdownParent: parent1 });
@@ -291,9 +288,6 @@ export function updateTeamDisplay(matchIndex) {
     }
 }
 
-
-// --- Остальные функции (attachWinnerButtons, refreshWinnerHighlight, attachStatusChangeHandlers, updateStatusColor, gatherSingleMatchData, getScoreIcon) остаются такими же, как в вашем первом варианте кода, где используется Select2 ---
-
 /**
  * Привязывает обработчики кликов к кнопкам выбора победителя.
  */
@@ -357,11 +351,10 @@ export function attachStatusChangeHandlers() {
                          const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
                          if (thirdMapScoreInput && !thirdMapScoreInput.value) { // Заполняем, только если пусто
                              thirdMapScoreInput.value = `MATCH ${m}`;
-                             // thirdMapScoreInput.placeholder = `MATCH ${m}`; // Можно и плейсхолдер менять
                          }
                      }
                  } else {
-                      // Можно добавить логику очистки, если статус меняется с UPCOM
+                     // Можно добавить логику очистки, если статус меняется с UPCOM
                  }
             }
         });
@@ -398,43 +391,30 @@ export function gatherSingleMatchData(matchIndex) {
         return null;
     }
 
-    // --- НАЧАЛО ИЗМЕНЕНИЙ ---
-    // Базовый путь Windows (в JS-строке обратные слеши должны быть экранированы)
-    const windowsBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; // Укажите ваш корректный базовый путь
+    // --- НАЧАЛО ИЗМЕНЕНИЙ ДЛЯ ЛОКАЛЬНЫХ ПУТЕЙ ---
+    // Базовый путь Windows. В строке JavaScript обратные слеши должны быть экранированы.
+    // Эта JS-строка "C:\\\\projects\\\\NewTimer\\\\files" представляет собой реальный путь "C:\projects\NewTimer\files".
+    const localBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; 
 
-    // Обновленная функция toLocal для генерации file:/// URI
+    // Функция для генерации локальных путей Windows.
+    // Цель: получить JS-строку вида "C:\projects\NewTimer\files\icon.png",
+    // которая при сериализации в JSON станет "C:\\projects\\NewTimer\\files\\icon.png".
     const toLocal = (fileName) => {
-        // 1. Нормализуем базовый путь: заменяем двойные экранированные слеши (\\) на одиночные прямые (/)
-        let normalizedBasePath = windowsBasePath.replace(/\\\\/g, '/');
-
-        // 2. Нормализуем имя файла: заменяем возможные обратные слеши на прямые
-        const normalizedFileName = fileName.replace(/\\/g, '/');
-
-        // 3. Убедимся, что между путем и файлом один слеш
-        if (normalizedBasePath.endsWith('/')) {
-            normalizedBasePath = normalizedBasePath.slice(0, -1); // Убираем слеш в конце, если есть
-        }
-        
-        let cleanFileName = normalizedFileName;
-        if (cleanFileName.startsWith('/')) {
-            cleanFileName = cleanFileName.slice(1); // Убираем слеш в начале имени файла, если есть
-        }
-        
-        // 4. Формируем полный путь для URI
-        const fullPathForURI = `${normalizedBasePath}/${cleanFileName}`; // Например, "C:/projects/NewTimer/files/LIVEBG.png"
-
-        // 5. Возвращаем в формате file URI
-        return `file:///${fullPathForURI}`;
+        // localBasePath (JS-строка) уже имеет правильное экранирование для представления пути.
+        // fileName (JS-строка), например, "icon.png".
+        // Нам нужен один обратный слеш "\" как разделитель. В строке JavaScript он записывается как "\\".
+        return `${localBasePath}\\\\${fileName}`;
     };
 
-    // Локальные пути для иконок, которые не являются логотипами, теперь в формате file:///
-    // Убедитесь, что имена файлов ("none_score_icon.png", "mp_L.png", и т.д.)
-    // соответствуют реальным именам файлов в вашей папке.
-    const localNoneIconPath = toLocal("none_score_icon.png"); // Используйте "none.png", если ваш файл так называется
+    // Убедитесь, что имена файлов (например, "none_score_icon.png") 
+    // точно соответствуют именам файлов в вашей папке C:\projects\NewTimer\files.
+    // Если для FIN_RectangleUP в вашем JSON сейчас приходит путь к "none.png",
+    // то здесь должно быть toLocal("none.png"). Адаптируйте имена файлов ниже под ваши нужды.
+    const localNoneIconPath = toLocal("none_score_icon.png"); 
     const localMpLIconPath = toLocal("mp_L.png");
     const localMpRIconPath = toLocal("mp_R.png");
     const localMpNoneIconPath = toLocal("mp_none.png");
-    // --- КОНЕЦ ИЗМЕНЕНИЙ ---
+    // --- КОНЕЦ ИЗМЕНЕНИЙ ДЛЯ ЛОКАЛЬНЫХ ПУТЕЙ ---
 
     const statusSelect = document.getElementById(`statusSelect${m}`);
     const statusText = statusSelect ? statusSelect.value.toUpperCase() : "";
@@ -459,7 +439,6 @@ export function gatherSingleMatchData(matchIndex) {
         maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
 
-    // ... (логика автозаполнения счета остается без изменений) ...
     if (statusText === "LIVE") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         const isScore1Numeric = SCORE_REGEX.test(s1);
@@ -484,7 +463,6 @@ export function gatherSingleMatchData(matchIndex) {
         }
     }
 
-
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
@@ -504,7 +482,10 @@ export function gatherSingleMatchData(matchIndex) {
         finCest = "cest"; finResult = "Result"; finVictory = "VICTORY";
     }
 
-    // --- ПУТИ К ИЗОБРАЖЕНИЯМ С ИСПОЛЬЗОВАНИЕМ НОВОГО toLocal ---
+    // --- ПУТИ К ИЗОБРАЖЕНИЯМ С ИСПОЛЬЗОВАНИЕМ toLocal ---
+    // defaultLogoPath (URL) используется как заглушка для лого-связанных полей или где это имело смысл в исходной логике.
+    // localNoneIconPath (локальный путь) используется как заглушка для не-логотипных изображений.
+
     const liveStatusValue = statusText === "LIVE" ? toLocal("live_icon.png") : defaultLogoPath;
     const liveBgValue = statusText === "LIVE" ? toLocal("LIVEBG.png") : defaultLogoPath;
     const liveVs = statusText === "LIVE" ? "vs" : "";
@@ -535,8 +516,9 @@ export function gatherSingleMatchData(matchIndex) {
     return matchObj;
 }
 
-// Вспомогательная функция getScoreIcon остается без изменений в своей логике,
-// но теперь она будет получать локальные пути в качестве аргументов lPath, rPath, mpNonePath, nonePath.
+/**
+ * Помощник для иконок счета карты (L/R/None).
+ */
 function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
     if (!scoreStr || typeof scoreStr !== 'string') return nonePath;
     const parts = scoreStr.split(':');
@@ -546,11 +528,8 @@ function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
         if (!isNaN(score1) && !isNaN(score2)) {
             if (score1 > score2) return lPath;
             if (score2 > score1) return rPath;
-            return mpNonePath;
+            return mpNonePath; // Используем mp_none для ничьей или 0:0
         }
     }
-    return nonePath;
+    return nonePath; // Используем none для нечисловых (NEXT, DECIDER, пустая строка)
 }
-
-// Убедитесь, что `defaultLogoPath` определен глобально или передан в функцию, как и раньше:
-// const defaultLogoPath = "https://waywayway-production.up.railway.app/logos/none.png";
