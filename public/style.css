@@ -1548,3 +1548,90 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
     #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); }
     #castersListContainer li .caster-details .edit-input { width: 100% !important; flex-basis: auto !important; margin-right: 0; }
 }
+
+/* Styles for the Map Veto Team Display */
+.map-veto-team-display {
+    display: flex; /* Используем Flexbox для расположения элементов в ряд */
+    align-items: center; /* Вертикальное выравнивание по центру */
+    justify-content: space-between; /* Распределяем место между элементами */
+    gap: var(--spacing-md); /* Промежуток между элементами */
+    padding: var(--spacing-md) var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    background-color: var(--color-surface-secondary); /* Фон как у других элементов */
+    /* border и border-radius наследуются от .card-style */
+}
+
+.map-veto-team-display .team-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md); /* Промежуток между лого и именем */
+    flex: 1; /* Позволяем блокам команд занимать доступное место */
+    min-width: 0; /* Предотвращает выход контента за пределы блока */
+}
+
+/* Выравнивание для Команды 1 (имя слева, лого справа) */
+.map-veto-team-display .team-display.team-1 {
+    justify-content: flex-end; /* Сдвигаем контент вправо */
+    text-align: right;
+}
+.map-veto-team-display .team-display.team-1 .team-display-name {
+    order: 1; /* Имя первым */
+     color: var(--team1-color-accent); /* Опциональный цвет акцента */
+}
+.map-veto-team-display .team-display.team-1 .team-display-logo {
+    order: 2; /* Лого вторым */
+}
+
+/* Выравнивание для Команды 2 (лого слева, имя справа) */
+.map-veto-team-display .team-display.team-2 {
+    justify-content: flex-start; /* Оставляем контент слева */
+    text-align: left;
+}
+.map-veto-team-display .team-display.team-2 .team-display-name {
+     color: var(--team2-color-accent); /* Опциональный цвет акцента */
+}
+/* Для Команды 2 порядок по умолчанию (лого слева, имя справа) */
+
+
+.map-veto-team-display .team-display-logo {
+    width: 32px; /* Размер лого */
+    height: 32px;
+    object-fit: contain; /* Масштабирование лого */
+    border-radius: var(--border-radius-sm);
+    background-color: rgba(255,255,255,0.05); /* Небольшой фон на случай ошибки */
+    flex-shrink: 0; /* Лого не должно сжиматься */
+    border: 1px solid var(--color-border-light); /* Тонкая рамка */
+}
+
+.map-veto-team-display .team-display-name {
+    font-size: 1.2rem; /* Размер шрифта имени */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    white-space: nowrap; /* Запрет переноса */
+    overflow: hidden; /* Скрытие лишнего */
+    text-overflow: ellipsis; /* Многоточие для длинных имен */
+}
+
+.map-veto-team-display .vs-indicator {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    flex-shrink: 0; /* VS не должно сжиматься */
+}
+
+/* Небольшая адаптация для очень маленьких экранов */
+@media (max-width: 480px) {
+    .map-veto-team-display {
+        flex-direction: column; /* Ставим элементы друг под другом */
+        gap: var(--spacing-sm);
+    }
+    .map-veto-team-display .team-display {
+        width: 100%;
+        justify-content: center; /* Центрируем на маленьких экранах */
+        text-align: center;
+    }
+     .map-veto-team-display .team-display.team-1 .team-display-name,
+     .map-veto-team-display .team-display.team-1 .team-display-logo {
+        order: initial; /* Сбрасываем порядок */
+     }
+}

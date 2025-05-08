@@ -5,7 +5,7 @@ import {
     initMatches,
     gatherSingleMatchData,
     refreshWinnerHighlight,
-    // areTeamsInitialized, // Кажется, не используется в main.js напрямую
+    // areTeamsInitialized, // Не используется напрямую здесь
     updateStatusColor,
     updateTeamDisplay
 } from "./matches.js";
@@ -13,7 +13,8 @@ import {
     initMapVeto,
     gatherMapVetoData,
     updateVetoTeamOptions,
-    styleVetoActionSelect
+    styleVetoActionSelect,
+    updateMapVetoDisplay // <-- Импортируем новую функцию
 } from "./mapVeto.js";
 import {
     initVRS,
@@ -24,10 +25,9 @@ import { saveData } from "./api.js";
 // Импорты для нового модуля кастеров
 import {
     initCasters,
-    // loadCasters, // Вызывается внутри initCasters или по сокету
-    // updateCastersUIFromSocket, // Вызывается по сокету
-    // updateSelectedCastersUIFromSocket, // Вызывается по сокету
-    // loadSelectedCasters // Вызывается внутри initCasters или по сокету
+    updateCastersUIFromSocket, // Функция для обновления списка ВСЕХ кастеров из сокета
+    updateSelectedCastersUIFromSocket // Функция для обновления ВЫБРАННЫХ кастеров из сокета
+    // loadCasters, loadSelectedCasters вызываются внутри initCasters или по сокету
 } from "./casters.js";
 
 // Инициализация Socket.IO клиента
@@ -61,13 +61,17 @@ socket.on("jsonUpdate", async (matches) => {
 // Получение обновления данных для Map Veto
 socket.on("mapVetoUpdate", (updatedMapVeto) => {
     console.log("[SOCKET] Received 'mapVetoUpdate' with data:", updatedMapVeto);
-    updateMapVetoUI(updatedMapVeto); // Обновляем интерфейс Map Veto
-    // Обновляем опции команд для соответствующего матча в Map Veto
+    updateMapVetoUI(updatedMapVeto); // Обновляем интерфейс Map Veto (таблицу)
+
+    // Обновляем опции и дисплей команд для соответствующего матча в Map Veto
     if (updatedMapVeto && typeof updatedMapVeto.matchIndex !== 'undefined') {
         const matchSelectElement = document.getElementById("matchSelect");
-        // Проверяем, что функция updateVetoTeamOptions существует перед вызовом
+        // Проверяем, что функции существуют перед вызовом
         if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
             updateVetoTeamOptions(matchSelectElement.value); // Обновляем с учетом текущего выбранного матча в Veto
+        }
+        if (matchSelectElement && typeof updateMapVetoDisplay === 'function') {
+             updateMapVetoDisplay(matchSelectElement.value); // Обновляем дисплей над таблицей
         }
     }
 });
@@ -113,30 +117,31 @@ socket.on("pauseUpdate", (pauseData) => {
 // Получение обновления данных о ВСЕХ кастерах
 socket.on("castersUpdate", (casters) => {
     console.log("[SOCKET] Received 'castersUpdate' with data:", casters);
-    // Предполагается, что updateCastersUIFromSocket импортируется из casters.js и существует
-    if (typeof window.updateCastersUIFromSocket === 'function') { // Используем window для глобальной доступности, если не импортировано напрямую
-        window.updateCastersUIFromSocket(casters);
-    } else if (typeof updateCastersUIFromSocket === 'function') { // Если импортировано
-         updateCastersUIFromSocket(casters);
+    // Используем импортированную функцию напрямую
+    if (typeof updateCastersUIFromSocket === 'function') {
+       updateCastersUIFromSocket(casters);
+    } else {
+        console.warn("Function 'updateCastersUIFromSocket' not found or not imported correctly from casters.js");
     }
 });
 
 // Получение обновления данных о ВЫБРАННЫХ кастерах
 socket.on("selectedCastersUpdate", (selectedCasters) => {
     console.log("[SOCKET] Received 'selectedCastersUpdate' with data:", selectedCasters);
-    if (typeof window.updateSelectedCastersUIFromSocket === 'function') {
-        window.updateSelectedCastersUIFromSocket(selectedCasters);
-    } else if (typeof updateSelectedCastersUIFromSocket === 'function') {
+    // Используем импортированную функцию напрямую
+    if (typeof updateSelectedCastersUIFromSocket === 'function') {
         updateSelectedCastersUIFromSocket(selectedCasters);
+    } else {
+        console.warn("Function 'updateSelectedCastersUIFromSocket' not found or not imported correctly from casters.js");
     }
 });
 
 
 // --- Функция стилизации селекта выбора стороны в Map Veto ---
 /**
- * Обновляет CSS классы для элемента select выбора стороны в MapVeto.
- * @param {HTMLSelectElement} selectElement - Элемент select.
- */
+ * Обновляет CSS классы для элемента select выбора стороны в MapVeto.
+ * @param {HTMLSelectElement} selectElement - Элемент select.
+ */
 function updateSideSelectStyle(selectElement) {
     if (!selectElement) return;
     const selectedValue = selectElement.value;
@@ -153,10 +158,10 @@ function updateSideSelectStyle(selectElement) {
 // --- Функции обновления UI ---
 
 /**
- * Обновляет весь интерфейс матчей на основе полученных данных.
- * Учитывает использование Select2 для выбора команд.
- * @param {Array<Object>} matches - Массив объектов с данными по каждому матчу.
- */
+ * Обновляет весь интерфейс матчей на основе полученных данных.
+ * Учитывает использование Select2 для выбора команд.
+ * @param {Array<Object>} matches - Массив объектов с данными по каждому матчу.
+ */
 function updateMatchesUI(matches) {
     console.log("[UI] Attempting to update matches UI. Data:", matches);
     if (!Array.isArray(matches)) {
@@ -234,13 +239,13 @@ function updateMatchesUI(matches) {
                 team2SelectJQ.val("").trigger('change.select2'); // Сброс на "-"
             }
         }
-        
-        // Обновляем отображение команды (логотипы над селектом и текст кнопок) 
+
+        // Обновляем отображение команды (логотипы над селектом и текст кнопок)
         // ПОСЛЕ установки значений селектов и триггера 'change'
         if (typeof updateTeamDisplay === 'function') {
             updateTeamDisplay(matchIndex);
         }
-        
+
         // Префикс для карт
         let prefix = "";
         if (match.FINISHED_MATCH_STATUS === "FINISHED") prefix = "FINISHED_";
@@ -265,7 +270,7 @@ function updateMatchesUI(matches) {
                          if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
                     }
                 } else if (mapSelect.options.length > 0) {
-                        if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
+                     if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
                 }
             }
 
@@ -283,32 +288,29 @@ function updateMatchesUI(matches) {
         let serverWinnerTeamKey = "";
         const currentTeam1NameVal = team1SelectJQ.length ? team1SelectJQ.val() : ""; // Получаем актуальное имя из селекта
         const currentTeam2NameVal = team2SelectJQ.length ? team2SelectJQ.val() : ""; // Получаем актуальное имя из селекта
-        
+
         // Победитель из серверных данных устанавливается только если матч FINISHED и есть TEAMWINNER
         if (match.FINISHED_MATCH_STATUS === "FINISHED" && match.TEAMWINNER) {
             if (currentTeam1NameVal && match.TEAMWINNER === currentTeam1NameVal) serverWinnerTeamKey = "TEAM1";
             else if (currentTeam2NameVal && match.TEAMWINNER === currentTeam2NameVal) serverWinnerTeamKey = "TEAM2";
         }
-        
+
         // Устанавливаем или удаляем атрибут data-winner
-        // Это важно, так как refreshWinnerHighlight будет его использовать
         if (serverWinnerTeamKey) {
-            matchColumn.setAttribute("data-winner", serverWinnerTeamKey);
-        } else {
-            // Если сервер не указал победителя для FINISHED матча, или матч не FINISHED,
-            // мы не хотим сбрасывать data-winner, если он был установлен пользователем вручную.
-            // Поэтому, если serverWinnerTeamKey пуст, мы НЕ удаляем data-winner.
-            // Его будет контролировать attachWinnerButtons при клике.
-            // Однако, если матч UPCOM или LIVE и сервер не шлет TEAMWINNER, то data-winner должен быть пуст.
-            // Текущая логика refreshWinnerHighlight корректно обработает data-winner="" или отсутствующий data-winner.
-            // Если матч ТОЛЬКО ЧТО стал FINISHED и сервер прислал победителя, data-winner обновится.
-            // Если матч был FINISHED, но сервер перестал слать победителя, data-winner тоже сбросится.
-            if (match.FINISHED_MATCH_STATUS !== "FINISHED" && !matchColumn.getAttribute("data-winner")) {
-                 matchColumn.removeAttribute("data-winner");
-            } else if (match.FINISHED_MATCH_STATUS === "FINISHED" && !match.TEAMWINNER) {
-                 matchColumn.removeAttribute("data-winner"); // Если матч закончен, но победителя нет, сбрасываем
+            if (matchColumn.getAttribute("data-winner") !== serverWinnerTeamKey) {
+                 matchColumn.setAttribute("data-winner", serverWinnerTeamKey);
             }
+        } else {
+            // Если матч НЕ FINISHED или FINISHED, но без победителя от сервера, сбрасываем data-winner
+            if (match.FINISHED_MATCH_STATUS !== "FINISHED" || (match.FINISHED_MATCH_STATUS === "FINISHED" && !match.TEAMWINNER)) {
+                 if (matchColumn.hasAttribute("data-winner")) {
+                     matchColumn.removeAttribute("data-winner");
+                 }
+            }
+            // Если матч FINISHED и сервер прислал победителя, атрибут будет установлен выше.
+            // Если матч был FINISHED с победителем, а потом стал LIVE/UPCOM, он сбросится здесь.
         }
+
 
         // Обновление подсветки победителя на основе актуального data-winner
         if (typeof refreshWinnerHighlight === 'function') {
@@ -319,15 +321,17 @@ function updateMatchesUI(matches) {
     // Обновляем связанные элементы после всех матчей
     if (typeof updateVRSTeamNames === 'function') updateVRSTeamNames();
     const matchSelectElement = document.getElementById("matchSelect");
-    if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
-        updateVetoTeamOptions(matchSelectElement.value);
+    if (matchSelectElement?.value) {
+         if(typeof updateVetoTeamOptions === 'function') updateVetoTeamOptions(matchSelectElement.value);
+         if(typeof updateMapVetoDisplay === 'function') updateMapVetoDisplay(matchSelectElement.value); // Обновляем и дисплей
     }
     // console.log("[UI] All matches UI update finished.");
 }
 
+
 /**
- * Обновляет интерфейс Map Veto.
- */
+ * Обновляет интерфейс Map Veto (таблицу).
+ */
 function updateMapVetoUI(mapVetoData) {
     console.log("[UI] Attempting to update Map Veto UI. Data:", mapVetoData);
     if (!mapVetoData || !mapVetoData.veto || !Array.isArray(mapVetoData.veto)) {
@@ -336,8 +340,12 @@ function updateMapVetoUI(mapVetoData) {
     }
     const matchSelectElement = document.getElementById("matchSelect");
 
+    // Обновляем выбор матча, если данные пришли для другого матча
     if (matchSelectElement && typeof mapVetoData.matchIndex !== 'undefined' && matchSelectElement.value != mapVetoData.matchIndex) {
         matchSelectElement.value = mapVetoData.matchIndex;
+        // Важно: Не вызываем здесь updateVetoTeamOptions/updateMapVetoDisplay,
+        // т.к. это изменение инициировано сокетом, а не пользователем.
+        // Функции будут вызваны в конце socket.on('mapVetoUpdate')
     }
 
     mapVetoData.veto.forEach((vetoItem, idx) => {
@@ -349,16 +357,18 @@ function updateMapVetoUI(mapVetoData) {
             const teamSelect = row.querySelector(".veto-team");
             const sideSelect = row.querySelector(".veto-side");
 
+            // Обновление Action (BAN/PICK/DECIDER)
             if (actionSelect) {
-                const actionValueFromData = vetoItem.action || 'BAN'; // По умолчанию BAN
+                const actionValueFromData = vetoItem.action || 'BAN';
                 if (actionSelect.value !== actionValueFromData) {
                     actionSelect.value = actionValueFromData;
                 }
                 if (typeof styleVetoActionSelect === 'function') {
-                    styleVetoActionSelect(actionSelect);
+                    styleVetoActionSelect(actionSelect); // Применяем стиль
                 }
             }
 
+            // Обновление Карты
             if (mapSelectInRow) {
                 const mapValueFromData = vetoItem.map || (mapSelectInRow.options.length > 0 ? mapSelectInRow.options[0].value : "");
                 if (mapSelectInRow.value !== mapValueFromData) {
@@ -366,37 +376,42 @@ function updateMapVetoUI(mapVetoData) {
                 }
             }
 
+            // Обновление Команды
             if (teamSelect) {
-                const teamValueFromData = vetoItem.team || 'TEAM1'; // По умолчанию TEAM1
+                const teamValueFromData = vetoItem.team || 'TEAM1';
                 if (teamSelect.value !== teamValueFromData) {
                     teamSelect.value = teamValueFromData;
                 }
+                // Применяем стиль для команды
                 teamSelect.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
                 if (teamValueFromData === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
                 if (teamValueFromData === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
             }
 
+            // Обновление Стороны (CT/T/-)
             if (sideSelect) {
-                const sideValueFromData = vetoItem.side || '-'; // По умолчанию "-"
+                const sideValueFromData = vetoItem.side || '-';
                 if (sideSelect.value !== sideValueFromData) {
                     sideSelect.value = sideValueFromData;
                 }
-                updateSideSelectStyle(sideSelect);
+                updateSideSelectStyle(sideSelect); // Применяем стиль
             }
         } else {
             console.warn(`[UI] Row ${rowIndex} in Map Veto table not found.`);
         }
     });
 
+    // Важно: Обновляем тексты команд в селектах ПОСЛЕ обновления значений строк
     if (matchSelectElement?.value && typeof mapVetoData.matchIndex !== 'undefined' && typeof updateVetoTeamOptions === 'function') {
-        updateVetoTeamOptions(matchSelectElement.value);
+       updateVetoTeamOptions(matchSelectElement.value);
     }
-    console.log("[UI] Map Veto UI update finished for match", mapVetoData.matchIndex);
+    console.log("[UI] Map Veto UI (table) update finished for match", mapVetoData.matchIndex);
 }
 
+
 /**
- * Обновляет интерфейс VRS-блоков.
- */
+ * Обновляет интерфейс VRS-блоков.
+ */
 function updateVRSUI(rawVrsData) {
     console.log("[UI] Attempting to update VRS UI. Data:", rawVrsData);
     if (!rawVrsData || typeof rawVrsData !== 'object') {
@@ -448,8 +463,8 @@ function clearVRSFieldsForMatch(matchIndex) {
 }
 
 /**
- * Обновляет интерфейс кастомных полей (в хедере).
- */
+ * Обновляет интерфейс кастомных полей (в хедере).
+ */
 function updateCustomFieldsUI(fields) {
     // console.log("[UI] Attempting to update custom fields UI. Data:", fields);
     if (!fields || typeof fields !== 'object') {
@@ -523,12 +538,14 @@ async function loadMapVetoFromServer() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const mapVetoData = await response.json();
         console.log("[Data] Map veto data loaded successfully:", mapVetoData);
-        updateMapVetoUI(mapVetoData);
+        updateMapVetoUI(mapVetoData); // Обновляем таблицу
+        // Обновляем опции и дисплей команд ПОСЛЕ обновления таблицы
         if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined') {
             const matchSelectElement = document.getElementById("matchSelect");
-            if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
-                updateVetoTeamOptions(matchSelectElement.value);
-            }
+             if (matchSelectElement) { // Обновляем для текущего выбранного матча
+                 if(typeof updateVetoTeamOptions === 'function') updateVetoTeamOptions(matchSelectElement.value);
+                 if(typeof updateMapVetoDisplay === 'function') updateMapVetoDisplay(matchSelectElement.value);
+             }
         }
     } catch (error) {
         console.error("[Data] Error loading map veto data:", error);
@@ -590,8 +607,9 @@ function calculateTournamentDay() {
     try {
         const start = new Date(startDateInput);
         const end = endDateInput ? new Date(endDateInput) : null;
-        const today = new Date(); // Текущая дата для расчета
-        // const today = new Date("2025-05-09"); // Для теста - конкретная дата
+        // const today = new Date(); // Текущая дата для расчета
+        // Для теста - используем сегодняшнюю дату (8 мая 2025)
+         const today = new Date("2025-05-08"); // <<-- Установите здесь текущую дату для корректного расчета
 
         start.setHours(0, 0, 0, 0);
         today.setHours(0, 0, 0, 0);
@@ -615,6 +633,7 @@ function calculateTournamentDay() {
         displaySpan.style.color = 'var(--color-error)';
     }
 }
+
 
 function updateTournamentDay() {
     calculateTournamentDay();
@@ -783,7 +802,11 @@ function setupListeners() {
         }
         const matchIndex = button.dataset.matchIndex;
         if (matchIndex) {
-            button.addEventListener('click', () => saveMatchData(parseInt(matchIndex, 10), button));
+             // Проверяем, не добавлен ли уже слушатель, прежде чем добавлять новый
+             if (button.dataset.saveListenerAttached !== 'true') {
+                button.addEventListener('click', () => saveMatchData(parseInt(matchIndex, 10), button));
+                button.dataset.saveListenerAttached = 'true';
+             }
         } else {
             console.warn("[Init] Save match button found without 'data-match-index' attribute.");
         }
@@ -797,7 +820,10 @@ function setupListeners() {
             saveVetoButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : saveVetoButton.textContent.trim();
             if (icon && !saveVetoButton.dataset.originalIconClass) saveVetoButton.dataset.originalIconClass = icon.className;
         }
-        saveVetoButton.addEventListener('click', () => saveMapVetoData(saveVetoButton));
+        if (saveVetoButton.dataset.saveListenerAttached !== 'true') {
+             saveVetoButton.addEventListener('click', () => saveMapVetoData(saveVetoButton));
+             saveVetoButton.dataset.saveListenerAttached = 'true';
+        }
     } else {
         console.warn("[Init] Save Map Veto button (id='saveMapVetoButton') not found.");
     }
@@ -810,7 +836,10 @@ function setupListeners() {
             saveHeaderButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : saveHeaderButton.textContent.trim();
             if (icon && !saveHeaderButton.dataset.originalIconClass) saveHeaderButton.dataset.originalIconClass = icon.className;
         }
-        saveHeaderButton.addEventListener('click', () => saveHeaderData(saveHeaderButton));
+         if (saveHeaderButton.dataset.saveListenerAttached !== 'true') {
+            saveHeaderButton.addEventListener('click', () => saveHeaderData(saveHeaderButton));
+            saveHeaderButton.dataset.saveListenerAttached = 'true';
+         }
     } else {
         console.warn("[Init] Save Header button (id='saveHeaderButton') not found.");
     }
@@ -823,7 +852,10 @@ function setupListeners() {
             savePauseButton.dataset.originalText = icon ? icon.nextSibling?.textContent?.trim() : savePauseButton.textContent.trim();
             if (icon && !savePauseButton.dataset.originalIconClass) savePauseButton.dataset.originalIconClass = icon.className;
         }
-        savePauseButton.addEventListener('click', () => savePauseData(savePauseButton));
+        if (savePauseButton.dataset.saveListenerAttached !== 'true') {
+            savePauseButton.addEventListener('click', () => savePauseData(savePauseButton));
+            savePauseButton.dataset.saveListenerAttached = 'true';
+        }
     } else {
         console.warn("[Init] Save Pause button (id='savePauseButton') not found.");
     }
@@ -831,19 +863,33 @@ function setupListeners() {
     // Слушатель изменения матча в Map Veto
     const matchSelectElement = document.getElementById("matchSelect");
     if (matchSelectElement) {
-        matchSelectElement.addEventListener('change', () => {
-            if (typeof updateVetoTeamOptions === 'function') {
-                updateVetoTeamOptions(matchSelectElement.value);
-            }
-        });
+        if (matchSelectElement.dataset.changeListenerAttached !== 'true') { // Проверяем, добавлен ли слушатель
+            const handleMatchSelectChange = () => {
+                const selectedMatchIndex = matchSelectElement.value;
+                console.log(`[MapVeto] Match selection changed to: ${selectedMatchIndex}`);
+
+                // Обновляем опции команд ВНУТРИ таблицы вето
+                if (typeof updateVetoTeamOptions === 'function') {
+                     updateVetoTeamOptions(selectedMatchIndex);
+                } else {
+                     console.warn("updateVetoTeamOptions function not found");
+                }
+
+                // Обновляем дисплей команд НАД таблицей вето (НОВЫЙ ВЫЗОВ)
+                if (typeof updateMapVetoDisplay === 'function') {
+                     updateMapVetoDisplay(selectedMatchIndex);
+                } else {
+                     console.warn("updateMapVetoDisplay function not found");
+                }
+            };
+            matchSelectElement.addEventListener('change', handleMatchSelectChange);
+            matchSelectElement.dataset.changeListenerAttached = 'true'; // Помечаем, что слушатель добавлен
+        }
     }
 
-    // Слушатели для селектов команд УДАЛЕНЫ из main.js, так как они теперь обрабатываются
-    // через attachSelect2ChangeListeners в matches.js.
-    // Слушатели для кнопок победителя матчей теперь также в matches.js (attachWinnerButtons).
-    // Слушатели для селектов статуса матчей теперь также в matches.js (attachStatusChangeHandlers).
+    // Слушатели для селектов команд, кнопок победителя и статуса теперь в matches.js
 
-    // Слушатели для таблицы Map Veto (остаются как есть, т.к. специфичны для этого блока)
+    // Слушатели для таблицы Map Veto (остаются здесь, т.к. специфичны для этого блока)
     document.querySelectorAll('#vetoTable .veto-side').forEach(selectElement => {
         if (!selectElement.hasAttribute('data-side-listener-added')) {
             selectElement.addEventListener('change', () => {
@@ -924,41 +970,51 @@ function initTabs() {
 window.addEventListener("DOMContentLoaded", async () => {
     console.log("DOMContentLoaded: Starting application initialization...");
     try {
-        await initPromise; // Ждем инициализации команд (включая Select2 и слушатели кнопок победителя)
+        await initPromise; // Ждем инициализации команд (включая Select2 и слушатели)
         console.log("DOMContentLoaded: Core module (matches/teams) initialized.");
 
         // Загружаем все остальные данные параллельно
         await Promise.all([
-            loadMatchesFromServer(),
-            loadRawVRSData(),
-            loadCustomFieldsFromServer(),
-            loadMapVetoFromServer(),
-            loadPauseDataFromServer(),
-            // Загрузка данных для кастеров (если она не происходит внутри initCasters или по сокетам)
-            // Пример:
-            // typeof window.loadCasters === 'function' ? window.loadCasters() : Promise.resolve(),
-            // typeof window.loadSelectedCasters === 'function' ? window.loadSelectedCasters() : Promise.resolve()
+            loadMatchesFromServer(), // Загружает данные матчей и обновляет UI матчей
+            loadRawVRSData(),        // Загружает данные VRS и обновляет UI VRS
+            loadCustomFieldsFromServer(), // Загружает кастомные поля и обновляет хедер
+            loadMapVetoFromServer(),  // Загружает Map Veto и обновляет таблицу Veto
+            loadPauseDataFromServer(),   // Загружает данные паузы
+            // Загрузка данных для кастеров происходит внутри initCasters или по сокетам
         ]);
         console.log("DOMContentLoaded: All initial data loaded from server.");
 
-        // Настраиваем слушатели и табы
-        setupListeners(); // Слушатели для кнопок сохранения и элементов MapVeto, не связанных с матчами напрямую
+        // Настраиваем основные слушатели (кнопки Сохранить, табы и т.д.)
+        setupListeners();
         initTabs();
 
-        // Первичная настройка UI после загрузки данных
-        const matchSelectElement = document.getElementById("matchSelect");
-        if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
-            updateVetoTeamOptions(matchSelectElement.value);
+        // --- Первичная настройка UI после загрузки ВСЕХ данных ---
+
+        // 1. Обновляем тексты команд в Veto таблице на основе загруженных данных матчей
+        const initialMatchSelect = document.getElementById("matchSelect");
+        if (initialMatchSelect?.value && typeof updateVetoTeamOptions === 'function') {
+            updateVetoTeamOptions(initialMatchSelect.value);
         }
-        
-        // Применяем стили к элементам Veto (цвет BAN/PICK/DECIDER, цвет CT/T, цвет команды)
-        // Это нужно сделать после загрузки данных, чтобы селекты уже имели значения
+
+        // 2. Обновляем дисплей команд НАД таблицей Veto
+        if (initialMatchSelect?.value) {
+             if (typeof updateMapVetoDisplay === 'function') {
+                 console.log(`[Init] Calling initial updateMapVetoDisplay for Match ${initialMatchSelect.value}`);
+                 updateMapVetoDisplay(initialMatchSelect.value);
+             } else {
+                 console.warn("Initial call: updateMapVetoDisplay function not found");
+             }
+        }
+
+        // 3. Применяем стили к уже загруженным селектам в таблице MapVeto
         document.querySelectorAll('#vetoTable .veto-action').forEach(actionSelect => {
             if (typeof styleVetoActionSelect === 'function') {
                 styleVetoActionSelect(actionSelect);
             }
         });
         document.querySelectorAll('#vetoTable .veto-team').forEach(teamSelect => {
+             // Эта логика может быть избыточной, если updateVetoTeamOptions уже применила классы,
+             // но для надежности можно оставить или вынести в отдельную функцию styleVetoTeamSelectIfNeeded
             teamSelect.classList.remove('team-1-selected-veto', 'team-2-selected-veto');
             if (teamSelect.value === 'TEAM1') teamSelect.classList.add('team-1-selected-veto');
             if (teamSelect.value === 'TEAM2') teamSelect.classList.add('team-2-selected-veto');
@@ -967,7 +1023,7 @@ window.addEventListener("DOMContentLoaded", async () => {
             updateSideSelectStyle(sideSelect);
         });
 
-        // Обновляем день турнира
+        // 4. Обновляем день турнира
         updateTournamentDay();
 
         console.log("DOMContentLoaded: Full application initialization complete. UI is ready.");

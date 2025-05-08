@@ -125,7 +125,7 @@
                         </div>
 
                         <div class="match-column" data-match="2" data-winner="">
-                            <div class="match-header">
+                             <div class="match-header">
                                 <h2>Match 2</h2>
                                 <div class="match-meta">
                                     <select class="status-select styled-select" id="statusSelect2"><option value="UPCOM">UPCOM</option> <option value="LIVE">LIVE</option> <option value="FINISHED">FINISHED</option></select>
@@ -238,15 +238,25 @@
                             <div class="match-footer"><button class="save-match-button app-button primary" data-match-index="4"><i class="fas fa-save"></i> Сохранить Матч 4</button></div>
                         </div>
 
-                    </div>
-                </div>
-                <div id="tab-mapveto" class="tab-panel">
+                    </div> </div> <div id="tab-mapveto" class="tab-panel">
                     <div class="map-veto-block">
                         <div class="map-veto-content">
                             <h1 class="tab-title"><i class="fas fa-map-signs"></i> MAP VETO</h1>
                             <div class="map-veto-header">
                                 <label for="matchSelect"><i class="fas fa-filter"></i> Матч для Veto:</label>
                                 <select id="matchSelect" class="control-select styled-select"></select>
+                            </div>
+
+                            <div id="mapVetoTeamDisplay" class="map-veto-team-display card-style">
+                                <div class="team-display team-1">
+                                    <span class="team-display-name" id="mapVetoTeam1Name">Команда 1</span>
+                                    <img src="/logos/none.png" alt="Team 1 Logo" class="team-display-logo" id="mapVetoTeam1Logo">
+                                </div>
+                                <div class="vs-indicator">VS</div>
+                                <div class="team-display team-2">
+                                    <img src="/logos/none.png" alt="Team 2 Logo" class="team-display-logo" id="mapVetoTeam2Logo">
+                                    <span class="team-display-name" id="mapVetoTeam2Name">Команда 2</span>
+                                </div>
                             </div>
                             <div class="table-wrapper styled-scrollbar">
                                 <table id="vetoTable">
@@ -273,79 +283,76 @@
                             <button id="saveMapVetoButton" class="app-button primary"><i class="fas fa-save"></i> Save Map Veto</button>
                         </div>
                     </div>
-               </div>
-               <div id="tab-casters" class="tab-panel">
-                     <h1 class="tab-title"><i class="fas fa-microphone-alt"></i> Управление Кастерами</h1>
-                     <div class="casters-grid">
-                          <div class="caster-selection-block card-style">
-                               <h3><i class="fas fa-user-check"></i> Выбрать Кастеров</h3>
-                               <div class="form-group">
-                                   <label for="caster1Select"><i class="fas fa-microphone"></i> Кастер 1:</label>
-                                   <select id="caster1Select" class="control-select styled-select">
-                                       <option value="">- Выбрать кастера -</option>
-                                   </select>
-                               </div>
-                               <div class="form-group">
-                                   <label for="caster2Select"><i class="fas fa-microphone"></i> Кастер 2:</label>
-                                   <select id="caster2Select" class="control-select styled-select">
-                                       <option value="">- Выбрать кастера -</option>
-                                   </select>
-                               </div>
-                               <button id="saveSelectedCastersButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Кастеров</button>
-                          </div>
+                </div>
+                <div id="tab-casters" class="tab-panel">
+                         <h1 class="tab-title"><i class="fas fa-microphone-alt"></i> Управление Кастерами</h1>
+                         <div class="casters-grid">
+                                <div class="caster-selection-block card-style">
+                                   <h3><i class="fas fa-user-check"></i> Выбрать Кастеров</h3>
+                                   <div class="form-group">
+                                      <label for="caster1Select"><i class="fas fa-microphone"></i> Кастер 1:</label>
+                                      <select id="caster1Select" class="control-select styled-select">
+                                         <option value="">- Выбрать кастера -</option>
+                                      </select>
+                                   </div>
+                                   <div class="form-group">
+                                      <label for="caster2Select"><i class="fas fa-microphone"></i> Кастер 2:</label>
+                                      <select id="caster2Select" class="control-select styled-select">
+                                         <option value="">- Выбрать кастера -</option>
+                                      </select>
+                                   </div>
+                                   <button id="saveSelectedCastersButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Кастеров</button>
+                                </div>
 
-                          <div class="caster-creation-block card-style">
-                               <h3><i class="fas fa-user-plus"></i> Создать Нового Кастера</h3>
-                               <form id="addCasterForm">
-                                   <div class="form-group">
-                                       <label for="newCasterName"><i class="fas fa-signature"></i> Имя кастера:</label>
-                                       <input type="text" id="newCasterName" class="header-input" placeholder="Введите имя" required>
-                                   </div>
-                                   <div class="form-group">
-                                       <label for="newCasterSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
-                                       <input type="text" id="newCasterSocial" class="header-input" placeholder="Ссылка или никнейм">
-                                   </div>
-                                   <button type="submit" id="addCasterButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить кастера</button>
-                               </form>
-                          </div>
-                     </div>
-                     <div class="casters-list-block card-style" style="margin-top: var(--spacing-lg);">
-                          <h3><i class="fas fa-list-ul"></i> Список Кастеров</h3>
-                          <div id="castersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
-                               <p>Загрузка...</p> </div>
-                     </div>
-               </div>
-               <div id="tab-pause" class="tab-panel">
-                     <section class="pause-section">
-                          <h1 class="tab-title"><i class="fas fa-pause-circle"></i> Управление Паузой</h1>
-                         <div class="pause-controls-standalone">
-                             <div class="pause-fields-grid">
-                                  <div class="form-group">
-                                      <label for="pauseMessageInput"><i class="fas fa-comment-dots"></i> Сообщение паузы:</label>
-                                      <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
-                                  </div>
-                                  <div class="form-group">
-                                      <label for="pauseTimeInput"><i class="fas fa-clock"></i> Last UPD:</label>
-                                      <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
-                                  </div>
-                             </div>
-                             <button id="savePauseButton" class="app-button primary"><i class="fas fa-save"></i> Save Pause</button>
+                                <div class="caster-creation-block card-style">
+                                   <h3><i class="fas fa-user-plus"></i> Создать Нового Кастера</h3>
+                                   <form id="addCasterForm">
+                                      <div class="form-group">
+                                         <label for="newCasterName"><i class="fas fa-signature"></i> Имя кастера:</label>
+                                         <input type="text" id="newCasterName" class="header-input" placeholder="Введите имя" required>
+                                      </div>
+                                      <div class="form-group">
+                                         <label for="newCasterSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
+                                         <input type="text" id="newCasterSocial" class="header-input" placeholder="Ссылка или никнейм">
+                                      </div>
+                                      <button type="submit" id="addCasterButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить кастера</button>
+                                   </form>
+                                </div>
                          </div>
-                     </section>
-               </div>
-                <div id="tab-json" class="tab-panel">
-                    <h1 class="tab-title"><i class="fas fa-code"></i> JSON Вывод</h1>
-                    <div class="json-output-container">
-                        <div class="json-output styled-scrollbar" id="jsonOutput">
-                            JSON data will appear here...
-                        </div>
-                    </div>
-               </div>
+                         <div class="casters-list-block card-style" style="margin-top: var(--spacing-lg);">
+                             <h3><i class="fas fa-list-ul"></i> Список Кастеров</h3>
+                             <div id="castersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
+                                 <p>Загрузка...</p> </div>
+                         </div>
+                </div>
+                <div id="tab-pause" class="tab-panel">
+                         <section class="pause-section">
+                             <h1 class="tab-title"><i class="fas fa-pause-circle"></i> Управление Паузой</h1>
+                            <div class="pause-controls-standalone">
+                               <div class="pause-fields-grid">
+                                     <div class="form-group">
+                                         <label for="pauseMessageInput"><i class="fas fa-comment-dots"></i> Сообщение паузы:</label>
+                                         <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
+                                     </div>
+                                     <div class="form-group">
+                                         <label for="pauseTimeInput"><i class="fas fa-clock"></i> Last UPD:</label>
+                                         <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
+                                     </div>
+                               </div>
+                               <button id="savePauseButton" class="app-button primary"><i class="fas fa-save"></i> Save Pause</button>
+                            </div>
+                         </section>
+                </div>
+                 <div id="tab-json" class="tab-panel">
+                     <h1 class="tab-title"><i class="fas fa-code"></i> JSON Вывод</h1>
+                     <div class="json-output-container">
+                         <div class="json-output styled-scrollbar" id="jsonOutput">
+                             JSON data will appear here...
+                         </div>
+                     </div>
+                </div>
 
-            </div>
-        </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            </div> </div> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="js/main.js"></script>
