@@ -399,11 +399,11 @@ export function gatherSingleMatchData(matchIndex) {
     }
 
     // --- НАЧАЛО ИЗМЕНЕНИЙ ---
-    const localBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; // Ваш базовый локальный путь
-    const toLocal = (fileName) => `${localBasePath}\\\\${fileName}`;
+    const localBasePath = "C:\projects\NewTimer\files"; // Ваш базовый локальный путь
+    const toLocal = (fileName) => `${localBasePath}\\${fileName}`;
 
     // Локальные пути для иконок, которые не являются логотипами
-    const localNoneIconPath = toLocal("none_score_icon.png");
+    const localNoneIconPath = toLocal("none.png");
     const localMpLIconPath = toLocal("mp_L.png");
     const localMpRIconPath = toLocal("mp_R.png");
     const localMpNoneIconPath = toLocal("mp_none.png");
