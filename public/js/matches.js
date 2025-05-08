@@ -175,24 +175,35 @@ export function populateTeamSelects(teamsList) {
  * Инициализирует Select2 для всех селектов команд.
  */
 function initSelect2ForTeams() {
-    for (let m = 1; m <= 4; m++) {
-        const sel1 = $(`#team1Select${m}`);
-        const sel2 = $(`#team2Select${m}`);
-        const commonSelect2Options = {
-            templateResult: formatTeamOption,
-            templateSelection: formatTeamSelection,
-            width: '100%',
-            placeholder: "-",
-            allowClear: false, // Если нужен крестик для очистки, установите true и убедитесь, что есть пустая <option value="">
-        };
-        if (sel1.length) {
-            sel1.select2({...commonSelect2Options, dropdownParent: sel1.parent() });
-        }
-        if (sel2.length) {
-            sel2.select2({...commonSelect2Options, dropdownParent: sel2.parent() });
-        }
-    }
-    // console.log("[Matches] Select2 initialized for team selects.");
+    for (let m = 1; m <= 4; m++) {
+        const sel1 = $(`#team1Select${m}`);
+        const sel2 = $(`#team2Select${m}`);
+        // ПРАВИЛЬНО ПОЛУЧАЕМ РОДИТЕЛЕЙ
+        const parent1 = sel1.parent();
+        const parent2 = sel2.parent();
+
+        const commonSelect2Options = {
+            templateResult: formatTeamOption,
+            templateSelection: formatTeamSelection,
+            // width: '100%', // ЗАКОММЕНТИРУЙТЕ ИЛИ УДАЛИТЕ ЭТУ СТРОКУ (если она есть в JS)
+            width: 'resolve', // <<<< ПОПРОБУЙТЕ ЭТУ ОПЦИЮ
+            placeholder: "-",
+            allowClear: false,
+             // ПРОВЕРЬТЕ, ЧТО dropdownParent ПЕРЕДАЕТСЯ КОРРЕКТНО, ЕСЛИ ОН НУЖЕН
+            // dropdownParent: parent1 // Пример для sel1 (или parent2 для sel2)
+            // Если dropdownParent не нужен, закомментируйте эту строку
+        };
+
+        if (sel1.length) {
+            // Передаем корректный dropdownParent, если он используется
+            sel1.select2({...commonSelect2Options, dropdownParent: parent1 });
+        }
+        if (sel2.length) {
+             // Передаем корректный dropdownParent, если он используется
+            sel2.select2({...commonSelect2Options, dropdownParent: parent2 });
+        }
+    }
+     // console.log("[Matches] Select2 initialized for team selects.");
 }
 
 /**
