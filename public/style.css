@@ -1210,24 +1210,26 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 /* Container and Single Selection Field */
 .select2-container {
-    width: 100% !important; /* Force Select2 to take full width */
-    font-size: 0.9rem;     /* Match general input font size */
+    /* width: 100% !important; */ /* ЗАКОММЕНТИРОВАТЬ ИЛИ УДАЛИТЬ !important */
+    width: 100%; /* Оставить просто width: 100% */
+    max-width: 100%; /* ДОБАВИТЬ ЭТО */
+    font-size: 0.9rem;
     font-family: var(--font-family-base);
-    vertical-align: middle; /* Better alignment with other form elements */
-    position: relative;     /* Needed for dropdown positioning context */
+    vertical-align: middle;
+    position: relative;
 }
 .select2-container .select2-selection--single {
     background-color: var(--color-surface-tertiary);
     border: 1px solid var(--color-border);
     border-radius: var(--border-radius-md);
-    height: auto; /* Adjust height to content + padding */
-    /* Match padding of .header-input but adjust right for arrow */
+    height: auto;
     padding: var(--spacing-sm) calc(var(--spacing-sm) + 20px + var(--spacing-xs)) var(--spacing-sm) var(--spacing-md);
     box-shadow: var(--shadow-inset);
     transition: var(--transition-base);
     outline: none;
-    display: flex; /* To align items like logo and text */
+    display: flex;
     align-items: center;
+    max-width: 100%; /* <<<< ДОБАВИТЬ ЭТО */
 }
 .select2-container--default.select2-container--focus .select2-selection--single, /* Typo in original was --focus */
 .select2-container--default.select2-container--open .select2-selection--single {
@@ -1245,7 +1247,8 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     align-items: center;
     width: 100%;
     overflow: hidden;
-    min-width: 0; /* <<<< ДОБАВЛЕНО ЭТО СВОЙСТВО */
+    min-width: 0;
+    max-width: 100%; /* <<<< ДОБАВИТЬ ЭТО */
 }
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
     color: var(--color-text-placeholder);
