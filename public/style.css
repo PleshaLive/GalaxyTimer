@@ -309,15 +309,20 @@ label i {
     font-size: 0.9rem;
     font-weight: var(--font-weight-semibold);
     border-radius: var(--border-radius-md);
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Начальная граница для glass */
-    background-color: var(--color-primary-base); /* Базовый цвет */
+    border: 1px solid transparent; /* Граница будет проявляться при ховере/активности */
+    background-color: var(--color-primary-base); /* Основной цвет кнопки */
     color: var(--color-text-on-primary);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+    /* Небольшая тень для объема и отделения */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2),
+                /* Тонкий светлый внутренний блик сверху */
+                inset 0 1px 1px rgba(255,255,255,0.1),
+                /* Тонкая темная внутренняя тень снизу */
+                inset 0 -1px 1px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, backdrop-filter 0.3s ease;
-    position: relative; /* Для ::before и z-index */
-    overflow: hidden;   /* Для ::before и border-radius */
-    z-index: 1;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    position: relative; /* Для позиционирования псевдоэлемента ::before */
+    overflow: hidden;   /* Чтобы блик не выходил за пределы кнопки */
+    z-index: 1;         /* Для корректного стекинга с псевдоэлементом */
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -327,18 +332,20 @@ label i {
     letter-spacing: 0.03em;
     min-width: 140px;
     text-transform: uppercase;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.25); /* Тень для текста */
 }
 /* Иконка и текст внутри кнопки */
 .app-button i, button i {
     margin-right: var(--spacing-sm);
     font-size: 0.95em;
-    position: relative; /* Поверх блика */
-    z-index: 2;
+    position: relative;
+    z-index: 2; /* Текст и иконка должны быть над бликом */
 }
 /* Текст внутри кнопки (если он не в span, могут быть проблемы) */
-.app-button span, button span {
+.app-button span, /* Если текст обернут в span */
+button span {
     position: relative;
-    z-index: 2;
+    z-index: 2; /* Текст и иконка должны быть над бликом */
 }
 
 /* === Псевдоэлемент для блика === */
@@ -346,59 +353,58 @@ label i {
     content: "";
     position: absolute;
     top: 0;
-    left: -85%; /* Начинаем сильно левее */
-    width: 60%; /* Ширина самого блика */
+    left: -120%; /* Начинаем полностью за левым краем, чтобы анимация была длиннее */
+    width: 80%;  /* Ширина блика */
     height: 100%;
     background: linear-gradient(
-        75deg, /* Угол наклона блика */
-        transparent 0%,
-        rgba(255, 255, 255, 0.35) 50%, /* Цвет и прозрачность блика */
-        transparent 100%
+        60deg, /* Угол наклона блика */
+        transparent 25%,
+        rgba(255, 255, 255, 0.45) 50%, /* Центральная часть блика, чуть ярче */
+        transparent 75%
     );
-    transform: skewX(-25deg); /* Наклон блика */
-    opacity: 0; /* Скрыт по умолчанию */
-    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1), /* Анимация движения */
-                opacity 0.4s ease-in-out; /* Анимация появления/исчезновения */
-    z-index: 1; /* Под текстом/иконкой, над фоном */
+    transform: skewX(-25deg); /* Угол скоса блика */
+    opacity: 0; /* По умолчанию блик не виден */
+    /* transition убран отсюда, будет управляться на ховере */
+    z-index: 1; /* Блик под текстом, но над фоном кнопки */
 }
 
 /* === Hover State - Glassmorphism + Анимация блика === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover {
-    /* Glassmorphism фон */
-    background-color: rgba(255, 255, 255, 0.15);
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    color: var(--color-text-primary);
-    transform: translateY(-2px); /* Небольшой подъем */
+    background-color: var(--color-primary-dark); /* Затемнение основного цвета при наведении */
+    border-color: var(--color-primary-light); /* Подсветка границы */
+    color: var(--color-text-on-primary);
+    transform: translateY(-3px); /* Небольшой подъем кнопки */
+    /* Усиленная внешняя тень (glow) при ховере */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.25),
+                var(--glow-primary), /* Используем существующую glow-переменную */
+                inset 0 1px 0px rgba(255,255,255,0.1); /* Легкий внутренний блик сверху */
 }
 
 /* Запуск анимации блика при наведении */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before {
-    left: 125%; /* Двигаем блик направо */
-    opacity: 1; /* Показываем */
-    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-                opacity 0.2s ease-in-out;
+    left: 120%; /* Двигаем блик полностью за правый край */
+    opacity: 1; /* Показываем блик */
+    transition: left 0.7s cubic-bezier(0.23, 1, 0.32, 1), /* Плавная и быстрая анимация движения */
+                opacity 0.4s ease-out; /* Плавное появление */
 }
 
 /* === Active State === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active {
-    background-color: rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-    transform: translateY(0px); /* Возвращаем на место */
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
-    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(0px); /* Возвращаем кнопку на место */
+    background-color: var(--color-primary-dark); /* Можно сделать еще темнее */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), /* Более выраженная внутренняя тень "вдавленности" */
+                var(--glow-primary); /* Оставляем легкое свечение */
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
 }
 /* Мгновенно скрываем блик при нажатии */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
+    left: -120%; /* Возвращаем за левый край */
     opacity: 0;
-    transition: none;
+    transition: none; /* Без анимации при скрытии на active */
 }
 
 /* === Стили для особых типов кнопок === */
@@ -408,7 +414,8 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-color: var(--color-secondary-light);
     color: var(--color-secondary-light);
     box-shadow: none;
-     -webkit-backdrop-filter: none;
+    text-shadow: none;
+    -webkit-backdrop-filter: none;
     backdrop-filter: none;
 }
 .app-button.tertiary::before {
@@ -431,23 +438,23 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
     background-color: var(--color-text-muted) !important;
     border-color: var(--color-text-muted) !important;
-    border-width: 1px !important;
     color: var(--color-surface) !important;
     cursor: wait !important;
     opacity: 0.7;
     transform: none !important;
     box-shadow: var(--shadow-inset) !important;
-    -webkit-backdrop-filter: none !important;
+    text-shadow: none !important;
+    -webkit-backdrop-filter: none !important; /* Убираем glassmorphism, если он был */
     backdrop-filter: none !important;
 }
 /* Состояние Saved */
 .app-button.saved, button.saved {
     background-color: var(--color-success) !important;
     border-color: var(--color-success-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-primary) !important;
+    color: var(--color-text-on-primary) !important; /* Используем основной цвет текста на акцентах */
     box-shadow: var(--glow-success) !important;
     transform: none !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
@@ -455,10 +462,10 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .app-button.error, button.error {
     background-color: var(--color-error) !important;
     border-color: var(--color-error-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-accent) !important;
+    color: var(--color-text-on-accent) !important; /* Используем цвет текста на акцентах */
     box-shadow: var(--glow-error) !important;
     transform: none !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
@@ -473,10 +480,20 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 /* --- Winner Buttons --- */
 /* Оставляем их стиль без изменений, убираем блик */
 .winner-btn::before {
-    content: none;
+    content: none !important; /* Гарантированно убираем общий блик */
 }
 /* Стили для .winner-btn определены ниже и не будут затронуты общими правилами hover */
 
+.app-button.tertiary:not(:disabled):hover { /* Добавляем :not(:disabled) */
+    background-color: var(--color-secondary-base);
+    color: var(--color-text-on-accent);
+    border-color: var(--color-secondary-base);
+    box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
+    transform: translateY(-2px) scale(1.02);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
 
 /* Хедер */
 .site-header {
