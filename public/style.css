@@ -308,71 +308,104 @@ label i {
     font-size: 0.9rem;
     font-weight: var(--font-weight-semibold);
     border-radius: var(--border-radius-md);
-    border: 2px solid var(--color-primary-base);
-    background-color: var(--color-primary-base);
+    /* Устанавливаем начальную границу, можно полупрозрачную */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Начальная тонкая граница */
+    background-color: var(--color-primary-base); /* Оставляем базовый цвет */
     color: var(--color-text-on-primary);
     cursor: pointer;
-    transition: var(--transition-base);
+    /* Добавляем backdrop-filter в transition */
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, backdrop-filter 0.3s ease;
     text-align: center;
     line-height: 1.5;
     letter-spacing: 0.03em;
     min-width: 140px;
     text-transform: uppercase;
-    box-shadow: 0 2px 5px rgba(var(--rgb-primary),0.2), 0 0 10px rgba(var(--rgb-primary),0.1) inset;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.4); /* Более заметная тень для "стекла" */
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Важно для border-radius и backdrop-filter */
     z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     vertical-align: middle;
+    /* -webkit-backdrop-filter: blur(0px); */ /* Для поддержки Safari */
+    /* backdrop-filter: blur(0px); */ /* Начальное состояние без размытия */
 }
 .app-button i, button i {
     margin-right: var(--spacing-sm);
     font-size: 0.95em;
+    position: relative; /* Чтобы иконка была над фоном */
+    z-index: 2;
 }
+/* Убираем старую анимацию через ::before */
 .app-button::before, button::before {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 0; height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-    z-index: -1;
-    opacity: 0;
-}
-.app-button:hover::before, button:hover::before {
-    width: 250%; height: 250%;
-    opacity: 1;
-}
-.app-button:hover, button:hover {
-    background-color: var(--color-primary-light);
-    border-color: var(--color-primary-light);
-    box-shadow: var(--glow-primary), 0 0 15px rgba(var(--rgb-primary),0.3) inset;
-    transform: translateY(-2px) scale(1.02);
-}
-.app-button:active, button:active {
-    transform: translateY(0px) scale(1);
-    background-color: var(--color-primary-dark);
-    box-shadow: var(--shadow-inset);
+   content: none; /* Просто убираем псевдоэлемент */
 }
 
-.app-button.primary { /* Already styled by default .app-button */ }
+/* === Новый Glassmorphism Hover Effect === */
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover,
+button:not(:disabled):not(.saving):not(.saved):not(.error):hover {
+    /* Полупрозрачный фон "матового стекла" */
+    /* Можно использовать белый или цвет основной темы с альфа-каналом */
+    background-color: rgba(255, 255, 255, 0.15); /* Белый с прозрачностью */
+    /* Или использовать цвет темы: */
+    /* background-color: rgba(var(--rgb-primary), 0.2); */
+
+    /* Размытие фона */
+    -webkit-backdrop-filter: blur(8px); /* Размытие для Safari */
+    backdrop-filter: blur(8px); /* Стандартное свойство размытия (подберите значение) */
+
+    /* Светлая граница для эффекта стекла */
+    border-color: rgba(255, 255, 255, 0.25);
+
+    /* Тень можно оставить или изменить */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+
+    /* Цвет текста можно сделать светлее для контраста */
+    color: var(--color-text-primary);
+
+    /* Небольшой подъем кнопки */
+    transform: translateY(-2px);
+}
+
+/* === Active State для Glassmorphism === */
+.app-button:not(:disabled):not(.saving):not(.saved):not(.error):active,
+button:not(:disabled):not(.saving):not(.saved):not(.error):active {
+    /* Чуть менее прозрачный фон при нажатии */
+    background-color: rgba(255, 255, 255, 0.1);
+    /* Можно уменьшить размытие или убрать */
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    /* Убираем подъем, имитируем нажатие */
+    transform: translateY(0px);
+    /* Тень внутрь */
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* === Стили для особых типов кнопок === */
+/* Например, для .tertiary оставим старое поведение или адаптируем */
 .app-button.tertiary {
+    /* Базовые стили остаются */
     background-color: transparent;
     border-color: var(--color-secondary-light);
     color: var(--color-secondary-light);
-    box-shadow: 0 2px 5px rgba(var(--rgb-secondary),0.2);
+    box-shadow: none;
+    /* Убираем размытие для базового состояния */
+     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
+/* Оставляем старый ховер для tertiary или создаем другой */
 .app-button.tertiary:hover {
     background-color: var(--color-secondary-base);
     color: var(--color-text-on-accent);
     border-color: var(--color-secondary-base);
     box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
+    transform: translateY(-2px) scale(1.02);
+    /* Убираем размытие для ховера tertiary */
+     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
-
 
 /* Хедер */
 .site-header {
@@ -887,24 +920,34 @@ label i {
 .app-button.saving, button.saving,
 .app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
     background-color: var(--color-text-muted) !important;
-    border-color: var(--color-text-muted) !important;
+    border: 1px solid var(--color-text-muted) !important; /* Используем border 1px, как в glass */
     color: var(--color-surface) !important;
     cursor: wait !important;
     opacity: 0.7;
-    transform: none;
-    box-shadow: var(--shadow-inset);
+    transform: none !important;
+    box-shadow: var(--shadow-inset) !important;
+    -webkit-backdrop-filter: none !important; /* Убираем размытие */
+    backdrop-filter: none !important;
 }
 .app-button.saved, button.saved {
     background-color: var(--color-success) !important;
     border-color: var(--color-success-dark) !important;
+    border-width: 1px !important; /* Согласуем толщину рамки */
     color: var(--color-text-on-primary) !important;
-    box-shadow: var(--glow-success);
+    box-shadow: var(--glow-success) !important;
+     -webkit-backdrop-filter: none !important; /* Убираем размытие */
+    backdrop-filter: none !important;
+     transform: none !important; /* Сбрасываем hover transform */
 }
 .app-button.error, button.error {
     background-color: var(--color-error) !important;
     border-color: var(--color-error-dark) !important;
+    border-width: 1px !important; /* Согласуем толщину рамки */
     color: var(--color-text-on-accent) !important;
-    box-shadow: var(--glow-error);
+    box-shadow: var(--glow-error) !important;
+     -webkit-backdrop-filter: none !important; /* Убираем размытие */
+    backdrop-filter: none !important;
+     transform: none !important; /* Сбрасываем hover transform */
 }
 
 /* Styled Scrollbar */
