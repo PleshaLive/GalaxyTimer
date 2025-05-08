@@ -338,14 +338,13 @@ label i {
 .app-button i, button i {
     margin-right: var(--spacing-sm);
     font-size: 0.95em;
-    position: relative;
-    z-index: 2; /* Текст и иконка должны быть над бликом */
+    position: relative; /* Поверх блика */
+    z-index: 2;
 }
 /* Текст внутри кнопки (если он не в span, могут быть проблемы) */
-.app-button span, /* Если текст обернут в span */
-button span {
+.app-button span, button span {
     position: relative;
-    z-index: 2; /* Текст и иконка должны быть над бликом */
+    z-index: 2;
 }
 
 /* === Псевдоэлемент для блика === */
@@ -371,40 +370,40 @@ button span {
 /* === Hover State - Glassmorphism + Анимация блика === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover {
-    background-color: var(--color-primary-dark); /* Затемнение основного цвета при наведении */
-    border-color: var(--color-primary-light); /* Подсветка границы */
-    color: var(--color-text-on-primary);
-    transform: translateY(-3px); /* Небольшой подъем кнопки */
-    /* Усиленная внешняя тень (glow) при ховере */
-    box-shadow: 0 5px 15px rgba(0,0,0,0.25),
-                var(--glow-primary), /* Используем существующую glow-переменную */
-                inset 0 1px 0px rgba(255,255,255,0.1); /* Легкий внутренний блик сверху */
+    /* Glassmorphism фон */
+    background-color: rgba(255, 255, 255, 0.15);
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    color: var(--color-text-primary);
+    transform: translateY(-2px); /* Небольшой подъем */
 }
 
 /* Запуск анимации блика при наведении */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before {
-    left: 120%; /* Двигаем блик полностью за правый край */
-    opacity: 1; /* Показываем блик */
-    transition: left 0.7s cubic-bezier(0.23, 1, 0.32, 1), /* Плавная и быстрая анимация движения */
-                opacity 0.4s ease-out; /* Плавное появление */
+    left: 125%; /* Двигаем блик направо */
+    opacity: 1; /* Показываем */
+    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.2s ease-in-out;
 }
 
 /* === Active State === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active {
-    transform: translateY(0px); /* Возвращаем кнопку на место */
-    background-color: var(--color-primary-dark); /* Можно сделать еще темнее */
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), /* Более выраженная внутренняя тень "вдавленности" */
-                var(--glow-primary); /* Оставляем легкое свечение */
-    transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.1s ease;
+    background-color: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    transform: translateY(0px); /* Возвращаем на место */
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
+    border-color: rgba(255, 255, 255, 0.15);
 }
 /* Мгновенно скрываем блик при нажатии */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
-    left: -120%; /* Возвращаем за левый край */
     opacity: 0;
-    transition: none; /* Без анимации при скрытии на active */
+    transition: none;
 }
 
 /* === Стили для особых типов кнопок === */
@@ -414,8 +413,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-color: var(--color-secondary-light);
     color: var(--color-secondary-light);
     box-shadow: none;
-    text-shadow: none;
-    -webkit-backdrop-filter: none;
+     -webkit-backdrop-filter: none;
     backdrop-filter: none;
 }
 .app-button.tertiary::before {
@@ -438,23 +436,23 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
     background-color: var(--color-text-muted) !important;
     border-color: var(--color-text-muted) !important;
+    border-width: 1px !important;
     color: var(--color-surface) !important;
     cursor: wait !important;
     opacity: 0.7;
     transform: none !important;
     box-shadow: var(--shadow-inset) !important;
-    text-shadow: none !important;
-    -webkit-backdrop-filter: none !important; /* Убираем glassmorphism, если он был */
+    -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
 /* Состояние Saved */
 .app-button.saved, button.saved {
     background-color: var(--color-success) !important;
     border-color: var(--color-success-dark) !important;
-    color: var(--color-text-on-primary) !important; /* Используем основной цвет текста на акцентах */
+    border-width: 1px !important;
+    color: var(--color-text-on-primary) !important;
     box-shadow: var(--glow-success) !important;
     transform: none !important;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
@@ -462,10 +460,10 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .app-button.error, button.error {
     background-color: var(--color-error) !important;
     border-color: var(--color-error-dark) !important;
-    color: var(--color-text-on-accent) !important; /* Используем цвет текста на акцентах */
+    border-width: 1px !important;
+    color: var(--color-text-on-accent) !important;
     box-shadow: var(--glow-error) !important;
     transform: none !important;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important;
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
 }
@@ -480,20 +478,10 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 /* --- Winner Buttons --- */
 /* Оставляем их стиль без изменений, убираем блик */
 .winner-btn::before {
-    content: none !important; /* Гарантированно убираем общий блик */
+    content: none;
 }
 /* Стили для .winner-btn определены ниже и не будут затронуты общими правилами hover */
 
-.app-button.tertiary:not(:disabled):hover { /* Добавляем :not(:disabled) */
-    background-color: var(--color-secondary-base);
-    color: var(--color-text-on-accent);
-    border-color: var(--color-secondary-base);
-    box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
-    transform: translateY(-2px) scale(1.02);
-    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-}
 
 /* Хедер */
 .site-header {
