@@ -1635,3 +1635,127 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
         order: initial; /* Сбрасываем порядок */
      }
 }
+
+/* === VRS Table Styles === */
+/*
+   .vrs-block-wrapper уже существует в HTML и имеет заголовок h3.
+   Ему можно добавить стили, если он должен выглядеть как отдельная карточка,
+   но в вашем случае он уже внутри .match-body, так что достаточно разделителя и отступов.
+*/
+.vrs-block-wrapper {
+    border-top: 1px solid var(--color-divider); /* Разделитель от секции карт */
+    padding-top: var(--spacing-md); /* Отступ сверху */
+    margin-top: var(--spacing-md); /* Дополнительный отступ, если необходимо */
+}
+
+.vrs-block-wrapper h3 { /* Заголовок "VRS Статистика" */
+    font-size: 0.9rem;   /* Размер, как у заголовка "Карты" */
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.vrs-block-wrapper h3 i { /* Иконка в заголовке VRS */
+    margin-right: var(--spacing-xs);
+    color: var(--color-primary-base); /* Или другой акцентный цвет, например, var(--color-secondary-base) */
+}
+
+.vrs-table {
+    width: 100%;
+    border-collapse: separate; /* Позволяет использовать border-spacing и border-radius для таблицы */
+    border-spacing: 0;
+    font-size: 0.85rem; /* Немного меньше основного текста для компактности */
+    background-color: var(--color-surface-tertiary); /* Фон для всей таблицы */
+    border: 1px solid var(--color-border); /* Общая рамка для таблицы */
+    border-radius: var(--border-radius-md); /* Скругление углов таблицы */
+    /* overflow: hidden; /* Раскомментируйте, если нужен эффект "обрезки" дочерних элементов по border-radius таблицы */
+}
+
+.vrs-table th,
+.vrs-table td {
+    padding: var(--spacing-sm);
+    text-align: center;
+    border-bottom: 1px solid var(--color-divider); /* Горизонтальные линии-разделители */
+    /* Если у .vrs-table есть общая рамка, индивидуальные рамки ячеек можно убрать или сделать тоньше */
+    /* border-left: 1px solid var(--color-divider); */ /* Опционально: вертикальные линии */
+}
+/* .vrs-table td:first-child, .vrs-table th:first-child { border-left: none; } */ /* Если есть вертикальные линии, но не нужны скраю */
+/* .vrs-table td:last-child, .vrs-table th:last-child { border-right: none; } */
+
+
+.vrs-table th {
+    background-color: var(--color-surface); /* Фон для заголовков, чуть темнее фона ячеек */
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.75rem; /* Заголовки можно сделать еще немного меньше */
+}
+
+/* Убираем нижнюю границу у последней строки, чтобы не было двойной линии с рамкой таблицы */
+.vrs-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Стили для первой ячейки (имя команды) */
+.vrs-table td:first-child {
+    font-weight: var(--font-weight-semibold);
+    text-align: left; /* Имена команд обычно выравнивают по левому краю */
+    padding-left: var(--spacing-md); /* Немного больше отступ слева для имени */
+    min-width: 90px; /* Минимальная ширина для предотвращения слишком сильного сжатия */
+}
+
+/* Акцентные цвета для имен команд в VRS-таблице */
+.vrs-table tr.team-1-row td:first-child { /* td с именем команды 1 */
+    color: var(--team1-color-accent);
+    /* background-color: var(--team1-color-bg); /* Если нужен фон */
+    /* border-left: 3px solid var(--team1-color-accent); /* Акцентная линия */
+    /* padding-left: calc(var(--spacing-md) - 3px); /* Компенсация для border-left */
+}
+
+.vrs-table tr.team-2-row td:first-child { /* td с именем команды 2 */
+    color: var(--team2-color-accent);
+    /* background-color: var(--team2-color-bg); */
+    /* border-left: 3px solid var(--team2-color-accent); */
+    /* padding-left: calc(var(--spacing-md) - 3px); */
+}
+
+/* Эффект при наведении на строку таблицы (опционально) */
+.vrs-table tbody tr:hover td {
+    background-color: rgba(var(--rgb-primary), 0.05); /* Легкое выделение строки */
+}
+
+/* Инпуты внутри VRS таблицы */
+.vrs-input {
+    /* Наследование общих стилей инпутов */
+    background-color: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+    border-radius: var(--border-radius-sm); /* Можно сделать радиус меньше для компактности */
+    padding: var(--spacing-xs); /* Уменьшенный padding для инпутов в таблице */
+    font-size: 0.85rem; /* Размер шрифта как у текста в ячейках */
+    line-height: 1.4;   /* Стандартный line-height для инпутов */
+    text-align: center; /* Выравнивание текста по центру */
+    width: 100%;        /* Инпут занимает всю ширину ячейки */
+    box-shadow: var(--shadow-inset); /* Тень внутрь, если используется на других инпутах */
+    font-family: var(--font-family-base); /* Явное указание семейства шрифтов */
+    transition: var(--transition-base); /* Плавные переходы для :hover и :focus */
+    outline: none; /* Убираем стандартный outline */
+}
+
+.vrs-input:hover {
+    border-color: var(--color-primary-light); /* Стандартный hover-эффект */
+}
+
+.vrs-input:focus {
+    border-color: var(--color-primary-light); /* Стандартный focus-эффект */
+    box-shadow: 0 0 0 2px rgba(var(--rgb-primary), 0.25), var(--shadow-inset); /* Уменьшенная тень для фокуса в таблице */
+    background-color: var(--color-surface); /* Можно немного изменить фон при фокусе */
+}
+
+.vrs-input::placeholder {
+    color: var(--color-text-placeholder);
+    opacity: 0.7; /* Чуть менее заметный плейсхолдер */
+}
