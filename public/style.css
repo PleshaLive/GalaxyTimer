@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
+    /* Font variables remain the same */
     --font-family-base: 'Inter', sans-serif;
     --font-weight-light: 300;
     --font-weight-normal: 400;
@@ -8,133 +9,128 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-    --color-background: #0a0f18; /* Глубже темный */
-    --color-surface: #101622;    /* Чуть светлее для карточек */
-    --color-surface-secondary: #181f2c; /* Для вложенных элементов */
-    --color-surface-tertiary: #070a10; /* Очень темный для инпутов */
-    --color-border: #2a3140;
-    --color-border-light: #3c4455;
-    --color-divider: #222836;
+    /* Base Dark Theme - Inspired by the image's very dark background */
+    --color-background: #0A0A0F; /* Очень темный, почти черный */
+    --color-surface: #12141C;    /* Слегка светлее для карточек/поверхностей */
+    --color-surface-secondary: #1A1D2A; /* Для вложенных элементов */
+    --color-surface-tertiary: #07080D; /* Очень темный для инпутов, темнее основного фона */
+    --color-border: #282D3D;       /* Скорректирован для новых темных поверхностей */
+    --color-border-light: #383E50;  /* Скорректирован */
+    --color-divider: #202430;      /* Скорректирован */
 
-    --color-text-primary: #e0e7ff; /* Светлее для лучшего контраста */
-    --color-text-secondary: #a0aec0;
-    --color-text-muted: #718096;
-    --color-text-placeholder: #5a667a;
+    /* Text Colors - Bright for contrast on dark background */
+    --color-text-primary: #ECEFF4;   /* Ярче, почти белый */
+    --color-text-secondary: #A0AEC0; /* Оставлен текущий, хороший светло-серый */
+    --color-text-muted: #6C7A8F;     /* Скорректирован для нового фона */
+    --color-text-placeholder: #505A6B; /* Скорректирован */
 
-    --color-primary-base: #4f46e5; /* Яркий фиолетовый */
-    --color-primary-light: #6366f1;
-    --color-primary-dark: #4338ca;
-    --rgb-primary: 79, 70, 229;
-    --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
-    --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
+    /* Primary Accent - Используется яркий, почти белый, отражая выделяющийся текст на изображении */
+    --color-primary-base: #D8DEE9; /* Светлый серо-голубой, как яркий текст/UI элементы */
+    --color-primary-light: #E5E9F0;
+    --color-primary-dark: #C8CED9;
+    --rgb-primary: 216, 222, 233; /* Соответствует #D8DEE9 */
+    --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.4), 0 0 30px rgba(var(--rgb-primary), 0.2);
+    --text-shadow-primary: 0 0 8px rgba(var(--rgb-primary), 0.5);
+    --color-text-on-primary: #0A0A0F; /* Темный текст для контраста на этом светлом основном акценте */
 
-    --color-secondary-base: #0ea5e9; /* Яркий голубой */
-    --color-secondary-light: #38bdf8;
-    --color-secondary-dark: #0284c7;
-    --rgb-secondary: 14, 165, 233;
-    --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
-    --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
+    /* Secondary Accent - Приглушенный цвет, возможно, неяркий синий/бирюзовый из некоторых логотипов */
+    --color-secondary-base: #5E81AC; /* Спокойный синий (вдохновлен палитрой Nord) */
+    --color-secondary-light: #81A1C1;
+    --color-secondary-dark: #4C566A;
+    --rgb-secondary: 94, 129, 172; /* Соответствует #5E81AC */
+    --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.4), 0 0 30px rgba(var(--rgb-secondary), 0.2);
+    --text-shadow-secondary: 0 0 8px rgba(var(--rgb-secondary), 0.5);
+    --color-text-on-accent: #FFFFFF; /* Белый текст на этом вторичном цвете */
     
-    --color-success: #22c55e; /* Зеленый */
-    --color-success-dark: #16a34a;
-    --rgb-success: 34, 197, 94;
+    /* Semantic Colors (Success, Warning, Error) - Слегка приглушены */
+    --color-success: #A3BE8C; /* Мягкий зеленый */
+    --color-success-dark: #8FBCBB; 
+    --rgb-success: 163, 190, 140;
     --glow-success: 0 0 12px rgba(var(--rgb-success), 0.7), 0 0 24px rgba(var(--rgb-success), 0.4);
 
-    --color-warning: #f59e0b; /* Желтый/Оранжевый */
-    --color-warning-dark: #d97706;
-    --color-warning-text: #1f2937; /* Темный текст для желтого фона */
-    --rgb-warning: 245, 158, 11;
+    --color-warning: #EBCB8B; /* Мягкий желтый/оранжевый */
+    --color-warning-dark: #D08770; 
+    --color-warning-text: #2E3440; /* Темный текст для желтого/оранжевого фона */
+    --rgb-warning: 235, 203, 139;
     --glow-warning: 0 0 12px rgba(var(--rgb-warning), 0.7), 0 0 24px rgba(var(--rgb-warning), 0.4);
 
-    --color-error: #ef4444; /* Красный */
-    --color-error-dark: #dc2626;
-    --rgb-error: 239, 68, 68;
+    --color-error: #BF616A; /* Мягкий красный */
+    --color-error-dark: #B48EAD; 
+    --rgb-error: 191, 97, 106;
     --glow-error: 0 0 12px rgba(var(--rgb-error), 0.7), 0 0 24px rgba(var(--rgb-error), 0.4);
-    
-    --color-text-on-primary: #ffffff;
-    --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error) */
+     
+    /* Text on colored backgrounds - --color-text-on-primary и --color-text-on-accent определены выше */
 
     /* --- START: Status Specific Colors --- */
-    /* UPCOM Status Colors */
-    --color-status-upcom-bg: #4f46e5;
-    --color-status-upcom-text: #ffffff;
-    --color-status-upcom-border: #4f46e5;
-    --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5);
+    --color-status-upcom-bg: var(--color-secondary-dark); /* Используем темный вторичный для нейтральности */
+    --color-status-upcom-text: #ECEFF4;
+    --color-status-upcom-border: var(--color-secondary-dark);
+    --glow-status-upcom: 0 0 15px rgba(var(--rgb-secondary), 0.3);
 
-    /* LIVE Status Colors */
-    --color-status-live-bg: #f59e0b;
-    --color-status-live-text: #1f2937;
-    --color-status-live-border: #f59e0b;
-    --glow-status-live: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
+    --color-status-live-bg: var(--color-warning);
+    --color-status-live-text: var(--color-warning-text);
+    --color-status-live-border: var(--color-warning);
+    --glow-status-live: var(--glow-warning);
 
-    /* FINISHED Status Colors */
-    --color-status-finished-bg: #22c55e;
-    --color-status-finished-text: #ffffff;
-    --color-status-finished-border: #22c55e;
-    --glow-status-finished: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4);
+    --color-status-finished-bg: var(--color-success);
+    --color-status-finished-text: #2E3440; /* Темный текст для этого зеленого */
+    --color-status-finished-border: var(--color-success);
+    --glow-status-finished: var(--glow-success);
     /* --- END: Status Specific Colors --- */
 
     /* === MAP VETO TABLE SPECIFIC COLORS === */
-    /* Заголовки таблицы Map Veto */
-    --color-mapveto-th-text: var(--color-text-primary); /* Текст в th */
-    --color-mapveto-th-icon: var(--color-primary-light); /* Цвет иконок в th */
-    
-    /* Ячейки таблицы Map Veto */
-    --color-mapveto-td-text: var(--color-text-secondary); /* Основной текст в td (если не переопределен стилем селекта) */
+    --color-mapveto-th-text: var(--color-text-primary);
+    --color-mapveto-th-icon: var(--color-primary-light);
+    --color-mapveto-td-text: var(--color-text-secondary);
 
-    /* Действие BAN */
-    --color-veto-ban-bg: #582c2c;        /* Фон (исходный: --color-error) */
-    --color-veto-ban-text: #ffffff;       /* Текст (исходный: --color-text-on-accent) */
-    --color-veto-ban-border: #dc2626;     /* Рамка (исходный: --color-error-dark) */
-    --glow-veto-ban: 0 0 12px rgba(239, 68, 68, 0.7), 0 0 24px rgba(239, 68, 68, 0.4); /* Свечение (исходный: --glow-error) */
+    --color-veto-ban-bg: rgba(var(--rgb-error), 0.3); 
+    --color-veto-ban-text: var(--color-text-primary); 
+    --color-veto-ban-border: var(--color-error);
+    --glow-veto-ban: var(--glow-error);
 
-    /* Действие PICK */
-    --color-veto-pick-bg: #25722f;       /* Фон (исходный: --color-success) */
-    --color-veto-pick-text: #ffffff;      /* Текст (исходный: --color-text-on-primary) */
-    --color-veto-pick-border: #16a34a;    /* Рамка (исходный: --color-success-dark) */
-    --glow-veto-pick: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение (исходный: --glow-success) */
+    --color-veto-pick-bg: rgba(var(--rgb-success), 0.3);
+    --color-veto-pick-text: var(--color-text-primary);
+    --color-veto-pick-border: var(--color-success);
+    --glow-veto-pick: var(--glow-success);
 
-    /* Действие DECIDER (Нейтральный, но настраиваемый) */
-    --color-veto-decider-bg:  #646464; /* Фон */
-    --color-veto-decider-text:  #ffffff;   /* Текст */
-    --color-veto-decider-border:  #b8b8b8;  /* Рамка */
-    --glow-veto-decider: none;                               /* Свечение (по умолчанию нет) */
+    --color-veto-decider-bg:  #4C566A; /* Темный серо-синий */
+    --color-veto-decider-text:  var(--color-text-primary);
+    --color-veto-decider-border:  #60697A;
+    --glow-veto-decider: none; 
 
-    /* Сторона CT (Counter-Terrorists) */
-    --color-veto-side-ct-bg: #3182ce;     /* Синий фон */
-    --color-veto-side-ct-text: #ffffff;   /* Белый текст */
-    --color-veto-side-ct-border: #2c5282; /* Темно-синяя рамка */
+    --color-veto-side-ct-bg: #5E81AC; /* Спокойный синий */
+    --color-veto-side-ct-text: #ECEFF4;
+    --color-veto-side-ct-border: #4C566A; 
 
-    /* Сторона T (Terrorists) */
-    --color-veto-side-t-bg: #dd6b20;      /* Оранжевый фон */
-    --color-veto-side-t-text: #ffffff;    /* Белый текст */
-    --color-veto-side-t-border: #c05621;  /* Темно-оранжевая рамка */
+    --color-veto-side-t-bg: #D08770; /* Приглушенный оранжевый/терракотовый */
+    --color-veto-side-t-text: #ECEFF4;
+    --color-veto-side-t-border: #BF616A; 
     /* === END MAP VETO TABLE SPECIFIC COLORS === */
 
-    /* ВСТАВЬТЕ ЭТОТ БЛОК: */
-    /* === START: Team 1 Specific Colors === */
-    --team1-color-accent: #4f46e5; /* Основной акцентный цвет T1 */
-    --team1-color-rgb: 79, 70, 229; /* RGB для использования в rgba() */
-    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Фоновый оттенок T1 */
-    --team1-color-text-on-accent: #ffffff; /* Цвет текста на фоне T1 */
-    --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5); /* Свечение T1 */
-    --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8); /* Тень текста T1 */
+    /* === START: Team 1 Specific Colors (Пример: SINNERS Red с изображения) === */
+    --team1-color-accent: #D72C2C; /* SINNERS Red */
+    --team1-color-rgb: 215, 44, 44;
+    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15);
+    --team1-color-text-on-accent: #FFFFFF;
+    --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5);
+    --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8);
     /* === END: Team 1 Specific Colors === */
 
-    /* === START: Team 2 Specific Colors === */
-    --team2-color-accent: #bd7e2c; /* Основной акцентный цвет T2 */
-    --team2-color-rgb: 14, 165, 233; /* RGB для использования в rgba() */
-    --team2-color-bg: #503d24da; /* Фоновый оттенок T2 */
-    --team2-color-text-on-accent: #ffffff; /* Цвет текста на фоне T2 */
-    --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5); /* Свечение T2 */
-    --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8); /* Тень текста T2 */
+    /* === START: Team 2 Specific Colors (Пример: SASHI Teal с изображения) === */
+    --team2-color-accent: #2CACBE; /* SASHI Teal */
+    --team2-color-rgb: 44, 172, 190; /* Скорректированный RGB для SASHI Teal */
+    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Скорректированный BG для SASHI Teal */
+    --team2-color-text-on-accent: #FFFFFF;
+    --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5);
+    --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8);
     /* === END: Team 2 Specific Colors === */
 
-    --spacing-xs: 0.25rem;  /* 4px */
-    --spacing-sm: 0.5rem;   /* 8px */
-    --spacing-md: 1rem;     /* 16px */
-    --spacing-lg: 1.5rem;   /* 24px */
-    --spacing-xl: 2rem;     /* 32px */
+    /* Spacing, Border-radius, Shadows, Transitions - можно оставить без изменений или настроить */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
 
     --border-radius-sm: 6px;
     --border-radius-md: 8px;
@@ -142,12 +138,13 @@
     --border-radius-xl: 16px;
     --border-radius-round: 50%;
 
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
-    --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.35); 
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.45);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.55);
     --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.4);
-    --shadow-neumorphic: 5px 5px 10px #070a10, -5px -5px 10px #131824;
-    --shadow-neumorphic-inset: inset 3px 3px 6px #070a10, inset -3px -3px 6px #131824;
+    
+    --shadow-neumorphic: 5px 5px 10px #050508, -5px -5px 10px #0F0F16; /* Настроено для фона #0A0A0F */
+    --shadow-neumorphic-inset: inset 3px 3px 6px #050508, inset -3px -3px 6px #0F0F16; /* Настроено */
 
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-fast: all 0.15s ease-out;
