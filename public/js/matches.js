@@ -186,34 +186,35 @@ function initSelect2ForTeams() {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
 
-        // Определяем опции один раз
-        const select2Options = {
+        // Общие опции для Select2
+        const commonSelect2Options = {
             templateResult: formatTeamOption,
             templateSelection: formatTeamSelection,
             width: '100%',
             placeholder: "-",
-            allowClear: false, // <--- СТАЛО false (убирает крестик)
-            // dropdownParent: $('body') // Оставляем, если это решило проблему с обрезкой
-            // Если привязка к body не нужна, верните:
-            // dropdownParent: $(`#team1Select${m}`).parent() // или $(`#team2Select${m}`).parent() соответственно
+            allowClear: false, // Оставляем false (без крестика)
         };
 
+        // Инициализация для первого селекта
         if (sel1.length) {
-             // Передаем опции в оба вызова, возможно, корректируя dropdownParent
              sel1.select2({
-                 ...select2Options,
-                 dropdownParent: sel1.parent() // Пример: привязка к родителю sel1
+                 ...commonSelect2Options,
+                 // Возвращаем привязку dropdown к родительскому элементу (.team-block)
+                 dropdownParent: sel1.parent() // <-- ИЗМЕНЕНО ОБРАТНО
              });
         }
+
+        // Инициализация для второго селекта
         if (sel2.length) {
              sel2.select2({
-                 ...select2Options,
-                 dropdownParent: sel2.parent() // Пример: привязка к родителю sel2
+                 ...commonSelect2Options,
+                 // Возвращаем привязку dropdown к родительскому элементу (.team-block)
+                 dropdownParent: sel2.parent() // <-- ИЗМЕНЕНО ОБРАТНО
              });
         }
     }
-    // Обновляем лог, чтобы отразить изменение
-    console.log("[Matches] Select2 initialized for team selects (allowClear: false).");
+    // Обновляем лог
+    console.log("[Matches] Select2 initialized for team selects (allowClear: false, dropdownParent set to element's parent).");
 }
 
 /**
