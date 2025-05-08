@@ -186,28 +186,34 @@ function initSelect2ForTeams() {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
 
+        // Определяем опции один раз
+        const select2Options = {
+            templateResult: formatTeamOption,
+            templateSelection: formatTeamSelection,
+            width: '100%',
+            placeholder: "-",
+            allowClear: false, // <--- СТАЛО false (убирает крестик)
+            // dropdownParent: $('body') // Оставляем, если это решило проблему с обрезкой
+            // Если привязка к body не нужна, верните:
+            // dropdownParent: $(`#team1Select${m}`).parent() // или $(`#team2Select${m}`).parent() соответственно
+        };
+
         if (sel1.length) {
-            sel1.select2({
-                templateResult: formatTeamOption,
-                templateSelection: formatTeamSelection,
-                width: '100%', // или 'style' или 'resolve'
-                placeholder: "-", // Текст плейсхолдера
-                allowClear: true, // Позволяет очистить выбор
-                dropdownParent: sel1.parent() // Важно для корректного позиционирования в сложных макетах
-            });
+             // Передаем опции в оба вызова, возможно, корректируя dropdownParent
+             sel1.select2({
+                 ...select2Options,
+                 dropdownParent: sel1.parent() // Пример: привязка к родителю sel1
+             });
         }
         if (sel2.length) {
-            sel2.select2({
-                templateResult: formatTeamOption,
-                templateSelection: formatTeamSelection,
-                width: '100%',
-                placeholder: "-",
-                allowClear: true,
-                dropdownParent: sel2.parent()
-            });
+             sel2.select2({
+                 ...select2Options,
+                 dropdownParent: sel2.parent() // Пример: привязка к родителю sel2
+             });
         }
     }
-    console.log("[Matches] Select2 initialized for team selects.");
+    // Обновляем лог, чтобы отразить изменение
+    console.log("[Matches] Select2 initialized for team selects (allowClear: false).");
 }
 
 /**
