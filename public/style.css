@@ -1203,19 +1203,23 @@ label i {
 
 /* Dropdown */
 /* Dropdown */
+/* Dropdown */
 .select2-dropdown {
     background-color: var(--color-surface-secondary);
     border: 1px solid var(--color-border-light);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-md);
-    overflow: hidden;
-    z-index: 9999; /* Можно оставить высоким */
+    overflow: hidden; /* Оставляем для скругления углов */
 
-    /* Настройки ширины */
+    /* === УВЕЛИЧИВАЕМ Z-INDEX === */
+    z-index: 99999 !important; /* Очень высокое значение + !important для переопределения */
+    /* === КОНЕЦ ИЗМЕНЕНИЯ === */
+
+    /* Настройки ширины (оставляем) */
     width: auto;
-    min-width: 350px; /* Оставляем или корректируем по желанию */
+    min-width: 350px; /* Или ваше значение */
 
-    /* УДАЛЯЕМ ИЛИ КОММЕНТИРУЕМ СМЕЩЕНИЕ */
+    /* Убедитесь, что здесь нет ручного смещения */
     /* margin-left: -15px; */
 }
 /* Adjust border radius when dropdown opens below/above */
