@@ -1593,15 +1593,12 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
 }
 
 /* Styles for the Map Veto Team Display */
-.map-veto-team-display {
-    display: flex; /* Используем Flexbox для расположения элементов в ряд */
-    align-items: center; /* Вертикальное выравнивание по центру */
-    justify-content: space-between; /* Распределяем место между элементами */
-    gap: var(--spacing-md); /* Промежуток между элементами */
-    padding: var(--spacing-md) var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
-    background-color: var(--color-surface-secondary); /* Фон как у других элементов */
-    /* border и border-radius наследуются от .card-style */
+.map-veto-team-display-internal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+    /* padding: var(--spacing-md) var(--spacing-lg); /* Padding теперь от .card-style родителя или настройте здесь */
 }
 
 .map-veto-team-display .team-display {
@@ -1886,3 +1883,73 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
    корректно переопределять новые стили для .app-button.primary,
    когда эти состояния активны (что является ожидаемым поведением).
 */
+
+.map-veto-team-display-internal .team-display {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.map-veto-team-display-internal .team-display.team-1 {
+    justify-content: flex-end;
+    text-align: right;
+}
+.map-veto-team-display-internal .team-display.team-1 .team-display-name {
+    order: 1;
+    color: var(--team1-color-accent);
+}
+.map-veto-team-display-internal .team-display.team-1 .team-display-logo {
+    order: 2;
+}
+
+.map-veto-team-display-internal .team-display.team-2 {
+    justify-content: flex-start;
+    text-align: left;
+}
+.map-veto-team-display-internal .team-display.team-2 .team-display-name {
+    color: var(--team2-color-accent);
+}
+
+.map-veto-team-display-internal .team-display-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: var(--border-radius-sm);
+    background-color: rgba(255,255,255,0.05);
+    flex-shrink: 0;
+    border: 1px solid var(--color-border-light);
+}
+
+.map-veto-team-display-internal .team-display-name {
+    font-size: 1.2rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.map-veto-team-display-internal .vs-indicator {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+    .map-veto-team-display-internal { /* Адаптация для маленьких экранов */
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+    .map-veto-team-display-internal .team-display {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+    .map-veto-team-display-internal .team-display.team-1 .team-display-name,
+    .map-veto-team-display-internal .team-display.team-1 .team-display-logo {
+        order: initial; /* Сбрасываем порядок на маленьких экранах */
+    }
+}

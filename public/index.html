@@ -242,20 +242,21 @@
                     <div class="map-veto-block">
                         <div class="map-veto-content">
                             <h1 class="tab-title"><i class="fas fa-map-signs"></i> MAP VETO</h1>
-                            <div class="map-veto-header">
-                                <label for="matchSelect"><i class="fas fa-filter"></i> Матч для Veto:</label>
-                                <select id="matchSelect" class="control-select styled-select"></select>
-                            </div>
-
-                            <div id="mapVetoTeamDisplay" class="map-veto-team-display card-style">
-                                <div class="team-display team-1">
-                                    <span class="team-display-name" id="mapVetoTeam1Name">Команда 1</span>
-                                    <img src="/logos/none.png" alt="Team 1 Logo" class="team-display-logo" id="mapVetoTeam1Logo">
+                            <div id="mapVetoMatchAndTeamsHeader" class="card-style map-veto-combined-header">
+                                <div class="map-veto-header"> <label for="matchSelect"><i class="fas fa-filter"></i> Матч для Veto:</label>
+                                    <select id="matchSelect" class="control-select styled-select"></select>
                                 </div>
-                                <div class="vs-indicator">VS</div>
-                                <div class="team-display team-2">
-                                    <img src="/logos/none.png" alt="Team 2 Logo" class="team-display-logo" id="mapVetoTeam2Logo">
-                                    <span class="team-display-name" id="mapVetoTeam2Name">Команда 2</span>
+                
+                                <div id="mapVetoTeamDisplayInternal" class="map-veto-team-display-internal">
+                                    <div class="team-display team-1">
+                                        <span class="team-display-name" id="mapVetoTeam1Name">Команда 1</span>
+                                        <img src="/logos/none.png" alt="Team 1 Logo" class="team-display-logo" id="mapVetoTeam1Logo">
+                                    </div>
+                                    <div class="vs-indicator">VS</div>
+                                    <div class="team-display team-2">
+                                        <img src="/logos/none.png" alt="Team 2 Logo" class="team-display-logo" id="mapVetoTeam2Logo">
+                                        <span class="team-display-name" id="mapVetoTeam2Name">Команда 2</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="table-wrapper styled-scrollbar">
