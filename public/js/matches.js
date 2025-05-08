@@ -3,12 +3,12 @@
 // Флаг и промис для отслеживания завершения инициализации команд
 let teamsInitialized = false;
 let teamsInitializationPromise = null;
-const defaultLogoPath = "/logos/none.png"; // Глобальная константа для лого по умолчанию (WEB-ПУТЬ!)
+const defaultLogoPath = "/logos/none.png"; // Глобальный путь к логотипу по умолчанию (WEB-ПУТЬ!)
 
-// --- Select2 Template Functions ---
+// --- Функции-шаблоны для Select2 ---
 /**
  * Форматирует отображение опции команды в выпадающем списке Select2.
- * @param {Object} team - Данные команды из Select2 (содержит id, text, element).
+ * @param {Object} team - Данные команды из Select2.
  * @returns {jQuery|string} - jQuery объект или текст для отображения.
  */
 function formatTeamOption(team) {
@@ -17,10 +17,10 @@ function formatTeamOption(team) {
     }
     const logoUrl = team.element && team.element.dataset.logo ? team.element.dataset.logo : defaultLogoPath;
     const $container = $(
-        '<span class="select2-team-option">' +
-        '<img src="' + logoUrl + '" class="select2-team-logo" alt="' + team.text + ' logo" onerror="this.onerror=null; this.src=\'' + defaultLogoPath + '\';" />' +
-        '<span class="select2-team-name">' + team.text + '</span>' +
-        '</span>'
+        `<span class="select2-team-option">
+          <img src="${logoUrl}" class="select2-team-logo" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
+          <span class="select2-team-name">${team.text}</span>
+        </span>`
     );
     return $container;
 }
@@ -36,17 +36,17 @@ function formatTeamSelection(team) {
     }
     const logoUrl = team.element && team.element.dataset.logo ? team.element.dataset.logo : defaultLogoPath;
     const $container = $(
-        '<span class="select2-team-selection">' +
-        '<img src="' + logoUrl + '" class="select2-team-logo-selected" alt="' + team.text + ' logo" onerror="this.onerror=null; this.src=\'' + defaultLogoPath + '\';" />' +
-        '<span class="select2-team-name-selected">' + team.text + '</span>' +
-        '</span>'
+        `<span class="select2-team-selection">
+          <img src="${logoUrl}" class="select2-team-logo-selected" alt="${team.text} logo" onerror="this.onerror=null; this.src='${defaultLogoPath}';" />
+          <span class="select2-team-name-selected">${team.text}</span>
+        </span>`
     );
     return $container;
 }
 
 
 // ----------------------
-// Инициализация всего
+// Инициализация модуля матчей
 // ----------------------
 export async function initMatches() {
     if (teamsInitializationPromise) {
@@ -54,15 +54,14 @@ export async function initMatches() {
     }
 
     teamsInitializationPromise = new Promise(async (resolve, reject) => {
-        console.log("[Matches] Starting teams initialization from external API...");
+        console.log("[Matches] Starting teams initialization...");
         try {
-            const response = await fetch("https://waywayway-production.up.railway.app/api/teams");
+            const response = await fetch("https://waywayway-production.up.railway.app/api/teams"); // Используем внешний API для списка команд
             if (!response.ok) {
                 let errorText = `HTTP error! status: ${response.status}`;
                 try {
                     const errorData = await response.json();
-                    if (errorData && errorData.message) errorText += ` - ${errorData.message}`;
-                    else if (typeof errorData === 'string' && errorData.length > 0) errorText += ` - ${errorData.substring(0,100)}`;
+                    errorText += ` - ${errorData.message || JSON.stringify(errorData).substring(0,100)}`;
                 } catch (e) {
                     const textResponse = await response.text().catch(() => "");
                     if(textResponse) errorText += ` - Server response: ${textResponse.substring(0,100)}`;
@@ -73,42 +72,44 @@ export async function initMatches() {
             const teamsList = Array.isArray(data.teams) ? data.teams : (Array.isArray(data) ? data : []);
 
             if (teamsList.length === 0) {
-                console.warn("[Matches] Team list is empty or not received from the external API.");
+                console.warn("[Matches] Team list is empty or not received from the API.");
             }
 
             populateTeamSelects(teamsList);
             initSelect2ForTeams();
-            attachSelect2ChangeListeners(); 
-            attachWinnerButtons(); // Привязка обработчиков к кнопкам победителя
-            attachStatusChangeHandlers(); // Привязка обработчиков к селектам статуса
+            attachSelect2ChangeListeners();
+            attachWinnerButtons();
+            attachStatusChangeHandlers();
 
-            for (let m = 1; m <= 4; m++) {
-                updateTeamDisplay(m); 
-                refreshWinnerHighlight(m); // Первичная подсветка победителя
-                const statusSelectElement = document.getElementById("statusSelect" + m);
+            // Первичная настройка отображения для всех матчей
+            for (let m = 1; m <= 4; m++) { // Предполагаем до 4 матчей
+                updateTeamDisplay(m);
+                refreshWinnerHighlight(m);
+                const statusSelectElement = document.getElementById(`statusSelect${m}`);
                 if (statusSelectElement) {
-                    updateStatusColor(statusSelectElement); // Первичная установка цвета статуса
+                    updateStatusColor(statusSelectElement);
                 }
             }
-            
-            console.log("[Matches] Socket listener for 'teamsUpdate' is intentionally disabled.");
             teamsInitialized = true;
-            console.log("[Matches] Teams initialization completed.");
+            console.log("[Matches] Module initialized successfully.");
             resolve();
-
         } catch (err) {
-            console.error("[Matches] Error during initialization with external API:", err);
-            const errorDisplayElement = document.getElementById('teamsLoadingError');
+            console.error("[Matches] Critical error during initialization:", err);
+            const errorDisplayElement = document.getElementById('teamsLoadingError'); // Предполагается, что такой элемент есть в HTML
             if (errorDisplayElement) {
-                errorDisplayElement.textContent = `Ошибка загрузки команд: ${err.message}. Пожалуйста, проверьте консоль.`;
+                errorDisplayElement.textContent = `Ошибка загрузки списка команд: ${err.message}. Функционал матчей может быть ограничен.`;
                 errorDisplayElement.style.color = 'red';
             }
-            reject(err);
+            reject(err); // Отклоняем промис, чтобы внешние обработчики знали об ошибке
         }
     });
     return teamsInitializationPromise;
 }
 
+/**
+ * Возвращает true, если инициализация команд завершена.
+ * @returns {boolean}
+ */
 export function areTeamsInitialized() {
     return teamsInitialized;
 }
@@ -119,51 +120,55 @@ export function areTeamsInitialized() {
 export function populateTeamSelects(teamsList) {
     const defaultOption = document.createElement("option");
     defaultOption.value = "";
-    defaultOption.textContent = "-";
+    defaultOption.textContent = "-"; // Текст для плейсхолдера
     defaultOption.dataset.logo = defaultLogoPath;
 
-    const externalApiBaseUrl = "https://waywayway-production.up.railway.app";
+    const externalApiBaseUrl = "https://waywayway-production.up.railway.app"; // Базовый URL для относительных путей логотипов
 
-    for (let m = 1; m <= 4; m++) {
-        const sel1 = document.getElementById("team1Select" + m);
-        const sel2 = document.getElementById("team2Select" + m);
-        if (!sel1 || !sel2) continue;
+    for (let m = 1; m <= 4; m++) { // Предполагаем до 4 матчей
+        const team1Select = document.getElementById(`team1Select${m}`);
+        const team2Select = document.getElementById(`team2Select${m}`);
+        if (!team1Select || !team2Select) continue;
 
-        const currentVal1 = $(sel1).val();
-        const currentVal2 = $(sel2).val();
+        const currentVal1 = $(team1Select).val(); // Сохраняем текущее значение
+        const currentVal2 = $(team2Select).val();
 
-        if ($(sel1).data('select2')) $(sel1).select2('destroy').empty();
-        else $(sel1).empty();
-        if ($(sel2).data('select2')) $(sel2).select2('destroy').empty();
-        else $(sel2).empty();
+        // Уничтожаем Select2 перед очисткой, если он уже был инициализирован
+        if ($(team1Select).data('select2')) $(team1Select).select2('destroy');
+        if ($(team2Select).data('select2')) $(team2Select).select2('destroy');
         
-        sel1.appendChild(defaultOption.cloneNode(true));
-        sel2.appendChild(defaultOption.cloneNode(true));
+        team1Select.innerHTML = ''; // Очищаем старые опции
+        team2Select.innerHTML = '';
+        
+        team1Select.appendChild(defaultOption.cloneNode(true));
+        team2Select.appendChild(defaultOption.cloneNode(true));
 
         teamsList.forEach(team => {
-            if (!team.name) return;
-            const opt = document.createElement("option");
-            opt.value = team.name;
-            opt.textContent = team.name;
+            if (!team.name) return; // Пропускаем команды без имени
+            const option = document.createElement("option");
+            option.value = team.name;
+            option.textContent = team.name;
+
             let logoUrl = defaultLogoPath;
             if (team.logo) {
                 if (team.logo.startsWith('http://') || team.logo.startsWith('https://')) {
                     logoUrl = team.logo;
-                } else if (team.logo.startsWith('/')) {
+                } else if (team.logo.startsWith('/')) { // Если путь относительный от корня API
                     logoUrl = externalApiBaseUrl + team.logo;
-                } else {
+                } else { // Если просто имя файла
                     logoUrl = `${externalApiBaseUrl}/logos/${team.logo.replace(/\.png$/i, '')}.png`;
                 }
             }
-            opt.dataset.logo = logoUrl;
-            sel1.appendChild(opt.cloneNode(true));
-            sel2.appendChild(opt.cloneNode(true));
+            option.dataset.logo = logoUrl;
+            team1Select.appendChild(option.cloneNode(true));
+            team2Select.appendChild(option.cloneNode(true));
         });
 
-        $(sel1).val(currentVal1 || "").trigger('change.select2');
-        $(sel2).val(currentVal2 || "").trigger('change.select2');
+        // Восстанавливаем значения и триггерим событие для Select2
+        $(team1Select).val(currentVal1 || "").trigger('change.select2');
+        $(team2Select).val(currentVal2 || "").trigger('change.select2');
     }
-    console.log("[Matches] Team selects populated/repopulated.");
+    // console.log("[Matches] Team selects populated.");
 }
 
 /**
@@ -178,7 +183,7 @@ function initSelect2ForTeams() {
             templateSelection: formatTeamSelection,
             width: '100%',
             placeholder: "-",
-            allowClear: false,
+            allowClear: false, // Если нужен крестик для очистки, установите true и убедитесь, что есть пустая <option value="">
         };
         if (sel1.length) {
             sel1.select2({...commonSelect2Options, dropdownParent: sel1.parent() });
@@ -187,11 +192,11 @@ function initSelect2ForTeams() {
             sel2.select2({...commonSelect2Options, dropdownParent: sel2.parent() });
         }
     }
-    console.log("[Matches] Select2 initialized for team selects.");
+    // console.log("[Matches] Select2 initialized for team selects.");
 }
 
 /**
- * Привязывает обработчики 'change' к Select2 селектам команд.
+ * Привязывает обработчики 'change' к Select2 селектам команд для обновления UI.
  */
 function attachSelect2ChangeListeners() {
     for (let m = 1; m <= 4; m++) {
@@ -199,11 +204,14 @@ function attachSelect2ChangeListeners() {
         const sel2 = $(`#team2Select${m}`);
         const updateListener = () => {
             updateTeamDisplay(m);
+            // Обновление связанных элементов в других модулях (MapVeto, VRS)
             const currentVetoMatchIndex = document.getElementById("matchSelect")?.value;
             if (typeof window.updateVetoTeamOptions === 'function' && currentVetoMatchIndex && currentVetoMatchIndex == m) {
                 window.updateVetoTeamOptions(String(m));
             }
-            if (typeof window.updateVRSTeamNames === 'function') window.updateVRSTeamNames();
+            if (typeof window.updateVRSTeamNames === 'function') {
+                window.updateVRSTeamNames();
+            }
         };
         if (sel1.length) sel1.on("change.select2", updateListener);
         if (sel2.length) sel2.on("change.select2", updateListener);
@@ -211,32 +219,36 @@ function attachSelect2ChangeListeners() {
 }
 
 // ----------------------
-// Обновление отображения команды (логотип и текст кнопки)
+// Обновление отображения команды (логотип над селектом и текст на кнопке победителя)
 // ----------------------
 export function updateTeamDisplay(matchIndex) {
-    const sel1 = $(`#team1Select${matchIndex}`);
-    const sel2 = $(`#team2Select${matchIndex}`);
+    const team1Select = $(`#team1Select${matchIndex}`);
+    const team2Select = $(`#team2Select${matchIndex}`);
     const logo1Img = document.getElementById(`team1Logo${matchIndex}`);
     const logo2Img = document.getElementById(`team2Logo${matchIndex}`);
 
-    if (sel1.length) {
-        const selectedData1 = sel1.select2('data')[0];
-        const team1Name = selectedData1 && selectedData1.id ? selectedData1.text : "Team 1";
+    if (team1Select.length) {
+        const selectedData1 = team1Select.select2('data')[0];
+        const team1Name = selectedData1 && selectedData1.id ? selectedData1.text : "Team 1"; // Имя по умолчанию
         const logoUrl1 = selectedData1 && selectedData1.element && selectedData1.element.dataset.logo ? selectedData1.element.dataset.logo : defaultLogoPath;
-        const btn1 = document.querySelector(`.match-column[data-match="${matchIndex}"] .winner-btn[data-team="TEAM1"]`);
-        if (btn1) btn1.textContent = ` ${team1Name}`;
+        
+        const winnerBtn1 = document.querySelector(`.match-column[data-match="${matchIndex}"] .winner-btn[data-team="TEAM1"]`);
+        if (winnerBtn1) winnerBtn1.textContent = ` ${team1Name}`; // Обновляем текст на кнопке
+
         if (logo1Img) {
             if (logo1Img.getAttribute('src') !== logoUrl1) logo1Img.src = logoUrl1;
             logo1Img.onerror = () => { if (logo1Img.src !== defaultLogoPath) logo1Img.src = defaultLogoPath; };
         }
     }
 
-    if (sel2.length) {
-        const selectedData2 = sel2.select2('data')[0];
-        const team2Name = selectedData2 && selectedData2.id ? selectedData2.text : "Team 2";
+    if (team2Select.length) {
+        const selectedData2 = team2Select.select2('data')[0];
+        const team2Name = selectedData2 && selectedData2.id ? selectedData2.text : "Team 2"; // Имя по умолчанию
         const logoUrl2 = selectedData2 && selectedData2.element && selectedData2.element.dataset.logo ? selectedData2.element.dataset.logo : defaultLogoPath;
-        const btn2 = document.querySelector(`.match-column[data-match="${matchIndex}"] .winner-btn[data-team="TEAM2"]`);
-        if (btn2) btn2.textContent = ` ${team2Name}`;
+
+        const winnerBtn2 = document.querySelector(`.match-column[data-match="${matchIndex}"] .winner-btn[data-team="TEAM2"]`);
+        if (winnerBtn2) winnerBtn2.textContent = ` ${team2Name}`; // Обновляем текст на кнопке
+
         if (logo2Img) {
             if (logo2Img.getAttribute('src') !== logoUrl2) logo2Img.src = logoUrl2;
             logo2Img.onerror = () => { if (logo2Img.src !== defaultLogoPath) logo2Img.src = defaultLogoPath; };
@@ -245,8 +257,12 @@ export function updateTeamDisplay(matchIndex) {
 }
 
 // ----------------------
-// Кнопки Winner и подсветка
+// Кнопки Winner и их подсветка
 // ----------------------
+/**
+ * Привязывает обработчики кликов к кнопкам выбора победителя.
+ * Повторный клик по выбранному победителю снимает выбор.
+ */
 export function attachWinnerButtons() {
     // console.log("[Matches] Attaching winner button listeners (with deselection)...");
     const matchColumns = document.querySelectorAll('.match-column');
@@ -254,102 +270,132 @@ export function attachWinnerButtons() {
     matchColumns.forEach(matchColumn => {
         const matchIndex = matchColumn.dataset.match;
         if (!matchIndex) {
-            console.warn("[Matches] Match column found without 'data-match' attribute.", matchColumn);
+            // console.warn("[Matches] Match column found without 'data-match' attribute.", matchColumn);
             return;
         }
 
         const winnerBtns = matchColumn.querySelectorAll('.winner-btn');
         winnerBtns.forEach(btn => {
-            if (btn.dataset.listenerAttached === 'true') {
-                return; 
+            // Простая проверка, чтобы не навешивать слушатель многократно, если функция вызовется снова
+            if (btn.dataset.winnerListenerAttached === 'true') {
+                return;
             }
-            
-            const clickHandler = () => {
-                const selectedTeamKey = btn.dataset.team;
+            btn.dataset.winnerListenerAttached = 'true'; // Помечаем, что слушатель добавлен
+
+            btn.addEventListener('click', () => {
+                const selectedTeamKey = btn.dataset.team; // "TEAM1" or "TEAM2"
                 if (!selectedTeamKey) {
                     console.warn("[Matches] Winner button clicked without 'data-team' attribute.", btn);
                     return;
                 }
+
                 const currentWinnerKey = matchColumn.getAttribute('data-winner');
+
                 if (currentWinnerKey === selectedTeamKey) {
+                    // Кликнули по уже выбранному победителю - снимаем выбор
                     matchColumn.removeAttribute('data-winner');
                     // console.log(`[Matches] Winner ${selectedTeamKey} deselected for match ${matchIndex}`);
                 } else {
+                    // Выбираем нового победителя
                     matchColumn.setAttribute('data-winner', selectedTeamKey);
                     // console.log(`[Matches] Winner set to ${selectedTeamKey} for match ${matchIndex}`);
                 }
-                refreshWinnerHighlight(matchIndex);
-            };
-            
-            btn.addEventListener('click', clickHandler);
-            btn.dataset.listenerAttached = 'true';
+                refreshWinnerHighlight(matchIndex); // Обновляем подсветку в любом случае
+            });
         });
     });
 }
 
+/**
+ * Обновляет подсветку (класс 'winner-selected') кнопок победителя
+ * на основе атрибута 'data-winner' у родительской колонки матча.
+ * @param {string|number} matchIndex - Индекс матча (1-4).
+ */
 export function refreshWinnerHighlight(matchIndex) {
     const matchColumn = document.querySelector(`.match-column[data-match="${matchIndex}"]`);
-    if (!matchColumn) return;
+    if (!matchColumn) {
+        // console.warn(`[Matches] Match column ${matchIndex} not found for refreshing winner highlight.`);
+        return;
+    }
 
-    const winnerTeamKey = matchColumn.getAttribute("data-winner");
+    const winnerTeamKey = matchColumn.getAttribute("data-winner"); // Может быть "TEAM1", "TEAM2", или null
+
     const winnerBtn1 = matchColumn.querySelector('.winner-btn[data-team="TEAM1"]');
     const winnerBtn2 = matchColumn.querySelector('.winner-btn[data-team="TEAM2"]');
 
     if (winnerBtn1) {
+        // Метод toggle удобен: добавляет класс, если условие true, и удаляет, если false.
         winnerBtn1.classList.toggle('winner-selected', winnerTeamKey === "TEAM1");
     }
     if (winnerBtn2) {
         winnerBtn2.classList.toggle('winner-selected', winnerTeamKey === "TEAM2");
     }
+    // console.log(`[Matches] Winner highlight refreshed for match ${matchIndex}. Winner: ${winnerTeamKey || 'None'}`);
 }
 
 // ----------------------
-// Обработчики изменения статуса
+// Обработчики изменения статуса матча
 // ----------------------
 export function attachStatusChangeHandlers() {
     document.querySelectorAll('.status-select').forEach(select => {
-        if (select.dataset.statusListenerAttached === 'true') return;
+        if (select.dataset.statusListenerAttached === 'true') return; // Предотвращаем дублирование
         select.dataset.statusListenerAttached = 'true';
 
         select.addEventListener('change', function() {
-            updateStatusColor(this);
+            updateStatusColor(this); // Обновляем цвет самого селекта
             const matchColumn = this.closest('.match-column');
             if (matchColumn) {
                 const newStatus = this.value.toLowerCase();
+                // Удаляем все классы статусов и добавляем текущий
                 matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
-                if (newStatus) {
+                if (newStatus) { // Добавляем, только если статус не пустой
                     matchColumn.classList.add(`status-${newStatus}`);
                 }
             }
         });
-        updateStatusColor(select); // Инициализация цвета при загрузке
+        // Инициализация цвета и класса колонки при загрузке/перерисовке
+        updateStatusColor(select);
+        const matchColumnOnInit = select.closest('.match-column');
+        if (matchColumnOnInit) {
+            const currentStatus = select.value.toLowerCase();
+            matchColumnOnInit.classList.remove('status-upcom', 'status-live', 'status-finished');
+            if (currentStatus) {
+                 matchColumnOnInit.classList.add(`status-${currentStatus}`);
+            }
+        }
     });
+    // console.log("[Matches] Status change handlers attached.");
 }
 
+/**
+ * Обновляет цвет фона селекта статуса в зависимости от выбранного значения.
+ * @param {HTMLSelectElement} selectElement - Элемент select статуса.
+ */
 export function updateStatusColor(selectElement) {
     if (!selectElement) return;
+    // Удаляем все предыдущие классы цвета
     selectElement.classList.remove('status-upcom-selected', 'status-live-selected', 'status-finished-selected');
-    const status = selectElement.value;
-    if (status === 'UPCOM') selectElement.classList.add('status-upcom-selected');
-    else if (status === 'LIVE') selectElement.classList.add('status-live-selected');
-    else if (status === 'FINISHED') selectElement.classList.add('status-finished-selected');
+    const status = selectElement.value; // UPCOM, LIVE, FINISHED
+    if (status) { // Добавляем класс, только если статус выбран
+        selectElement.classList.add(`status-${status.toLowerCase()}-selected`);
+    }
 }
 
 // --------------------------------------------------
-// Сбор данных ОДНОГО матча
+// Сбор данных одного матча для отправки на сервер
 // --------------------------------------------------
 export function gatherSingleMatchData(matchIndex) {
     const m = matchIndex;
     const SCORE_REGEX = /^\d+:\d+$/;
     const column = document.querySelector(`.match-column[data-match="${m}"]`);
     if (!column) {
-        console.error(`Не удалось найти колонку для матча ${m} при сборе данных.`);
+        console.error(`[Matches] Не удалось найти колонку для матча ${m} при сборе данных.`);
         return null;
     }
 
-    const statusSelect = document.getElementById("statusSelect" + m);
+    const statusSelect = document.getElementById(`statusSelect${m}`);
     const statusText = statusSelect ? statusSelect.value.toUpperCase() : "";
-    const timeInput = document.getElementById("timeInput" + m);
+    const timeInput = document.getElementById(`timeInput${m}`);
     const timeVal = timeInput ? timeInput.value.trim() : "";
 
     const selTeam1 = $(`#team1Select${m}`);
@@ -369,80 +415,90 @@ export function gatherSingleMatchData(matchIndex) {
         maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
 
+    // Автозаполнение счета карт в зависимости от статуса
     if (statusText === "LIVE") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         const isScore1Numeric = SCORE_REGEX.test(s1);
         const isScore2Numeric = SCORE_REGEX.test(s2);
-        // const isScore3Numeric = SCORE_REGEX.test(s3); // Не используется в этой логике
-        if (isScore1Numeric && !isScore2Numeric) { maps.MAP2_SCORE = "NEXT"; maps.MAP3_SCORE = "DECIDER"; }
-        else if (isScore1Numeric && isScore2Numeric && !SCORE_REGEX.test(s3)) { maps.MAP3_SCORE = "NEXT"; }
+        if (isScore1Numeric && !isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) { // Если есть счет на 1-й, нет на 2-й и 3-й
+            maps.MAP2_SCORE = "NEXT";
+            if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "DECIDER"; // Только если 3-я карта выбрана
+            else maps.MAP3_SCORE = "";
+        } else if (isScore1Numeric && isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) { // Если есть счет на 1-й и 2-й, нет на 3-й
+            if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "NEXT"; // Только если 3-я карта выбрана
+             else maps.MAP3_SCORE = "";
+        }
     } else if (statusText === "FINISHED") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || !SCORE_REGEX.test(s3))) {
+        // Если 2 карты сыграны со счетом, а 3-я нет или не выбрана, она DECIDER (если она вообще должна была быть)
+        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && maps.MAP3 && maps.MAP3 !== "-" && (!s3 || !SCORE_REGEX.test(s3))) {
             maps.MAP3_SCORE = "DECIDER";
         }
     } else if (statusText === "UPCOM") {
-        if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
-        if (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE === "DECIDER") {
-            maps.MAP3_SCORE = `MATCH ${m}`;
+        if (!maps.MAP1_SCORE && maps.MAP1 && maps.MAP1 !== "-") maps.MAP1_SCORE = "NEXT";
+        if ((!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE === "DECIDER") && maps.MAP3 && maps.MAP3 !== "-") {
+            maps.MAP3_SCORE = `MATCH ${m}`; // Или просто "DECIDER", если не привязано к номеру матча
         }
     }
 
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
-    const noneIconPath = "/images/none_score_icon.png"; 
-    const mpLIconPath = "/images/mp_L.png";              
-    const mpRIconPath = "/images/mp_R.png";              
-    const mpNoneIconPath = "/images/mp_none.png";        
+    const noneIconPath = "/images/none_score_icon.png";
+    const mpLIconPath = "/images/mp_L.png";
+    const mpRIconPath = "/images/mp_R.png";
+    const mpNoneIconPath = "/images/mp_none.png";
 
     if (statusText === "UPCOM") { MP1_UPC = MP2_UPC = MP3_UPC = noneIconPath; }
-    else if (statusText === "LIVE") { 
-        MP1_LIVE = getScoreIcon(maps.MAP1_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
-        MP2_LIVE = getScoreIcon(maps.MAP2_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
-        MP3_LIVE = getScoreIcon(maps.MAP3_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
-    } else if (statusText === "FINISHED") { 
-        MP1_FIN = getScoreIcon(maps.MAP1_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
-        MP2_FIN = getScoreIcon(maps.MAP2_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
-        MP3_FIN = getScoreIcon(maps.MAP3_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath); 
+    else if (statusText === "LIVE") {
+        MP1_LIVE = getScoreIcon(maps.MAP1_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
+        MP2_LIVE = getScoreIcon(maps.MAP2_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
+        MP3_LIVE = getScoreIcon(maps.MAP3_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
+    } else if (statusText === "FINISHED") {
+        MP1_FIN = getScoreIcon(maps.MAP1_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
+        MP2_FIN = getScoreIcon(maps.MAP2_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
+        MP3_FIN = getScoreIcon(maps.MAP3_SCORE, mpLIconPath, mpRIconPath, mpNoneIconPath, noneIconPath);
     }
 
-    const winnerKey = column.getAttribute("data-winner") || "";
+    const winnerKey = column.getAttribute("data-winner") || ""; // Получаем победителя из UI
     let teamWinner = "";
     let teamWinnerLogo = defaultLogoPath;
     if (winnerKey === "TEAM1" && team1Name) { teamWinner = team1Name; teamWinnerLogo = team1Logo; }
     else if (winnerKey === "TEAM2" && team2Name) { teamWinner = team2Name; teamWinnerLogo = team2Logo; }
 
     let finCest = "", finResult = "", finVictory = "";
-    if (statusText === "FINISHED") { finCest = "cest"; finResult = "Result"; finVictory = "VICTORY"; }
+    if (statusText === "FINISHED" && teamWinner) { // Добавлено условие teamWinner для отображения этих полей
+        finCest = "cest"; finResult = "Result"; finVictory = "VICTORY";
+    }
 
-    const liveStatusValue = statusText === "LIVE" ? "/images/live_icon.png" : defaultLogoPath; 
-    const liveBgValue = statusText === "LIVE" ? "/images/LIVEBG.png" : defaultLogoPath; 
+
+    const liveStatusValue = statusText === "LIVE" ? "/images/live_icon.png" : defaultLogoPath;
+    const liveBgValue = statusText === "LIVE" ? "/images/LIVEBG.png" : defaultLogoPath;
     const liveVs = statusText === "LIVE" ? "vs" : "";
-    const liveCestValue = statusText === "LIVE" ? "/images/ongoing_icon.png" : defaultLogoPath; 
-    const liveRectUp = statusText === "LIVE" ? "/images/live_rectUp.png" : noneIconPath; 
-    const liveRectLow = statusText === "LIVE" ? "/images/live_rectLow.png" : noneIconPath; 
+    const liveCestValue = statusText === "LIVE" ? "/images/ongoing_icon.png" : defaultLogoPath;
+    const liveRectUp = statusText === "LIVE" ? "/images/live_rectUp.png" : noneIconPath;
+    const liveRectLow = statusText === "LIVE" ? "/images/live_rectLow.png" : noneIconPath;
     const upcomCestValue = statusText === "UPCOM" && timeVal ? "cest" : "";
-    const upcomRectUp = statusText === "UPCOM" ? "/images/rectUp.png" : defaultLogoPath; 
-    const upcomRectLow = statusText === "UPCOM" ? "/images/rectLow.png" : defaultLogoPath; 
+    const upcomRectUp = statusText === "UPCOM" ? "/images/rectUp.png" : defaultLogoPath;
+    const upcomRectLow = statusText === "UPCOM" ? "/images/rectLow.png" : defaultLogoPath;
     const upcomVsMiniValue = statusText === "UPCOM" ? "vs" : "";
     const upcomVsBigValue = statusText === "UPCOM" ? "vs" : "";
-    const upcomNextPhotoValue = statusText === "UPCOM" ? "/images/bg_next_upcom.png" : ""; 
-    const finRectUp = statusText === "FINISHED" ? "/images/fin_rectUp.png" : noneIconPath; 
-    const finRectLow = statusText === "FINISHED" ? "/images/fin_rectLow.png" : noneIconPath; 
+    const upcomNextPhotoValue = statusText === "UPCOM" ? "/images/bg_next_upcom.png" : "";
+    const finRectUp = statusText === "FINISHED" ? "/images/fin_rectUp.png" : noneIconPath;
+    const finRectLow = statusText === "FINISHED" ? "/images/fin_rectLow.png" : noneIconPath;
 
     const upcomObj = {
-        UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "", UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "",
+        UPCOM_MATCH_STATUS: statusText === "UPCOM" ? "UPCOM" : "", UPCOM_TIME: statusText === "UPCOM" && timeVal ? `${timeVal} CEST` : "",
         UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "", UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
         UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogoPath, UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogoPath,
         UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "", UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
         UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "", UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "",
         UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "", UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "",
         UPCOM_Cest: upcomCestValue, UPCOM_RectangleUP: upcomRectUp, UPCOM_RectangleLOW: upcomRectLow,
-        UPCOM_vs_mini: upcomVsMiniValue, UPCOM_vs_big: upcomVsBigValue, UPCOM_next: "", UPCOM_next_photo: upcomNextPhotoValue
+        UPCOM_vs_mini: upcomVsMiniValue, UPCOM_vs_big: upcomVsBigValue, UPCOM_next: statusText === "UPCOM" && maps.MAP1_SCORE === "NEXT" ? "NEXT" : "", UPCOM_next_photo: upcomNextPhotoValue
     };
     const liveObj = {
-        LIVE_MATCH_STATUS: statusText === "LIVE" ? statusText : "", LIVE_TIME: statusText === "LIVE" ? timeVal : "",
+        LIVE_MATCH_STATUS: statusText === "LIVE" ? "LIVE" : "", LIVE_TIME: statusText === "LIVE" ? timeVal : "",
         LIVE_TEAM1: statusText === "LIVE" ? team1Name : "", LIVE_TEAM2: statusText === "LIVE" ? team2Name : "",
         LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogoPath, LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogoPath,
         LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "", LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "",
@@ -452,7 +508,7 @@ export function gatherSingleMatchData(matchIndex) {
         LIVE_RectangleUP: liveRectUp, LIVE_RectangleLOW: liveRectLow
     };
     const finishedObj = {
-        FINISHED_MATCH_STATUS: statusText === "FINISHED" ? statusText : "", FINISHED_TIME: statusText === "FINISHED" ? (timeVal ? timeVal + " CEST" : "") : "",
+        FINISHED_MATCH_STATUS: statusText === "FINISHED" ? "FINISHED" : "", FINISHED_TIME: statusText === "FINISHED" && timeVal ? `${timeVal} CEST` : "",
         FINISHED_TEAM1: statusText === "FINISHED" ? team1Name : "", FINISHED_TEAM2: statusText === "FINISHED" ? team2Name : "",
         FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogoPath, FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogoPath,
         FINISHED_MAP1: statusText === "FINISHED" ? maps.MAP1 : "", FINISHED_MAP1_SCORE: statusText === "FINISHED" ? maps.MAP1_SCORE : "",
@@ -466,32 +522,41 @@ export function gatherSingleMatchData(matchIndex) {
         const sc = maps[`MAP${i}_SCORE`];
         const isNum = SCORE_REGEX.test(sc);
         const show = (statusText === "LIVE" || statusText === "FINISHED") && isNum;
-        perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogoPath;
-        perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogoPath;
+        perMapLogos[`MAP${i}_TEAM1logo`] = show && team1Name ? team1Logo : defaultLogoPath;
+        perMapLogos[`MAP${i}_TEAM2logo`] = show && team2Name ? team2Logo : defaultLogoPath;
     });
 
-    const matchLogos = {};
-    const showFinishedLogos = statusText === "FINISHED";
-    const showLiveLogos = statusText === "LIVE";
-    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogoPath;
-    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogoPath;
-    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogoPath;
-    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogoPath;
-    
+    const matchLogos = {}; // Логотипы для конкретных матчей, если нужны (например, FINISHED_TEAM1_LOGO_MATCH1)
+    if (statusText === "FINISHED") {
+        matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = team1Logo;
+        matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = team2Logo;
+    } else {
+        matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = defaultLogoPath;
+        matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = defaultLogoPath;
+    }
+    if (statusText === "LIVE") {
+        matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = team1Logo;
+        matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = team2Logo;
+    } else {
+        matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = defaultLogoPath;
+        matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = defaultLogoPath;
+    }
+
     const matchObj = {
         ...upcomObj, ...liveObj, ...finishedObj,
         MP1_UPC, MP2_UPC, MP3_UPC,
         MP1_LIVE, MP2_LIVE, MP3_LIVE,
         MP1_FIN, MP2_FIN, MP3_FIN,
         Fin_cest: finCest, FIN_Result: finResult, FIN_VICTORY: finVictory,
-        TEAMWINNER: teamWinner, TEAMWINNER_LOGO: teamWinnerLogo,
+        TEAMWINNER: teamWinner, // Из UI (data-winner)
+        TEAMWINNER_LOGO: teamWinnerLogo, // Из UI (data-winner)
         ...matchLogos, ...perMapLogos
     };
     return matchObj;
 }
 
 // ----------------------
-// Помощник для иконок счета
+// Помощник для иконок счета карты (L/R/None)
 // ----------------------
 function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
     if (!scoreStr || typeof scoreStr !== 'string') return nonePath;
@@ -499,11 +564,12 @@ function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
     if (parts.length === 2) {
         const score1 = parseInt(parts[0], 10);
         const score2 = parseInt(parts[1], 10);
-        if (!isNaN(score1) && !isNaN(score2)) {
-            if (score1 > score2) return lPath;
-            if (score2 > score1) return rPath;
-            return mpNonePath;
+        if (!isNaN(score1) && !isNaN(score2)) { // Если это числовой счет
+            if (score1 > score2) return lPath;  // Команда 1 выиграла
+            if (score2 > score1) return rPath;  // Команда 2 выиграла
+            return mpNonePath; // Ничья или счет 0:0
         }
     }
+    // Если не числовой счет (например, "NEXT", "DECIDER", пустая строка)
     return nonePath;
 }
