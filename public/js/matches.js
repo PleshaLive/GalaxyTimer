@@ -399,11 +399,38 @@ export function gatherSingleMatchData(matchIndex) {
     }
 
     // --- НАЧАЛО ИЗМЕНЕНИЙ ---
-    const localBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; // Ваш базовый локальный путь
-    const toLocal = (fileName) => `${localBasePath}\\\\${fileName}`;
+    // Базовый путь Windows (в JS-строке обратные слеши должны быть экранированы)
+    const windowsBasePath = "C:\\\\projects\\\\NewTimer\\\\files"; // Укажите ваш корректный базовый путь
 
-    // Локальные пути для иконок, которые не являются логотипами
-    const localNoneIconPath = toLocal("none.png");
+    // Обновленная функция toLocal для генерации file:/// URI
+    const toLocal = (fileName) => {
+        // 1. Нормализуем базовый путь: заменяем двойные экранированные слеши (\\) на одиночные прямые (/)
+        let normalizedBasePath = windowsBasePath.replace(/\\\\/g, '/');
+
+        // 2. Нормализуем имя файла: заменяем возможные обратные слеши на прямые
+        const normalizedFileName = fileName.replace(/\\/g, '/');
+
+        // 3. Убедимся, что между путем и файлом один слеш
+        if (normalizedBasePath.endsWith('/')) {
+            normalizedBasePath = normalizedBasePath.slice(0, -1); // Убираем слеш в конце, если есть
+        }
+        
+        let cleanFileName = normalizedFileName;
+        if (cleanFileName.startsWith('/')) {
+            cleanFileName = cleanFileName.slice(1); // Убираем слеш в начале имени файла, если есть
+        }
+        
+        // 4. Формируем полный путь для URI
+        const fullPathForURI = `${normalizedBasePath}/${cleanFileName}`; // Например, "C:/projects/NewTimer/files/LIVEBG.png"
+
+        // 5. Возвращаем в формате file URI
+        return `file:///${fullPathForURI}`;
+    };
+
+    // Локальные пути для иконок, которые не являются логотипами, теперь в формате file:///
+    // Убедитесь, что имена файлов ("none_score_icon.png", "mp_L.png", и т.д.)
+    // соответствуют реальным именам файлов в вашей папке.
+    const localNoneIconPath = toLocal("none_score_icon.png"); // Используйте "none.png", если ваш файл так называется
     const localMpLIconPath = toLocal("mp_L.png");
     const localMpRIconPath = toLocal("mp_R.png");
     const localMpNoneIconPath = toLocal("mp_none.png");
@@ -432,42 +459,39 @@ export function gatherSingleMatchData(matchIndex) {
         maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
 
+    // ... (логика автозаполнения счета остается без изменений) ...
     if (statusText === "LIVE") {
-        // ... (логика автозаполнения счета остается без изменений)
-         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-         const isScore1Numeric = SCORE_REGEX.test(s1);
-         const isScore2Numeric = SCORE_REGEX.test(s2);
-         if (isScore1Numeric && !isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) {
-             maps.MAP2_SCORE = "NEXT";
-             if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "DECIDER";
-             else maps.MAP3_SCORE = "";
-         } else if (isScore1Numeric && isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) {
-             if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "NEXT";
-              else maps.MAP3_SCORE = "";
-         }
+        const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
+        const isScore1Numeric = SCORE_REGEX.test(s1);
+        const isScore2Numeric = SCORE_REGEX.test(s2);
+        if (isScore1Numeric && !isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) {
+            maps.MAP2_SCORE = "NEXT";
+            if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "DECIDER";
+            else maps.MAP3_SCORE = "";
+        } else if (isScore1Numeric && isScore2Numeric && (!s3 || !SCORE_REGEX.test(s3))) {
+            if (maps.MAP3 && maps.MAP3 !== "-") maps.MAP3_SCORE = "NEXT";
+            else maps.MAP3_SCORE = "";
+        }
     } else if (statusText === "FINISHED") {
-        // ... (логика автозаполнения счета остается без изменений)
-         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-         if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && maps.MAP3 && maps.MAP3 !== "-" && (!s3 || !SCORE_REGEX.test(s3))) {
-             maps.MAP3_SCORE = "DECIDER";
-         }
+        const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
+        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && maps.MAP3 && maps.MAP3 !== "-" && (!s3 || !SCORE_REGEX.test(s3))) {
+            maps.MAP3_SCORE = "DECIDER";
+        }
     } else if (statusText === "UPCOM") {
-        // ... (логика автозаполнения счета остается без изменений)
-         if (!maps.MAP1_SCORE && maps.MAP1 && maps.MAP1 !== "-") maps.MAP1_SCORE = "NEXT";
-         if ((!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE === "DECIDER") && maps.MAP3 && maps.MAP3 !== "-") {
-             maps.MAP3_SCORE = `MATCH ${m}`;
-         }
+        if (!maps.MAP1_SCORE && maps.MAP1 && maps.MAP1 !== "-") maps.MAP1_SCORE = "NEXT";
+        if ((!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE === "DECIDER") && maps.MAP3 && maps.MAP3 !== "-") {
+            maps.MAP3_SCORE = `MATCH ${m}`;
+        }
     }
+
 
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
 
-    // --- НАЧАЛО ИЗМЕНЕНИЙ ДЛЯ MP* ---
     if (statusText === "UPCOM") { MP1_UPC = MP2_UPC = MP3_UPC = localNoneIconPath; }
     else if (statusText === "LIVE") { MP1_LIVE = getScoreIcon(maps.MAP1_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); MP2_LIVE = getScoreIcon(maps.MAP2_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); MP3_LIVE = getScoreIcon(maps.MAP3_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); }
     else if (statusText === "FINISHED") { MP1_FIN = getScoreIcon(maps.MAP1_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); MP2_FIN = getScoreIcon(maps.MAP2_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); MP3_FIN = getScoreIcon(maps.MAP3_SCORE, localMpLIconPath, localMpRIconPath, localMpNoneIconPath, localNoneIconPath); }
-    // --- КОНЕЦ ИЗМЕНЕНИЙ ДЛЯ MP* ---
 
     const winnerKey = column.getAttribute("data-winner") || "";
     let teamWinner = "";
@@ -480,30 +504,24 @@ export function gatherSingleMatchData(matchIndex) {
         finCest = "cest"; finResult = "Result"; finVictory = "VICTORY";
     }
 
-    // --- НАЧАЛО ИЗМЕНЕНИЙ ДЛЯ ПУТЕЙ К ИЗОБРАЖЕНИЯМ ---
-    // defaultLogoPath (URL) используется как заглушка для некоторых полей, если они связаны с логотипами или если так было в оригинальной логике
-    // localNoneIconPath используется как локальная заглушка для не-логотипных изображений
-
-    const liveStatusValue = statusText === "LIVE" ? toLocal("live_icon.png") : defaultLogoPath; // Если не LIVE, будет URL-лого заглушка
-    const liveBgValue = statusText === "LIVE" ? toLocal("LIVEBG.png") : defaultLogoPath;       // Если не LIVE, будет URL-лого заглушка
+    // --- ПУТИ К ИЗОБРАЖЕНИЯМ С ИСПОЛЬЗОВАНИЕМ НОВОГО toLocal ---
+    const liveStatusValue = statusText === "LIVE" ? toLocal("live_icon.png") : defaultLogoPath;
+    const liveBgValue = statusText === "LIVE" ? toLocal("LIVEBG.png") : defaultLogoPath;
     const liveVs = statusText === "LIVE" ? "vs" : "";
-    const liveCestValue = statusText === "LIVE" ? toLocal("ongoing_icon.png") : defaultLogoPath; // Если не LIVE, будет URL-лого заглушка
+    const liveCestValue = statusText === "LIVE" ? toLocal("ongoing_icon.png") : defaultLogoPath;
     const liveRectUp = statusText === "LIVE" ? toLocal("live_rectUp.png") : localNoneIconPath;
     const liveRectLow = statusText === "LIVE" ? toLocal("live_rectLow.png") : localNoneIconPath;
 
     const upcomCestValue = statusText === "UPCOM" && timeVal ? "cest" : "";
-    // Для полей UPCOM_* , если статус не UPCOM, они могут получать URL-заглушку (defaultLogoPath),
-    // так как они специфичны для секции UPCOM и в других состояниях могут не отображаться или показывать лого-заглушку.
-    // Это соответствует вашему JSON-примеру, где неактивные секции часто содержат defaultLogoPath.
     const upcomRectUp = statusText === "UPCOM" ? toLocal("rectUp.png") : defaultLogoPath;
     const upcomRectLow = statusText === "UPCOM" ? toLocal("rectLow.png") : defaultLogoPath;
     const upcomVsMiniValue = statusText === "UPCOM" ? "vs" : "";
     const upcomVsBigValue = statusText === "UPCOM" ? "vs" : "";
-    const upcomNextPhotoValue = statusText === "UPCOM" ? toLocal("bg_next_upcom.png") : ""; // Пустая строка если не UPCOM
+    const upcomNextPhotoValue = statusText === "UPCOM" ? toLocal("bg_next_upcom.png") : "";
 
     const finRectUp = statusText === "FINISHED" ? toLocal("fin_rectUp.png") : localNoneIconPath;
     const finRectLow = statusText === "FINISHED" ? toLocal("fin_rectLow.png") : localNoneIconPath;
-    // --- КОНЕЦ ИЗМЕНЕНИЙ ДЛЯ ПУТЕЙ К ИЗОБРАЖЕНИЯМ ---
+    // --- КОНЕЦ ИЗМЕНЕНИЙ ПУТЕЙ ---
 
     const upcomObj = { UPCOM_MATCH_STATUS: statusText === "UPCOM" ? "UPCOM" : "", UPCOM_TIME: statusText === "UPCOM" && timeVal ? `${timeVal} CEST` : "", UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "", UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "", UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogoPath, UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogoPath, UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "", UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "", UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "", UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "", UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "", UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "", UPCOM_Cest: upcomCestValue, UPCOM_RectangleUP: upcomRectUp, UPCOM_RectangleLOW: upcomRectLow, UPCOM_vs_mini: upcomVsMiniValue, UPCOM_vs_big: upcomVsBigValue, UPCOM_next: statusText === "UPCOM" && maps.MAP1_SCORE === "NEXT" ? "NEXT" : "", UPCOM_next_photo: upcomNextPhotoValue };
     const liveObj = { LIVE_MATCH_STATUS: statusText === "LIVE" ? "LIVE" : "", LIVE_TIME: statusText === "LIVE" ? timeVal : "", LIVE_TEAM1: statusText === "LIVE" ? team1Name : "", LIVE_TEAM2: statusText === "LIVE" ? team2Name : "", LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogoPath, LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogoPath, LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "", LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "", LIVE_MAP2: statusText === "LIVE" ? maps.MAP2 : "", LIVE_MAP2_SCORE: statusText === "LIVE" ? maps.MAP2_SCORE : "", LIVE_MAP3: statusText === "LIVE" ? maps.MAP3 : "", LIVE_MAP3_SCORE: statusText === "LIVE" ? maps.MAP3_SCORE : "", LIVE_Cest: liveCestValue, LIVE_VS: liveVs, LIVE_STATUS: liveStatusValue, LIVE_BG: liveBgValue, LIVE_RectangleUP: liveRectUp, LIVE_RectangleLOW: liveRectLow };
