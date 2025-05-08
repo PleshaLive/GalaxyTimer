@@ -536,12 +536,16 @@ label i {
 .match-column {
     background-color: var(--color-surface-secondary);
     border-radius: var(--border-radius-lg);
-    overflow: hidden;
+    /* overflow: hidden; */ /* <--- ЗАКОММЕНТИРОВАНО ИЛИ УДАЛЕНО */
     display: flex;
     flex-direction: column;
     border: 1px solid var(--color-border);
     transition: var(--transition-base);
     box-shadow: var(--shadow-sm);
+    /* Примечание: Если после удаления overflow возникнут другие проблемы с макетом,
+       возможно, понадобится добавить position: relative; этому элементу,
+       но сначала попробуйте просто убрать overflow. */
+    /* position: relative; */
 }
 .match-column:hover {
     transform: translateY(-5px);
