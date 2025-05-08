@@ -1204,6 +1204,11 @@ label i {
     box-shadow: var(--shadow-md);
     overflow: hidden; /* Ensure rounded corners apply to content */
     z-index: 1051; /* Ensure dropdown is above other content if needed */
+    /* Добавьте или измените следующие строки: */
+    width: auto; /* Позволяет ширине подстраиваться под контент */
+    min-width: 350px; /* Задайте минимальную ширину (подберите значение) */
+    /* Или можно задать фиксированную ширину: */
+    /* width: 400px !important; */ /* Используйте !important, если нужно переопределить */
 }
 /* Adjust border radius when dropdown opens below/above */
 .select2-container--default.select2-container--open .select2-dropdown--below {
