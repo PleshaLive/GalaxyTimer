@@ -1339,8 +1339,8 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 .select2-team-name, .select2-team-name-selected {
     white-space: nowrap;
-    overflow: hidden !important; /* Усилено !important */
-    text-overflow: ellipsis !important; /* Усилено !important */
+    overflow: hidden
+    text-overflow: ellipsis 
     flex-grow: 1;
     min-width: 0; /* Добавлено ранее */
     vertical-align: middle;
