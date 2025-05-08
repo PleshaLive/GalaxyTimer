@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-    /* Font variables remain the same */
     --font-family-base: 'Inter', sans-serif;
     --font-weight-light: 300;
     --font-weight-normal: 400;
@@ -9,123 +8,125 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-    /* Base Dark Theme - Inspired by the image's very dark background */
-    --color-background: #0A0A0F; /* Очень темный, почти черный */
-    --color-surface: #12141C;    /* Слегка светлее для карточек/поверхностей */
-    --color-surface-secondary: #1A1D2A; /* Для вложенных элементов */
-    --color-surface-tertiary: #07080D; /* Очень темный для инпутов, темнее основного фона */
-    --color-border: #282D3D;       /* Скорректирован для новых темных поверхностей */
-    --color-border-light: #383E50;  /* Скорректирован */
-    --color-divider: #202430;      /* Скорректирован */
+    /* Основные цвета темы (предоставлены пользователем) */
+    --color-background: #0E0A1C;
+    --color-surface: #151127;
+    --color-surface-secondary: #221C3B;
+    --color-surface-tertiary: #151127; /* Фон для инпутов, совпадает с --color-surface */
+    --color-border: #3B325C; /* Немного светлее и насыщеннее, чем surface-secondary */
+    --color-border-light: #50467A;
+    --color-divider: #1D1733; /* Для тонких разделителей */
 
-    /* Text Colors - Bright for contrast on dark background */
-    --color-text-primary: #ECEFF4;   /* Ярче, почти белый */
-    --color-text-secondary: #A0AEC0; /* Оставлен текущий, хороший светло-серый */
-    --color-text-muted: #6C7A8F;     /* Скорректирован для нового фона */
-    --color-text-placeholder: #505A6B; /* Скорректирован */
+    /* Текстовые цвета */
+    --color-text-primary: #F0F2F5; /* Очень светлый для контраста */
+    --color-text-secondary: #B0B8C5; /* Светло-серый */
+    --color-text-muted: #808A9A;    /* Средне-серый */
+    --color-text-placeholder: #606A7A; /* Для плейсхолдеров */
 
-    /* Primary Accent - Используется яркий, почти белый, отражая выделяющийся текст на изображении */
-    --color-primary-base: #D8DEE9; /* Светлый серо-голубой, как яркий текст/UI элементы */
-    --color-primary-light: #E5E9F0;
-    --color-primary-dark: #C8CED9;
-    --rgb-primary: 216, 222, 233; /* Соответствует #D8DEE9 */
-    --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.4), 0 0 30px rgba(var(--rgb-primary), 0.2);
-    --text-shadow-primary: 0 0 8px rgba(var(--rgb-primary), 0.5);
-    --color-text-on-primary: #0A0A0F; /* Темный текст для контраста на этом светлом основном акценте */
+    /* Основной акцент (используем #7A64B9 от Team1 как общий) */
+    --color-primary-base: #7A64B9;
+    --color-primary-light: #9370DB; /* Чуть светлее */
+    --color-primary-dark: #6A5ACD;  /* Чуть темнее */
+    --rgb-primary: 122, 100, 185;
+    --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
+    --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
+    --color-text-on-primary: #FFFFFF; /* Белый текст на фиолетовом */
 
-    /* Secondary Accent - Приглушенный цвет, возможно, неяркий синий/бирюзовый из некоторых логотипов */
-    --color-secondary-base: #5E81AC; /* Спокойный синий (вдохновлен палитрой Nord) */
-    --color-secondary-light: #81A1C1;
-    --color-secondary-dark: #4C566A;
-    --rgb-secondary: 94, 129, 172; /* Соответствует #5E81AC */
-    --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.4), 0 0 30px rgba(var(--rgb-secondary), 0.2);
-    --text-shadow-secondary: 0 0 8px rgba(var(--rgb-secondary), 0.5);
-    --color-text-on-accent: #FFFFFF; /* Белый текст на этом вторичном цвете */
+    /* Вторичный акцент */
+    --color-secondary-base: #9D88D9; /* Светло-фиолетовый, гармонирует с основным */
+    --color-secondary-light: #B0A0E0;
+    --color-secondary-dark: #8A70C8;
+    --rgb-secondary: 157, 136, 217;
+    --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
+    --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
     
-    /* Semantic Colors (Success, Warning, Error) - Слегка приглушены */
-    --color-success: #A3BE8C; /* Мягкий зеленый */
-    --color-success-dark: #8FBCBB; 
-    --rgb-success: 163, 190, 140;
+    /* Семантические цвета (стандартные) */
+    --color-success: #22c55e;
+    --color-success-dark: #16a34a;
+    --rgb-success: 34, 197, 94;
     --glow-success: 0 0 12px rgba(var(--rgb-success), 0.7), 0 0 24px rgba(var(--rgb-success), 0.4);
 
-    --color-warning: #EBCB8B; /* Мягкий желтый/оранжевый */
-    --color-warning-dark: #D08770; 
-    --color-warning-text: #2E3440; /* Темный текст для желтого/оранжевого фона */
-    --rgb-warning: 235, 203, 139;
+    --color-warning: #f59e0b;
+    --color-warning-dark: #d97706;
+    --color-warning-text: #1f2937; /* Темный текст для желтого фона */
+    --rgb-warning: 245, 158, 11;
     --glow-warning: 0 0 12px rgba(var(--rgb-warning), 0.7), 0 0 24px rgba(var(--rgb-warning), 0.4);
 
-    --color-error: #BF616A; /* Мягкий красный */
-    --color-error-dark: #B48EAD; 
-    --rgb-error: 191, 97, 106;
+    --color-error: #ef4444;
+    --color-error-dark: #dc2626;
+    --rgb-error: 239, 68, 68;
     --glow-error: 0 0 12px rgba(var(--rgb-error), 0.7), 0 0 24px rgba(var(--rgb-error), 0.4);
-     
-    /* Text on colored backgrounds - --color-text-on-primary и --color-text-on-accent определены выше */
+    
+    --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error, secondary) */
 
-    /* --- START: Status Specific Colors --- */
-    --color-status-upcom-bg: var(--color-secondary-dark); /* Используем темный вторичный для нейтральности */
-    --color-status-upcom-text: #ECEFF4;
-    --color-status-upcom-border: var(--color-secondary-dark);
-    --glow-status-upcom: 0 0 15px rgba(var(--rgb-secondary), 0.3);
+    /* --- Цвета статусов --- */
+    --color-status-upcom-bg: var(--color-primary-base); /* Используем основной акцент */
+    --color-status-upcom-text: var(--color-text-on-primary);
+    --color-status-upcom-border: var(--color-primary-dark);
+    --glow-status-upcom: var(--glow-primary);
 
     --color-status-live-bg: var(--color-warning);
     --color-status-live-text: var(--color-warning-text);
-    --color-status-live-border: var(--color-warning);
+    --color-status-live-border: var(--color-warning-dark);
     --glow-status-live: var(--glow-warning);
 
     --color-status-finished-bg: var(--color-success);
-    --color-status-finished-text: #2E3440; /* Темный текст для этого зеленого */
-    --color-status-finished-border: var(--color-success);
+    --color-status-finished-text: #ffffff;
+    --color-status-finished-border: var(--color-success-dark);
     --glow-status-finished: var(--glow-success);
     /* --- END: Status Specific Colors --- */
 
-    /* === MAP VETO TABLE SPECIFIC COLORS === */
+    /* === Цвета таблицы Map Veto === */
     --color-mapveto-th-text: var(--color-text-primary);
     --color-mapveto-th-icon: var(--color-primary-light);
     --color-mapveto-td-text: var(--color-text-secondary);
 
-    --color-veto-ban-bg: rgba(var(--rgb-error), 0.3); 
+    --color-veto-ban-bg: rgba(var(--rgb-error), 0.2); /* Полупрозрачный фон */
     --color-veto-ban-text: var(--color-text-primary); 
     --color-veto-ban-border: var(--color-error);
     --glow-veto-ban: var(--glow-error);
 
-    --color-veto-pick-bg: rgba(var(--rgb-success), 0.3);
+    --color-veto-pick-bg: rgba(var(--rgb-success), 0.2); /* Полупрозрачный фон */
     --color-veto-pick-text: var(--color-text-primary);
     --color-veto-pick-border: var(--color-success);
     --glow-veto-pick: var(--glow-success);
 
-    --color-veto-decider-bg:  #4C566A; /* Темный серо-синий */
+    --color-veto-decider-bg:  #4A4458; /* Нейтральный темно-серый с фиолетовым оттенком */
     --color-veto-decider-text:  var(--color-text-primary);
-    --color-veto-decider-border:  #60697A;
+    --color-veto-decider-border:  #605A70;
     --glow-veto-decider: none; 
 
-    --color-veto-side-ct-bg: #5E81AC; /* Спокойный синий */
-    --color-veto-side-ct-text: #ECEFF4;
-    --color-veto-side-ct-border: #4C566A; 
+    /* Сторона CT (предоставлено пользователем) */
+    --color-veto-side-ct-bg: #E3D9FF;
+    --color-veto-side-ct-text: #221C3B; /* Темный текст на светлом фоне */
+    --color-veto-side-ct-border: #B0A0E0; /* Темнее лавандовый для рамки */
 
-    --color-veto-side-t-bg: #D08770; /* Приглушенный оранжевый/терракотовый */
-    --color-veto-side-t-text: #ECEFF4;
-    --color-veto-side-t-border: #BF616A; 
+    /* Сторона T (предоставлено пользователем) */
+    --color-veto-side-t-bg: #DFC9AA;
+    --color-veto-side-t-text: #5A4F3F; /* Темный текст на светлом фоне */
+    --color-veto-side-t-border: #C8B08E; /* Темнее для рамки */
     /* === END MAP VETO TABLE SPECIFIC COLORS === */
 
-    /* === START: Team 1 Specific Colors (Пример: SINNERS Red с изображения) === */
-    --team1-color-accent: #D72C2C; /* SINNERS Red */
-    --team1-color-rgb: 215, 44, 44;
-    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15);
-    --team1-color-text-on-accent: #FFFFFF;
+    /* === Цвета Команды 1 (предоставлены пользователем) === */
+    --team1-color-accent: #C3ADFF; /* Светло-фиолетовый */
+    --team1-color-rgb: 195, 173, 255;
+    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
+    --team1-color-text-on-accent: #221C3B; /* Темный текст на светло-фиолетовом */
     --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5);
     --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8);
+    /* Второй цвет для Team1 #7A64B9 используется как --color-primary-base */
     /* === END: Team 1 Specific Colors === */
 
-    /* === START: Team 2 Specific Colors (Пример: SASHI Teal с изображения) === */
-    --team2-color-accent: #2CACBE; /* SASHI Teal */
-    --team2-color-rgb: 44, 172, 190; /* Скорректированный RGB для SASHI Teal */
-    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Скорректированный BG для SASHI Teal */
-    --team2-color-text-on-accent: #FFFFFF;
+    /* === Цвета Команды 2 (предоставлены пользователем) === */
+    --team2-color-accent: #EADAA5; /* Светло-бежево-золотой */
+    --team2-color-rgb: 234, 218, 165;
+    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
+    --team2-color-text-on-accent: #726952; /* Темный текст (второй цвет команды) на светло-золотом */
     --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5);
     --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8);
+    /* Второй цвет для Team2 #726952 можно использовать для --team2-color-darker-bg или границ при необходимости */
     /* === END: Team 2 Specific Colors === */
 
-    /* Spacing, Border-radius, Shadows, Transitions - можно оставить без изменений или настроить */
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
@@ -138,13 +139,13 @@
     --border-radius-xl: 16px;
     --border-radius-round: 50%;
 
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.35); 
-    --shadow-md: 0 5px 15px rgba(0,0,0,0.45);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.55);
-    --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.4);
-    
-    --shadow-neumorphic: 5px 5px 10px #050508, -5px -5px 10px #0F0F16; /* Настроено для фона #0A0A0F */
-    --shadow-neumorphic-inset: inset 3px 3px 6px #050508, inset -3px -3px 6px #0F0F16; /* Настроено */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4); /* Тени можно оставить или настроить */
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.5);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
+    --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.5);
+    /* Нейморфные тени, настроенные под фон #0E0A1C */
+    --shadow-neumorphic: 5px 5px 10px #080611, -5px -5px 10px #140E27; 
+    --shadow-neumorphic-inset: inset 3px 3px 6px #080611, inset -3px -3px 6px #140E27;
 
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-fast: all 0.15s ease-out;
