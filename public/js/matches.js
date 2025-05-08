@@ -22,6 +22,7 @@ const SCORE_ICONS_BASE_PATH_WINDOWS = "C:\\\\projects\\\\NewTimer\\\\files"; // 
  */
 function convertFullPathToForwardSlash(fullWindowsPath) {
     if (!fullWindowsPath || typeof fullWindowsPath !== 'string') return "";
+    // Заменяем двойные обратные слеши (экранированные в JS) на один прямой
     return fullWindowsPath.replace(/\\\\/g, '/');
 }
 
@@ -32,33 +33,45 @@ function convertFullPathToForwardSlash(fullWindowsPath) {
  * @returns {string} - Отформатированный путь "C:/base/path/file.png".
  */
 function formatPath(baseWindowsPath, filePathOrName) {
-    if (!baseWindowsPath || !filePathOrName) return "";
-
-    let combinedWindowsPath = baseWindowsPath;
-    // Нормализуем filePathOrName, чтобы он использовал \ и корректно соединялся
-    let normalizedRelativePath = filePathOrName.replace(/\//g, '\\\\');
-
-    if (!combinedWindowsPath.endsWith('\\\\')) {
-        combinedWindowsPath += '\\\\';
+    if (!baseWindowsPath || !filePathOrName) {
+         // Возвращаем пустую строку или возможно дефолтный путь, если аргументы некорректны
+         console.warn(`[formatPath] Invalid arguments received: basePath='${baseWindowsPath}', file='${filePathOrName}'`);
+         return ""; 
     }
-    if (normalizedRelativePath.startsWith('\\\\')) {
-        normalizedRelativePath = normalizedRelativePath.substring(2);
+
+    // Сначала конвертируем базовый путь в формат с прямыми слешами
+    let normalizedBase = convertFullPathToForwardSlash(baseWindowsPath); // C:\\path -> C:/path
+
+    // Нормализуем имя файла или относительный путь: заменяем \ на / и убираем / в начале
+    let normalizedFile = filePathOrName.replace(/\\/g, '/');
+    if (normalizedFile.startsWith('/')) {
+        normalizedFile = normalizedFile.substring(1);
     }
-    combinedWindowsPath += normalizedRelativePath;
-    
-    return convertFullPathToForwardSlash(combinedWindowsPath);
+     // Убедимся, что базовый путь не заканчивается на / перед добавлением имени файла
+    if (normalizedBase.endsWith('/')) {
+        normalizedBase = normalizedBase.slice(0, -1);
+    }
+
+    return `${normalizedBase}/${normalizedFile}`;
 }
 
-// Глобальная переменная для дефолтного локального логотипа в нужном формате
+// Глобальная переменная для дефолтного локального логотипа в нужном формате C:/...
 const DEFAULT_FORMATTED_LOGO_PATH = formatPath(DEFAULT_LOGO_BASE_PATH_WINDOWS, DEFAULT_LOGO_FILENAME);
 
 // ----------------------
 // Инициализация всего
 // ----------------------
 export async function initMatches() {
+    if (teamsInitializationPromise && teamsInitialized) { // Добавим проверку teamsInitialized
+        console.log("[Matches] Already initialized.");
+        return teamsInitializationPromise;
+    }
+    
+    // Если промис есть, но инициализация не завершена, ждем его
     if (teamsInitializationPromise) {
         return teamsInitializationPromise;
     }
+
     teamsInitializationPromise = new Promise(async (resolve, reject) => {
         console.log("[Matches] Starting teams initialization...");
         try {
@@ -97,6 +110,7 @@ export async function initMatches() {
 
             if (typeof io !== 'undefined') {
                 const socket = io();
+                socket.off('teamsUpdate'); // Удаляем старый обработчик перед добавлением нового
                 socket.on('teamsUpdate', (updatedTeams) => {
                     console.log('[SOCKET][Matches] Received teamsUpdate:', updatedTeams);
                     populateTeamSelects(Array.isArray(updatedTeams) ? updatedTeams : []);
@@ -108,7 +122,7 @@ export async function initMatches() {
             } else {
                 console.warn("[Matches] Socket.IO client not found. Real-time team updates on this page might not work.");
             }
-            teamsInitialized = true;
+            teamsInitialized = true; // Устанавливаем флаг после успешной инициализации
             console.log("[Matches] Teams initialization completed.");
             resolve();
         } catch (err) {
@@ -118,6 +132,8 @@ export async function initMatches() {
                 errorDisplayElement.textContent = `Ошибка загрузки команд: ${err.message}.`;
                 errorDisplayElement.style.color = 'red';
             }
+            teamsInitializationPromise = null; // Сбрасываем промис при ошибке, чтобы можно было попробовать снова
+            teamsInitialized = false;
             reject(err);
         }
     });
@@ -135,7 +151,7 @@ export function populateTeamSelects(teamsList) {
     const defaultOption = document.createElement("option");
     defaultOption.value = "";
     defaultOption.textContent = "-";
-    defaultOption.dataset.logo = DEFAULT_FORMATTED_LOGO_PATH;
+    defaultOption.dataset.logo = DEFAULT_FORMATTED_LOGO_PATH; // Уже в формате C:/...
 
     for (let m = 1; m <= 4; m++) {
         const sel1 = document.getElementById("team1Select" + m);
@@ -169,12 +185,13 @@ export function populateTeamSelects(teamsList) {
             } else {
                 logoPath = DEFAULT_FORMATTED_LOGO_PATH;
             }
-            opt.dataset.logo = logoPath;
+            opt.dataset.logo = logoPath; // Сохраняем путь в формате C:/...
             
             sel1.appendChild(opt.cloneNode(true));
             sel2.appendChild(opt.cloneNode(true));
         });
 
+        // Восстанавливаем значения, если они все еще существуют в списке
         if (sel1.querySelector(`option[value="${CSS.escape(currentVal1)}"]`)) {
             sel1.value = currentVal1;
         } else { sel1.value = ""; }
@@ -196,6 +213,7 @@ export function attachTeamLogoUpdates() {
         
         const updateHandler = () => updateWinnerButtonLabels(m);
         
+        // Удаляем старый обработчик перед добавлением нового для предотвращения дублирования
         if (sel1._updateHandlerRef) sel1.removeEventListener("change", sel1._updateHandlerRef);
         sel1.addEventListener("change", updateHandler);
         sel1._updateHandlerRef = updateHandler;
@@ -216,6 +234,7 @@ export function updateWinnerButtonLabels(matchIndex) {
     if (!matchColumn) return;
     const btn1 = matchColumn.querySelector('.winner-btn[data-team="TEAM1"]');
     const btn2 = matchColumn.querySelector('.winner-btn[data-team="TEAM2"]');
+    // Текст кнопок теперь соответствует вашему эталонному коду
     if (btn1) btn1.textContent = `Победитель: ${name1}`;
     if (btn2) btn2.textContent = `Победитель: ${name2}`;
 }
@@ -225,8 +244,10 @@ export function updateWinnerButtonLabels(matchIndex) {
 // ----------------------
 export function attachWinnerButtons() {
     document.querySelectorAll(".winner-btn").forEach(btn => {
+        // Предотвращаем повторное назначение слушателя
         if (btn.dataset.winnerListenerAttached === 'true') return;
         btn.dataset.winnerListenerAttached = 'true';
+
         btn.addEventListener("click", () => {
             const matchColumn = btn.closest(".match-column");
             if (!matchColumn) return;
@@ -267,33 +288,37 @@ export function attachStatusChangeHandlers() {
             if (matchColumn) {
                 matchColumn.classList.remove('status-upcom', 'status-live', 'status-finished');
                 if(this.value) matchColumn.classList.add(`status-${this.value.toLowerCase()}`);
-                const currentMatchIndex = matchColumn.dataset.match; // Используем matchIndex из data-атрибута
+                const currentMatchIndex = matchColumn.dataset.match; 
                 if (this.value === 'UPCOM') {
                     const mapRows = matchColumn.querySelectorAll('.map-row');
                     if (mapRows.length >= 3) { 
                         const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
-                        if (thirdMapScoreInput && !thirdMapScoreInput.value) {
+                        // Заполняем только если поле пусто или содержит старое автозаполнение
+                        if (thirdMapScoreInput && (!thirdMapScoreInput.value || thirdMapScoreInput.value.startsWith("MATCH "))) {
                             thirdMapScoreInput.value = `MATCH ${currentMatchIndex}`;
                             thirdMapScoreInput.placeholder = `MATCH ${currentMatchIndex}`;
                         }
                     }
-                } else {
+                } else { // Если статус не UPCOM
                     const mapRows = matchColumn.querySelectorAll('.map-row');
                     if (mapRows.length >= 3) {
                         const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
+                        // Очищаем, только если значение было автозаполнено для UPCOM
                         if (thirdMapScoreInput && thirdMapScoreInput.value === `MATCH ${currentMatchIndex}`) {
                             thirdMapScoreInput.value = "";
-                            thirdMapScoreInput.placeholder = "0:0"; 
+                            thirdMapScoreInput.placeholder = "0:0"; // Или другой дефолтный placeholder
                         }
                     }
                 }
             }
         };
+
+        // Удаляем старый обработчик перед добавлением нового
         if (sel.dataset.statusListenerAttached === 'true' && sel._eventHandlerRef) {
            sel.removeEventListener("change", sel._eventHandlerRef);
         }
         sel.addEventListener("change", eventHandler);
-        sel._eventHandlerRef = eventHandler; 
+        sel._eventHandlerRef = eventHandler; // Сохраняем ссылку на обработчик для возможного удаления
         sel.dataset.statusListenerAttached = 'true';
     }
 }
@@ -319,7 +344,7 @@ export function updateStatusColor(sel) {
 // --------------------------------------------------
 export function gatherSingleMatchData(matchIndex) {
     const m = matchIndex;
-    const defaultFormattedLogo = DEFAULT_FORMATTED_LOGO_PATH; 
+    const defaultFormattedLogo = DEFAULT_FORMATTED_LOGO_PATH; // Уже в формате C:/...
     const SCORE_REGEX = /^\d+:\d+$/;
 
     const column = document.querySelector(`.match-column[data-match="${m}"]`);
@@ -341,6 +366,7 @@ export function gatherSingleMatchData(matchIndex) {
 
     const getLogoFromSelect = (selectElement) => {
         if (selectElement && selectElement.selectedIndex >= 0 && selectElement.options[selectElement.selectedIndex]) {
+            // Предполагается, что dataset.logo уже в нужном формате "C:/..." после populateTeamSelects
             return selectElement.options[selectElement.selectedIndex].dataset.logo || defaultFormattedLogo;
         }
         return defaultFormattedLogo;
@@ -378,10 +404,11 @@ export function gatherSingleMatchData(matchIndex) {
         }
     } else if (statusText === "UPCOM") {
         if (!maps.MAP1_SCORE && maps.MAP1 && maps.MAP1 !== "-") maps.MAP1_SCORE = "NEXT";
+        // Автозаполнение для 3-й карты UPCOM, если она выбрана и счет не введен
         if (maps.MAP3 && maps.MAP3 !== "-" && 
             (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE === "DECIDER" || maps.MAP3_SCORE === "NEXT")) { 
             maps.MAP3_SCORE = `MATCH ${m}`;
-        } else if (!maps.MAP3 || maps.MAP3 === "-") {
+        } else if (!maps.MAP3 || maps.MAP3 === "-") { // Если карта не выбрана, очищаем счет
             maps.MAP3_SCORE = "";
         }
     }
@@ -390,7 +417,7 @@ export function gatherSingleMatchData(matchIndex) {
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
     
-    // Используем SCORE_ICONS_BASE_PATH_WINDOWS для getScoreIcon
+    // Формируем пути для иконок счета, используя SCORE_ICONS_BASE_PATH_WINDOWS
     if (statusText === "UPCOM") {
         MP1_UPC = MP2_UPC = MP3_UPC = formatPath(SCORE_ICONS_BASE_PATH_WINDOWS, "none_score_icon.png");
     } else if (statusText === "LIVE") {
@@ -408,19 +435,21 @@ export function gatherSingleMatchData(matchIndex) {
 
     const winnerKey = column.getAttribute("data-winner") || ""; 
     let teamWinner = "";
-    let teamWinnerLogo = defaultFormattedLogo;
+    let teamWinnerLogo = defaultFormattedLogo; // Используем дефолтное лого как заглушку
     if (statusText === "FINISHED" && winnerKey) {
         if (winnerKey === "TEAM1" && team1Name) { 
             teamWinner = team1Name;
-            teamWinnerLogo = team1Logo;
+            teamWinnerLogo = team1Logo; // team1Logo уже в формате C:/...
         } else if (winnerKey === "TEAM2" && team2Name) {
             teamWinner = team2Name;
-            teamWinnerLogo = team2Logo;
+            teamWinnerLogo = team2Logo; // team2Logo уже в формате C:/...
         }
     }
     
+    // Заглушка для изображений матчей (не логотипов)
     const defaultMatchImageNone = formatPath(MATCH_IMAGES_BASE_PATH_WINDOWS, "none_score_icon.png");
 
+    // Формируем пути к изображениям матчей в формате C:/...
     const liveStatusValue = statusText === "LIVE" ? formatPath(MATCH_IMAGES_BASE_PATH_WINDOWS, "live_icon.png") : defaultFormattedLogo;
     const liveBgValue = statusText === "LIVE" ? formatPath(MATCH_IMAGES_BASE_PATH_WINDOWS, "LIVEBG.png") : defaultFormattedLogo;
     const liveVs = statusText === "LIVE" ? "vs" : "";
@@ -438,6 +467,7 @@ export function gatherSingleMatchData(matchIndex) {
     const finRectUp = statusText === "FINISHED" ? formatPath(MATCH_IMAGES_BASE_PATH_WINDOWS, "fin_rectUp.png") : defaultMatchImageNone;
     const finRectLow = statusText === "FINISHED" ? formatPath(MATCH_IMAGES_BASE_PATH_WINDOWS, "fin_rectLow.png") : defaultMatchImageNone;
     
+    // Собираем объекты данных для каждого статуса
     const upcomObj = {
         UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "", UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "", UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "", UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "", UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultFormattedLogo, UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultFormattedLogo, UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "", UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "", UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "", UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "", UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "", UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "", UPCOM_Cest: upcomCestValue, UPCOM_RectangleUP: upcomRectUp, UPCOM_RectangleLOW: upcomRectLow, UPCOM_vs_mini: upcomVsMiniValue, UPCOM_vs_big: upcomVsBigValue, UPCOM_next: (statusText === "UPCOM" && maps.MAP1_SCORE === "NEXT") ? "NEXT" : "", UPCOM_next_photo: upcomNextPhotoValue
     };
@@ -448,6 +478,7 @@ export function gatherSingleMatchData(matchIndex) {
         FINISHED_MATCH_STATUS: statusText === "FINISHED" ? statusText : "", FINISHED_TIME: statusText === "FINISHED" ? (timeVal ? timeVal + " CEST" : "") : "", FINISHED_TEAM1: statusText === "FINISHED" ? team1Name : "", FINISHED_TEAM2: statusText === "FINISHED" ? team2Name : "", FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultFormattedLogo, FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultFormattedLogo, FINISHED_MAP1: statusText === "FINISHED" ? maps.MAP1 : "", FINISHED_MAP1_SCORE: statusText === "FINISHED" ? maps.MAP1_SCORE : "", FINISHED_MAP2: statusText === "FINISHED" ? maps.MAP2 : "", FINISHED_MAP2_SCORE: statusText === "FINISHED" ? maps.MAP2_SCORE : "", FINISHED_MAP3: statusText === "FINISHED" ? maps.MAP3 : "", FINISHED_MAP3_SCORE: statusText === "FINISHED" ? maps.MAP3_SCORE : "", FIN_RectangleUP: finRectUp, FIN_RectangleLOW: finRectLow
     };
 
+    // Собираем логотипы для карт
     const perMapLogos = {};
     [1, 2, 3].forEach(i => {
         const sc = maps[`MAP${i}_SCORE`];
@@ -457,12 +488,14 @@ export function gatherSingleMatchData(matchIndex) {
         perMapLogos[`MAP${i}_TEAM2logo`] = show && team2Name ? team2Logo : defaultFormattedLogo;
     });
 
+    // Собираем логотипы для матча
     const matchLogos = {};
     matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = (statusText === "FINISHED" && team1Name) ? team1Logo : defaultFormattedLogo;
     matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = (statusText === "FINISHED" && team2Name) ? team2Logo : defaultFormattedLogo;
     matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = (statusText === "LIVE" && team1Name) ? team1Logo : defaultFormattedLogo;
     matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = (statusText === "LIVE" && team2Name) ? team2Logo : defaultFormattedLogo;
     
+    // Собираем итоговый объект
     const matchObj = {
         ...upcomObj, ...liveObj, ...finishedObj,
         MP1_UPC, MP2_UPC, MP3_UPC, MP1_LIVE, MP2_LIVE, MP3_LIVE, MP1_FIN, MP2_FIN, MP3_FIN,
@@ -476,24 +509,37 @@ export function gatherSingleMatchData(matchIndex) {
 // ----------------------
 // Помощник для иконок счета
 // ----------------------
+/**
+ * Возвращает путь к иконке счета карты в формате C:/...
+ * @param {string} scoreStr - Строка счета "X:Y" или текст ("NEXT", "DECIDER" и т.д.).
+ * @param {string} baseWindowsPathForScoreIcons - Базовый путь Windows к иконкам счета.
+ * @returns {string} - Отформатированный путь C:/... к нужной иконке.
+ */
 function getScoreIcon(scoreStr, baseWindowsPathForScoreIcons) {
+    // Используем formatPath для получения путей в формате C:/...
     const noneIcon = formatPath(baseWindowsPathForScoreIcons, "none_score_icon.png"); 
     const mpNoneIcon = formatPath(baseWindowsPathForScoreIcons, "mp_none.png");
     const mpLIcon = formatPath(baseWindowsPathForScoreIcons, "mp_L.png");
     const mpRIcon = formatPath(baseWindowsPathForScoreIcons, "mp_R.png");
 
     if (typeof scoreStr !== 'string' || !scoreStr.trim()) return noneIcon;
+    // Если счет текстовый - возвращаем иконку "нет счета"
     if (scoreStr === "NEXT" || scoreStr === "DECIDER" || scoreStr.startsWith("MATCH ")) return noneIcon;
 
     const parts = scoreStr.split(":");
-    if (parts.length !== 2) return mpNoneIcon; // Возвращаем mp_none для невалидного формата счета
+    // Если формат счета не "X:Y" - возвращаем иконку "ничья/неопределенно"
+    if (parts.length !== 2) return mpNoneIcon; 
 
     const left = parseInt(parts[0], 10);
     const right = parseInt(parts[1], 10);
 
-    if (isNaN(left) || isNaN(right)) return noneIcon; // Если не числа, то noneIcon
-    if (right > left) return mpRIcon;
-    if (left > right) return mpLIcon;
+    // Если не удалось распознать числа - возвращаем иконку "нет счета"
+    if (isNaN(left) || isNaN(right)) return noneIcon; 
     
-    return mpNoneIcon; // Ничья, включая 0:0
+    // Определяем победителя по счету
+    if (right > left) return mpRIcon; // Команда 2 (справа) выиграла
+    if (left > right) return mpLIcon; // Команда 1 (слева) выиграла
+    
+    // Если счет равный (включая 0:0) - возвращаем иконку "ничья"
+    return mpNoneIcon; 
 }
