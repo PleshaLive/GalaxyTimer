@@ -8,130 +8,133 @@
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
-    /* Основные цвета темы (предоставлены пользователем) */
-    --color-background: #0E0A1C;
-    --color-surface: #151127;
-    --color-surface-secondary: #221C3B;
-    --color-surface-tertiary: #151127; /* Фон для инпутов, совпадает с --color-surface */
-    --color-border: #3B325C; /* Немного светлее и насыщеннее, чем surface-secondary */
-    --color-border-light: #50467A;
-    --color-divider: #1D1733; /* Для тонких разделителей */
+    --color-background: #0a0f18; /* Глубже темный */
+    --color-surface: #101622;    /* Чуть светлее для карточек */
+    --color-surface-secondary: #181f2c; /* Для вложенных элементов */
+    --color-surface-tertiary: #070a10; /* Очень темный для инпутов */
+    --color-border: #2a3140;
+    --color-border-light: #3c4455;
+    --color-divider: #222836;
 
-    /* Текстовые цвета */
-    --color-text-primary: #F0F2F5; /* Очень светлый для контраста */
-    --color-text-secondary: #B0B8C5; /* Светло-серый */
-    --color-text-muted: #808A9A;    /* Средне-серый */
-    --color-text-placeholder: #606A7A; /* Для плейсхолдеров */
+    --color-text-primary: #e0e7ff; /* Светлее для лучшего контраста */
+    --color-text-secondary: #a0aec0;
+    --color-text-muted: #718096;
+    --color-text-placeholder: #5a667a;
 
-    /* Основной акцент (используем #7A64B9 от Team1 как общий) */
-    --color-primary-base: #7A64B9;
-    --color-primary-light: #9370DB; /* Чуть светлее */
-    --color-primary-dark: #6A5ACD;  /* Чуть темнее */
-    --rgb-primary: 122, 100, 185;
+    --color-primary-base: #4f46e5; /* Яркий фиолетовый */
+    --color-primary-light: #6366f1;
+    --color-primary-dark: #4338ca;
+    --rgb-primary: 79, 70, 229;
     --glow-primary: 0 0 15px rgba(var(--rgb-primary), 0.7), 0 0 30px rgba(var(--rgb-primary), 0.5);
     --text-shadow-primary: 0 0 10px rgba(var(--rgb-primary), 0.8);
-    --color-text-on-primary: #FFFFFF; /* Белый текст на фиолетовом */
 
-    /* Вторичный акцент */
-    --color-secondary-base: #9D88D9; /* Светло-фиолетовый, гармонирует с основным */
-    --color-secondary-light: #B0A0E0;
-    --color-secondary-dark: #8A70C8;
-    --rgb-secondary: 157, 136, 217;
+    --color-secondary-base: #0ea5e9; /* Яркий голубой */
+    --color-secondary-light: #38bdf8;
+    --color-secondary-dark: #0284c7;
+    --rgb-secondary: 14, 165, 233;
     --glow-secondary: 0 0 15px rgba(var(--rgb-secondary), 0.7), 0 0 30px rgba(var(--rgb-secondary), 0.5);
     --text-shadow-secondary: 0 0 10px rgba(var(--rgb-secondary), 0.8);
-
-    /* Семантические цвета (стандартные) */
-    --color-success: #22c55e;
+    
+    --color-success: #22c55e; /* Зеленый */
     --color-success-dark: #16a34a;
     --rgb-success: 34, 197, 94;
     --glow-success: 0 0 12px rgba(var(--rgb-success), 0.7), 0 0 24px rgba(var(--rgb-success), 0.4);
 
-    --color-warning: #f59e0b;
+    --color-warning: #f59e0b; /* Желтый/Оранжевый */
     --color-warning-dark: #d97706;
     --color-warning-text: #1f2937; /* Темный текст для желтого фона */
     --rgb-warning: 245, 158, 11;
     --glow-warning: 0 0 12px rgba(var(--rgb-warning), 0.7), 0 0 24px rgba(var(--rgb-warning), 0.4);
 
-    --color-error: #ef4444;
+    --color-error: #ef4444; /* Красный */
     --color-error-dark: #dc2626;
     --rgb-error: 239, 68, 68;
     --glow-error: 0 0 12px rgba(var(--rgb-error), 0.7), 0 0 24px rgba(var(--rgb-error), 0.4);
+    
+    --color-text-on-primary: #ffffff;
+    --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error) */
 
-    --color-text-on-accent: #ffffff; /* Для текста на цветных фонах (success, error, secondary) */
+    /* --- START: Status Specific Colors --- */
+    /* UPCOM Status Colors */
+    --color-status-upcom-bg: #4f46e5;
+    --color-status-upcom-text: #ffffff;
+    --color-status-upcom-border: #4f46e5;
+    --glow-status-upcom: 0 0 15px rgba(79, 70, 229, 0.7), 0 0 30px rgba(79, 70, 229, 0.5);
 
-    /* --- Цвета статусов --- */
-    --color-status-upcom-bg: var(--color-primary-base); /* Используем основной акцент */
-    --color-status-upcom-text: var(--color-text-on-primary);
-    --color-status-upcom-border: var(--color-primary-dark);
-    --glow-status-upcom: var(--glow-primary);
+    /* LIVE Status Colors */
+    --color-status-live-bg: #f59e0b;
+    --color-status-live-text: #1f2937;
+    --color-status-live-border: #f59e0b;
+    --glow-status-live: 0 0 12px rgba(245, 158, 11, 0.7), 0 0 24px rgba(245, 158, 11, 0.4);
 
-    --color-status-live-bg: var(--color-warning);
-    --color-status-live-text: var(--color-warning-text);
-    --color-status-live-border: var(--color-warning-dark);
-    --glow-status-live: var(--glow-warning);
-
-    --color-status-finished-bg: var(--color-success);
+    /* FINISHED Status Colors */
+    --color-status-finished-bg: #22c55e;
     --color-status-finished-text: #ffffff;
-    --color-status-finished-border: var(--color-success-dark);
-    --glow-status-finished: var(--glow-success);
+    --color-status-finished-border: #22c55e;
+    --glow-status-finished: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4);
     /* --- END: Status Specific Colors --- */
 
-    /* === Цвета таблицы Map Veto === */
-    --color-mapveto-th-text: var(--color-text-primary);
-    --color-mapveto-th-icon: var(--color-primary-light);
-    --color-mapveto-td-text: var(--color-text-secondary);
+    /* === MAP VETO TABLE SPECIFIC COLORS === */
+    /* Заголовки таблицы Map Veto */
+    --color-mapveto-th-text: var(--color-text-primary); /* Текст в th */
+    --color-mapveto-th-icon: var(--color-primary-light); /* Цвет иконок в th */
+    
+    /* Ячейки таблицы Map Veto */
+    --color-mapveto-td-text: var(--color-text-secondary); /* Основной текст в td (если не переопределен стилем селекта) */
 
-    --color-veto-ban-bg: rgba(var(--rgb-error), 0.2); /* Полупрозрачный фон */
-    --color-veto-ban-text: var(--color-text-primary);
-    --color-veto-ban-border: var(--color-error);
-    --glow-veto-ban: var(--glow-error);
+    /* Действие BAN */
+    --color-veto-ban-bg: #582c2c;        /* Фон (исходный: --color-error) */
+    --color-veto-ban-text: #ffffff;       /* Текст (исходный: --color-text-on-accent) */
+    --color-veto-ban-border: #dc2626;     /* Рамка (исходный: --color-error-dark) */
+    --glow-veto-ban: 0 0 12px rgba(239, 68, 68, 0.7), 0 0 24px rgba(239, 68, 68, 0.4); /* Свечение (исходный: --glow-error) */
 
-    --color-veto-pick-bg: rgba(var(--rgb-success), 0.2); /* Полупрозрачный фон */
-    --color-veto-pick-text: var(--color-text-primary);
-    --color-veto-pick-border: var(--color-success);
-    --glow-veto-pick: var(--glow-success);
+    /* Действие PICK */
+    --color-veto-pick-bg: #25722f;       /* Фон (исходный: --color-success) */
+    --color-veto-pick-text: #ffffff;      /* Текст (исходный: --color-text-on-primary) */
+    --color-veto-pick-border: #16a34a;    /* Рамка (исходный: --color-success-dark) */
+    --glow-veto-pick: 0 0 12px rgba(34, 197, 94, 0.7), 0 0 24px rgba(34, 197, 94, 0.4); /* Свечение (исходный: --glow-success) */
 
-    --color-veto-decider-bg:  #4A4458; /* Нейтральный темно-серый с фиолетовым оттенком */
-    --color-veto-decider-text:  var(--color-text-primary);
-    --color-veto-decider-border:  #605A70;
-    --glow-veto-decider: none;
+    /* Действие DECIDER (Нейтральный, но настраиваемый) */
+    --color-veto-decider-bg:  #646464; /* Фон */
+    --color-veto-decider-text:  #ffffff;   /* Текст */
+    --color-veto-decider-border:  #b8b8b8;  /* Рамка */
+    --glow-veto-decider: none;                               /* Свечение (по умолчанию нет) */
 
-    /* Сторона CT (предоставлено пользователем) */
-    --color-veto-side-ct-bg: #E3D9FF;
-    --color-veto-side-ct-text: #221C3B; /* Темный текст на светлом фоне */
-    --color-veto-side-ct-border: #B0A0E0; /* Темнее лавандовый для рамки */
+    /* Сторона CT (Counter-Terrorists) */
+    --color-veto-side-ct-bg: #3182ce;     /* Синий фон */
+    --color-veto-side-ct-text: #ffffff;   /* Белый текст */
+    --color-veto-side-ct-border: #2c5282; /* Темно-синяя рамка */
 
-    /* Сторона T (предоставлено пользователем) */
-    --color-veto-side-t-bg: #DFC9AA;
-    --color-veto-side-t-text: #5A4F3F; /* Темный текст на светлом фоне */
-    --color-veto-side-t-border: #C8B08E; /* Темнее для рамки */
+    /* Сторона T (Terrorists) */
+    --color-veto-side-t-bg: #dd6b20;      /* Оранжевый фон */
+    --color-veto-side-t-text: #ffffff;    /* Белый текст */
+    --color-veto-side-t-border: #c05621;  /* Темно-оранжевая рамка */
     /* === END MAP VETO TABLE SPECIFIC COLORS === */
 
-    /* === Цвета Команды 1 (предоставлены пользователем) === */
-    --team1-color-accent: #C3ADFF; /* Светло-фиолетовый */
-    --team1-color-rgb: 195, 173, 255;
-    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
-    --team1-color-text-on-accent: #221C3B; /* Темный текст на светло-фиолетовом */
-    --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5);
-    --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8);
-    /* Второй цвет для Team1 #7A64B9 используется как --color-primary-base */
+    /* ВСТАВЬТЕ ЭТОТ БЛОК: */
+    /* === START: Team 1 Specific Colors === */
+    --team1-color-accent: #4f46e5; /* Основной акцентный цвет T1 */
+    --team1-color-rgb: 79, 70, 229; /* RGB для использования в rgba() */
+    --team1-color-bg: rgba(var(--team1-color-rgb), 0.15); /* Фоновый оттенок T1 */
+    --team1-color-text-on-accent: #ffffff; /* Цвет текста на фоне T1 */
+    --team1-glow: 0 0 15px rgba(var(--team1-color-rgb), 0.7), 0 0 30px rgba(var(--team1-color-rgb), 0.5); /* Свечение T1 */
+    --team1-text-shadow: 0 0 10px rgba(var(--team1-color-rgb), 0.8); /* Тень текста T1 */
     /* === END: Team 1 Specific Colors === */
 
-    /* === Цвета Команды 2 (предоставлены пользователем) === */
-    --team2-color-accent: #EADAA5; /* Светло-бежево-золотой */
-    --team2-color-rgb: 234, 218, 165;
-    --team2-color-bg: rgba(var(--team2-color-rgb), 0.15); /* Прозрачный фон на основе акцента */
-    --team2-color-text-on-accent: #726952; /* Темный текст (второй цвет команды) на светло-золотом */
-    --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5);
-    --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8);
-    /* Второй цвет для Team2 #726952 можно использовать для --team2-color-darker-bg или границ при необходимости */
+    /* === START: Team 2 Specific Colors === */
+    --team2-color-accent: #bd7e2c; /* Основной акцентный цвет T2 */
+    --team2-color-rgb: 14, 165, 233; /* RGB для использования в rgba() */
+    --team2-color-bg: #503d24da; /* Фоновый оттенок T2 */
+    --team2-color-text-on-accent: #ffffff; /* Цвет текста на фоне T2 */
+    --team2-glow: 0 0 15px rgba(var(--team2-color-rgb), 0.7), 0 0 30px rgba(var(--team2-color-rgb), 0.5); /* Свечение T2 */
+    --team2-text-shadow: 0 0 10px rgba(var(--team2-color-rgb), 0.8); /* Тень текста T2 */
     /* === END: Team 2 Specific Colors === */
 
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
+    --spacing-xs: 0.25rem;  /* 4px */
+    --spacing-sm: 0.5rem;   /* 8px */
+    --spacing-md: 1rem;     /* 16px */
+    --spacing-lg: 1.5rem;   /* 24px */
+    --spacing-xl: 2rem;     /* 32px */
 
     --border-radius-sm: 6px;
     --border-radius-md: 8px;
@@ -139,13 +142,12 @@
     --border-radius-xl: 16px;
     --border-radius-round: 50%;
 
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
-    --shadow-md: 0 5px 15px rgba(0,0,0,0.5);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
-    --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.5);
-    /* Нейморфные тени, настроенные под фон #0E0A1C */
-    --shadow-neumorphic: 5px 5px 10px #080611, -5px -5px 10px #140E27;
-    --shadow-neumorphic-inset: inset 3px 3px 6px #080611, inset -3px -3px 6px #140E27;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-md: 0 5px 15px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+    --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.4);
+    --shadow-neumorphic: 5px 5px 10px #070a10, -5px -5px 10px #131824;
+    --shadow-neumorphic-inset: inset 3px 3px 6px #070a10, inset -3px -3px 6px #131824;
 
     --transition-base: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --transition-fast: all 0.15s ease-out;
@@ -203,20 +205,20 @@ h1 {
     font-weight: var(--font-weight-bold);
     margin-bottom: var(--spacing-lg);
 }
-h2 {
-    font-size: 1.25rem;
+h2 { 
+    font-size: 1.25rem; 
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-h3 {
+h3 { 
     font-size: 1rem;
     font-weight: var(--font-weight-medium);
     color: var(--color-text-secondary);
     margin-bottom: var(--spacing-sm);
 }
-.section-title {
+.section-title { 
     font-size: 1.6rem;
     color: var(--color-secondary-light);
     margin-bottom: var(--spacing-md);
@@ -225,7 +227,7 @@ h3 {
     font-weight: var(--font-weight-semibold);
     text-shadow: var(--text-shadow-secondary);
 }
-.tab-title {
+.tab-title { 
     font-size: 1.8rem;
     color: var(--color-primary-light);
     text-align: center;
@@ -278,7 +280,7 @@ label i {
 {
     border-color: var(--color-primary-light);
     box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
-    background-color: var(--color-surface);
+    background-color: var(--color-surface); 
 }
 .header-input::placeholder, .map-score-input::placeholder, .time-input::placeholder,
 .edit-input::placeholder
@@ -286,8 +288,7 @@ label i {
     color: var(--color-text-placeholder);
     opacity: 0.8;
 }
-/* Стили для стандартных select, которые НЕ будут Select2 */
-.styled-select {
+.styled-select { 
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -295,7 +296,7 @@ label i {
     background-repeat: no-repeat;
     background-position: right var(--spacing-md) center;
     background-size: 16px 12px;
-    padding-right: calc(var(--spacing-md) * 2 + 16px);
+    padding-right: calc(var(--spacing-md) * 2 + 16px); 
 }
 .styled-select option {
     background-color: var(--color-surface-secondary);
@@ -304,183 +305,75 @@ label i {
 
 
 /* Кнопки */
-.app-button, button {
+.app-button, button { 
     padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
     font-size: 0.9rem;
     font-weight: var(--font-weight-semibold);
     border-radius: var(--border-radius-md);
-    border: 1px solid transparent; /* Граница будет проявляться при ховере/активности */
-    background-color: var(--color-primary-base); /* Основной цвет кнопки */
+    border: 2px solid var(--color-primary-base);
+    background-color: var(--color-primary-base);
     color: var(--color-text-on-primary);
-    /* Небольшая тень для объема и отделения */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2),
-                /* Тонкий светлый внутренний блик сверху */
-                inset 0 1px 1px rgba(255,255,255,0.1),
-                /* Тонкая темная внутренняя тень снизу */
-                inset 0 -1px 1px rgba(0,0,0,0.1);
     cursor: pointer;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
-    position: relative; /* Для позиционирования псевдоэлемента ::before */
-    overflow: hidden;   /* Чтобы блик не выходил за пределы кнопки */
-    z-index: 1;         /* Для корректного стекинга с псевдоэлементом */
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
+    transition: var(--transition-base);
     text-align: center;
     line-height: 1.5;
     letter-spacing: 0.03em;
     min-width: 140px;
     text-transform: uppercase;
-    text-shadow: 0 1px 1px rgba(0,0,0,0.25); /* Тень для текста */
+    box-shadow: 0 2px 5px rgba(var(--rgb-primary),0.2), 0 0 10px rgba(var(--rgb-primary),0.1) inset;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle; 
 }
-/* Иконка и текст внутри кнопки */
 .app-button i, button i {
     margin-right: var(--spacing-sm);
     font-size: 0.95em;
-    position: relative; /* Поверх блика */
-    z-index: 2;
 }
-/* Текст внутри кнопки (если он не в span, могут быть проблемы) */
-.app-button span, button span {
-    position: relative;
-    z-index: 2;
-}
-
-/* === Псевдоэлемент для блика === */
 .app-button::before, button::before {
-    content: "";
+    content: '';
     position: absolute;
-    top: 0;
-    left: -120%; /* Начинаем полностью за левым краем, чтобы анимация была длиннее */
-    width: 80%;  /* Ширина блика */
-    height: 100%;
-    background: linear-gradient(
-        60deg, /* Угол наклона блика */
-        transparent 25%,
-        rgba(255, 255, 255, 0.45) 50%, /* Центральная часть блика, чуть ярче */
-        transparent 75%
-    );
-    transform: skewX(-25deg); /* Угол скоса блика */
-    opacity: 0; /* По умолчанию блик не виден */
-    /* transition убран отсюда, будет управляться на ховере */
-    z-index: 1; /* Блик под текстом, но над фоном кнопки */
-}
-
-/* === Hover State - Glassmorphism + Анимация блика === */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover,
-button:not(:disabled):not(.saving):not(.saved):not(.error):hover {
-    /* Glassmorphism фон */
-    background-color: rgba(255, 255, 255, 0.15);
-    -webkit-backdrop-filter: blur(5px);
-    backdrop-filter: blur(5px);
-    border-color: rgba(255, 255, 255, 0.25);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    color: var(--color-text-primary);
-    transform: translateY(-2px); /* Небольшой подъем */
-}
-
-/* Запуск анимации блика при наведении */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before,
-button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before {
-    left: 125%; /* Двигаем блик направо */
-    opacity: 1; /* Показываем */
-    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1),
-                opacity 0.2s ease-in-out;
-}
-
-/* === Active State === */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):active,
-button:not(:disabled):not(.saving):not(.saved):not(.error):active {
-    background-color: rgba(255, 255, 255, 0.1);
-    -webkit-backdrop-filter: blur(3px);
-    backdrop-filter: blur(3px);
-    transform: translateY(0px); /* Возвращаем на место */
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-/* Мгновенно скрываем блик при нажатии */
-.app-button:not(:disabled):not(.saving):not(.saved):not(.error):active::before,
-button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
+    top: 50%; left: 50%;
+    width: 0; height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: -1;
     opacity: 0;
-    transition: none;
+}
+.app-button:hover::before, button:hover::before {
+    width: 250%; height: 250%;
+    opacity: 1;
+}
+.app-button:hover, button:hover {
+    background-color: var(--color-primary-light);
+    border-color: var(--color-primary-light);
+    box-shadow: var(--glow-primary), 0 0 15px rgba(var(--rgb-primary),0.3) inset;
+    transform: translateY(-2px) scale(1.02);
+}
+.app-button:active, button:active {
+    transform: translateY(0px) scale(1);
+    background-color: var(--color-primary-dark);
+    box-shadow: var(--shadow-inset);
 }
 
-/* === Стили для особых типов кнопок === */
-/* Кнопка Tertiary (без glass/блика) */
+.app-button.primary { /* Already styled by default .app-button */ }
 .app-button.tertiary {
     background-color: transparent;
     border-color: var(--color-secondary-light);
     color: var(--color-secondary-light);
-    box-shadow: none;
-     -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-}
-.app-button.tertiary::before {
-    content: none; /* Убираем блик */
+    box-shadow: 0 2px 5px rgba(var(--rgb-secondary),0.2);
 }
 .app-button.tertiary:hover {
     background-color: var(--color-secondary-base);
-    color: var(--color-text-on-accent);
+    color: var(--color-text-on-accent); 
     border-color: var(--color-secondary-base);
     box-shadow: var(--glow-secondary), 0 0 15px rgba(var(--rgb-secondary),0.3) inset;
-    transform: translateY(-2px) scale(1.02);
-     -webkit-backdrop-filter: none;
-    backdrop-filter: none;
 }
-
-/* --- Button States (Saving, Saved, Error, Disabled) --- */
-/* Важно: Убеждаемся, что эти состояния ПЕРЕОПРЕДЕЛЯЮТ glassmorphism и блик */
-/* Состояния Saving и Disabled */
-.app-button.saving, button.saving,
-.app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
-    background-color: var(--color-text-muted) !important;
-    border-color: var(--color-text-muted) !important;
-    border-width: 1px !important;
-    color: var(--color-surface) !important;
-    cursor: wait !important;
-    opacity: 0.7;
-    transform: none !important;
-    box-shadow: var(--shadow-inset) !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-}
-/* Состояние Saved */
-.app-button.saved, button.saved {
-    background-color: var(--color-success) !important;
-    border-color: var(--color-success-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-primary) !important;
-    box-shadow: var(--glow-success) !important;
-    transform: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-}
-/* Состояние Error */
-.app-button.error, button.error {
-    background-color: var(--color-error) !important;
-    border-color: var(--color-error-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-accent) !important;
-    box-shadow: var(--glow-error) !important;
-    transform: none !important;
-    -webkit-backdrop-filter: none !important;
-    backdrop-filter: none !important;
-}
-/* Гарантированно убираем блик (псевдоэлемент ::before) для этих состояний */
-.app-button.saving::before, button.saving::before,
-.app-button:disabled:not(.winner-btn)::before, button:disabled:not(.winner-btn)::before,
-.app-button.saved::before, button.saved::before,
-.app-button.error::before, button.error::before {
-    content: none !important;
-}
-
-/* --- Winner Buttons --- */
-/* Оставляем их стиль без изменений, убираем блик */
-.winner-btn::before {
-    content: none;
-}
-/* Стили для .winner-btn определены ниже и не будут затронуты общими правилами hover */
 
 
 /* Хедер */
@@ -645,13 +538,12 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .match-column {
     background-color: var(--color-surface-secondary);
     border-radius: var(--border-radius-lg);
-    /* overflow: hidden; */ /* УБРАНО - для Select2 dropdown */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--color-border);
     transition: var(--transition-base);
     box-shadow: var(--shadow-sm);
-    /* position: relative; */ /* Может понадобиться, если будут проблемы с позиционированием */
 }
 .match-column:hover {
     transform: translateY(-5px);
@@ -695,7 +587,6 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     padding: var(--spacing-xs) var(--spacing-sm);
 }
 
-/* Status Select Colors */
 .status-select option[value="UPCOM"] { background-color: var(--color-status-upcom-bg); color: var(--color-status-upcom-text); }
 .status-select option[value="LIVE"] { background-color: var(--color-status-live-bg); color: var(--color-status-live-text); }
 .status-select option[value="FINISHED"] { background-color: var(--color-status-finished-bg); color: var(--color-status-finished-text); }
@@ -721,47 +612,27 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-radius: var(--border-radius-md);
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
-    position: relative; /* Для позиционирования Select2 dropdown */
 }
 
-/* Team Logo above Select */
-.team-info-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: var(--spacing-xs);
-}
-.team-logo {
-    width: 24px;
-    height: 24px;
-    margin-right: var(--spacing-sm);
-    object-fit: contain;
-    border-radius: var(--border-radius-sm);
-    background-color: rgba(var(--rgb-primary), 0.05);
-    border: 1px solid var(--color-border);
-    flex-shrink: 0;
-}
-.team-block label {
-    margin-bottom: 0;
-    flex-grow: 1;
-}
-.team-block .team-select {
-    width: 100%;
-    margin-top: auto;
-}
-
-/* Team Block Specific Styles */
+/* 1. Блок Команды 1 */
 .team-1-block {
     border-color: var(--team1-color-accent);
     background-color: var(--team1-color-bg);
 }
+
+/* 2. Ховер Блока Команды 1 */
 .team-1-block:hover {
     border-color: var(--team1-color-accent);
     background-color: rgba(var(--team1-color-rgb), 0.25);
 }
+
+/* 3. Блок Команды 2 */
 .team-2-block {
     border-color: var(--team2-color-accent);
     background-color: var(--team2-color-bg);
 }
+
+/* 4. Ховер Блока Команды 2 */
 .team-2-block:hover {
     border-color: var(--team2-color-accent);
     background-color: rgba(var(--team2-color-rgb), 0.25);
@@ -776,7 +647,6 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border: 1px dashed var(--color-divider);
     border-radius: var(--border-radius-round);
     width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
 }
 
 .winner-buttons {
@@ -799,44 +669,41 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     transition: var(--transition-fast);
     min-width: auto;
     text-transform: none;
-    /* Ensure no ::before from general button styles */
-    /* content: none !important; */ /* Already handled by .winner-btn::before below */
-}
-.winner-btn::before {
-    content: none; /* Disable glare for winner buttons */
 }
 
-/* Winner Button Styles */
+/* 5. Кнопка Победитель T1 (база) */
 .winner-btn.team-1-accent-border {
     border-left: 4px solid var(--team1-color-accent);
     color: var(--team1-color-accent);
 }
+
+/* 6. Кнопка Победитель T1 (ховер) */
 .winner-btn.team-1-accent-border:hover {
     background-color: var(--team1-color-bg);
     box-shadow: var(--team1-glow);
-    /* Keep specific hover, no glass */
-    transform: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
 }
+
+/* 7. Кнопка Победитель T1 (выбрана) */
 .winner-btn.team-1-accent-border.winner-selected {
     background-color: var(--team1-color-accent);
     color: var(--team1-color-text-on-accent);
     box-shadow: var(--team1-glow);
     font-weight: var(--font-weight-bold);
 }
+
+/* 8. Кнопка Победитель T2 (база) */
 .winner-btn.team-2-accent-border {
     border-left: 4px solid var(--team2-color-accent);
     color: var(--team2-color-accent);
 }
+
+/* 9. Кнопка Победитель T2 (ховер) */
 .winner-btn.team-2-accent-border:hover {
     background-color: var(--team2-color-bg);
     box-shadow: var(--team2-glow);
-     /* Keep specific hover, no glass */
-    transform: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
 }
+
+/* 10. Кнопка Победитель T2 (выбрана) */
 .winner-btn.team-2-accent-border.winner-selected {
     background-color: var(--team2-color-accent);
     color: var(--team2-color-text-on-accent);
@@ -859,12 +726,14 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .vrs-table th, .vrs-table td { border: 1px solid var(--color-border); padding: var(--spacing-sm); text-align: center; color: var(--color-text-secondary); background-color: transparent; }
 .vrs-table th { background-color: var(--color-surface); font-weight: var(--font-weight-semibold); color: var(--color-text-primary); }
 .vrs-table td:first-child { font-weight: var(--font-weight-semibold); text-align: left; }
-/* VRS Table Team Colors */
+/* 11. Строка T1 в таблице VRS */
 .vrs-table tr.team-1-row td:first-child {
     background-color: var(--team1-color-bg);
     color: var(--team1-color-accent);
     border-left: 4px solid var(--team1-color-accent);
 }
+
+/* 12. Строка T2 в таблице VRS */
 .vrs-table tr.team-2-row td:first-child {
     background-color: var(--team2-color-bg);
     color: var(--team2-color-accent);
@@ -891,37 +760,39 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .table-wrapper { overflow-x: auto; border: 1px solid var(--color-divider); border-radius: var(--border-radius-lg); background-color: var(--color-surface-secondary); box-shadow: var(--shadow-neumorphic-inset); }
 #vetoTable { width: 100%; border-collapse: separate; border-spacing:0; font-size: 0.9rem; min-width: 600px; }
 
-#vetoTable th {
-    background-color: var(--color-surface);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-mapveto-th-text);
-    text-transform: uppercase;
+#vetoTable th { 
+    background-color: var(--color-surface); 
+    font-weight: var(--font-weight-semibold); 
+    color: var(--color-mapveto-th-text); 
+    text-transform: uppercase; 
     letter-spacing: 0.04em;
 }
 #vetoTable td {
-    color: var(--color-mapveto-td-text);
+    color: var(--color-mapveto-td-text); /* Базовый цвет текста для ячеек */
 }
 
-#vetoTable th, #vetoTable td {
-    border-bottom: 1px solid var(--color-divider);
-    border-right: 1px solid var(--color-divider);
-    padding: var(--spacing-md);
-    text-align: center;
-    white-space: nowrap;
+#vetoTable th, #vetoTable td { 
+    border-bottom: 1px solid var(--color-divider); 
+    border-right: 1px solid var(--color-divider); 
+    padding: var(--spacing-md); 
+    text-align: center; 
+    white-space: nowrap; 
 }
 #vetoTable th:last-child, #vetoTable td:last-child { border-right: none; }
 #vetoTable tr:last-child td { border-bottom: none; }
 
-#vetoTable th i {
-    margin-right: var(--spacing-xs);
-    color: var(--color-mapveto-th-icon);
+#vetoTable th i { 
+    margin-right: var(--spacing-xs); 
+    color: var(--color-mapveto-th-icon); 
 }
 
-/* Map Veto Team Headers */
+/* 13. Заголовок T1 в таблице Veto */
 #vetoTable th.team-1-text-accent {
     color: var(--team1-color-accent);
     text-shadow: var(--team1-text-shadow);
 }
+
+/* 14. Заголовок T2 в таблице Veto */
 #vetoTable th.team-2-text-accent {
     color: var(--team2-color-accent);
     text-shadow: var(--team2-text-shadow);
@@ -929,49 +800,49 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 #vetoTable select { font-weight: var(--font-weight-medium); }
 
-/* Map Veto Select Styles */
-#vetoTable select.veto-action.action-is-ban {
-    background-color: var(--color-veto-ban-bg) !important;
-    color: var(--color-veto-ban-text) !important;
-    border-color: var(--color-veto-ban-border) !important;
-    box-shadow: var(--glow-veto-ban);
+#vetoTable select.veto-action.action-is-ban { 
+    background-color: var(--color-veto-ban-bg) !important; 
+    color: var(--color-veto-ban-text) !important; 
+    border-color: var(--color-veto-ban-border) !important; 
+    box-shadow: var(--glow-veto-ban); 
 }
-#vetoTable select.veto-action.action-is-pick {
-    background-color: var(--color-veto-pick-bg) !important;
-    color: var(--color-veto-pick-text) !important;
-    border-color: var(--color-veto-pick-border) !important;
-    box-shadow: var(--glow-veto-pick);
+#vetoTable select.veto-action.action-is-pick { 
+    background-color: var(--color-veto-pick-bg) !important; 
+    color: var(--color-veto-pick-text) !important; 
+    border-color: var(--color-veto-pick-border) !important; 
+    box-shadow: var(--glow-veto-pick); 
 }
-#vetoTable select.veto-action.action-is-decider {
-    background-color: var(--color-veto-decider-bg) !important;
-    color: var(--color-veto-decider-text) !important;
-    border-color: var(--color-veto-decider-border) !important;
-    box-shadow: var(--glow-veto-decider);
+#vetoTable select.veto-action.action-is-decider { /* Предполагается, что JS добавит класс .action-is-decider */
+    background-color: var(--color-veto-decider-bg) !important; 
+    color: var(--color-veto-decider-text) !important; 
+    border-color: var(--color-veto-decider-border) !important; 
+    box-shadow: var(--glow-veto-decider); 
 }
 
-#vetoTable select.veto-side.side-is-ct {
+#vetoTable select.veto-side.side-is-ct { /* Предполагается, что JS добавит класс .side-is-ct */
     background-color: var(--color-veto-side-ct-bg) !important;
     color: var(--color-veto-side-ct-text) !important;
     border-color: var(--color-veto-side-ct-border) !important;
 }
-#vetoTable select.veto-side.side-is-t {
+#vetoTable select.veto-side.side-is-t { /* Предполагается, что JS добавит класс .side-is-t */
     background-color: var(--color-veto-side-t-bg) !important;
     color: var(--color-veto-side-t-text) !important;
     border-color: var(--color-veto-side-t-border) !important;
 }
 
-/* Map Veto Team Selects */
+/* 15. Выбранная команда T1 в селекте Veto */
 #vetoTable .veto-team.team-1-selected-veto {
     border-color: var(--team1-color-accent) !important;
     background-color: var(--team1-color-bg) !important;
     color: var(--team1-color-accent) !important;
 }
+
+/* 16. Выбранная команда T2 в селекте Veto */
 #vetoTable .veto-team.team-2-selected-veto {
     border-color: var(--team2-color-accent) !important;
     background-color: var(--team2-color-bg) !important;
     color: var(--team2-color-accent) !important;
-}
-#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
+}#saveMapVetoButton { display: block; margin: var(--spacing-lg) auto 0; min-width: 200px; }
 
 /* Pause Tab */
 .pause-section { margin-top: 0; border-top: none; }
@@ -996,6 +867,30 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     overflow-y: auto;
     box-shadow: var(--shadow-neumorphic-inset);
     line-height: 1.6;
+}
+
+/* Button States */
+.app-button.saving, button.saving,
+.app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
+    background-color: var(--color-text-muted) !important;
+    border-color: var(--color-text-muted) !important;
+    color: var(--color-surface) !important;
+    cursor: wait !important;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: var(--shadow-inset);
+}
+.app-button.saved, button.saved {
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success-dark) !important;
+    color: var(--color-text-on-primary) !important;
+    box-shadow: var(--glow-success);
+}
+.app-button.error, button.error {
+    background-color: var(--color-error) !important;
+    border-color: var(--color-error-dark) !important;
+    color: var(--color-text-on-accent) !important;
+    box-shadow: var(--glow-error);
 }
 
 /* Styled Scrollbar */
@@ -1077,7 +972,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm); 
     transition: background-color var(--transition-fast);
 }
 #castersListContainer li:hover {
@@ -1090,13 +985,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 #castersListContainer .caster-details {
     flex-grow: 1;
     display: flex;
-    align-items: center;
+    align-items: center; 
     gap: var(--spacing-sm);
     min-width: 0;
 }
 
 #castersListContainer li:not(.editing) .caster-details {
-     align-items: baseline;
+     align-items: baseline; 
 }
 
 #castersListContainer .caster-name {
@@ -1105,7 +1000,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
+    max-width: 150px; 
 }
 
 #castersListContainer .caster-social {
@@ -1119,7 +1014,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 #castersListContainer .caster-actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    flex-shrink: 0; 
 }
 #castersListContainer .caster-actions button {
     margin-left: var(--spacing-sm);
@@ -1181,9 +1076,9 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     color: var(--color-secondary-light);
 }
 #castersListContainer .caster-actions .edit-caster-btn:hover {
-      background-color: var(--color-secondary-base) !important;
-      color: var(--color-text-on-accent) !important;
-      border-color: var(--color-secondary-base) !important;
+     background-color: var(--color-secondary-base) !important;
+     color: var(--color-text-on-accent) !important;
+     border-color: var(--color-secondary-base) !important;
 }
 #castersListContainer .caster-actions .delete-caster-btn {
     background-color: transparent;
@@ -1195,230 +1090,6 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     color: var(--color-text-on-accent) !important;
     border-color: var(--color-error-dark) !important;
 }
-
-/* == Select2 Integration Styles == */
-
-/* Container and Single Selection Field */
-.select2-container {
-    width: 100% !important; /* Force Select2 to take full width */
-    font-size: 0.9rem;      /* Match general input font size */
-    font-family: var(--font-family-base);
-    vertical-align: middle; /* Better alignment */
-    position: relative;     /* Needed for dropdown positioning context */
-}
-.select2-container .select2-selection--single {
-    background-color: var(--color-surface-tertiary);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
-    height: auto; /* Adjust height to content */
-    padding: var(--spacing-sm) calc(var(--spacing-sm) + 20px) var(--spacing-sm) var(--spacing-md); /* Adjust right padding for arrow */
-    box-shadow: var(--shadow-inset);
-    transition: var(--transition-base);
-    outline: none;
-    display: flex;
-    align-items: center;
-}
-.select2-container--default.select2-container--focus .select2-selection--single,
-.select2-container--default.select2-container--open .select2-selection--single {
-    border-color: var(--color-primary-light);
-    box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
-}
-
-/* Rendered Selection (Text and Logo) */
-.select2-container .select2-selection--single .select2-selection__rendered {
-    color: var(--color-text-primary);
-    line-height: normal;
-    padding-left: 0;
-    padding-right: 0;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    overflow: hidden;
-}
-.select2-container--default .select2-selection--single .select2-selection__placeholder {
-    color: var(--color-text-placeholder);
-    display: flex;
-    align-items: center;
-}
-
-/* Arrow */
-.select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 100%;
-    position: absolute;
-    top: 0;
-    right: var(--spacing-sm);
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.select2-container--default .select2-selection--single .select2-selection__arrow b {
-    border-color: var(--color-text-muted) transparent transparent transparent;
-    border-style: solid;
-    border-width: 5px 4px 0 4px;
-    height: 0;
-    left: 50%;
-    margin-left: -4px;
-    margin-top: -2px;
-    position: absolute;
-    top: 50%;
-    width: 0;
-    transition: var(--transition-fast);
-}
-.select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
-    border-color: transparent transparent var(--color-text-muted) transparent;
-    border-width: 0 4px 5px 4px;
-}
-
-/* Clear Button (X) - Should be hidden via JS allowClear: false */
-.select2-container--default .select2-selection--single .select2-selection__clear {
-    display: none; /* Hide it explicitly just in case */
-}
-
-/* Dropdown */
-.select2-dropdown {
-    background-color: var(--color-surface-secondary);
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--border-radius-md);
-    box-shadow: var(--shadow-md);
-    overflow: hidden;
-    z-index: 99999 !important; /* Ensure high z-index */
-    width: auto;
-    min-width: 350px; /* Adjust minimum width */
-    /* Ensure no manual offset */
-    /* margin-left: -15px; */
-}
-.select2-container--default.select2-container--open .select2-dropdown--below {
-    border-top: none;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-.select2-container--default.select2-container--open .select2-dropdown--above {
-    border-bottom: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-}
-
-/* Search Field inside Dropdown */
-.select2-search--dropdown {
-    padding: var(--spacing-sm);
-    background-color: var(--color-surface);
-}
-.select2-search--dropdown .select2-search__field {
-    background-color: var(--color-surface-tertiary);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-primary);
-    border-radius: var(--border-radius-sm);
-    padding: var(--spacing-sm);
-    width: 100%;
-    outline: none;
-}
-.select2-search--dropdown .select2-search__field:focus {
-     border-color: var(--color-primary-light);
-     box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3);
-}
-
-/* Results List */
-.select2-results__options {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    max-height: 250px;
-    overflow-y: auto;
-}
-
-/* Individual Result Option */
-.select2-results__option {
-    padding: var(--spacing-sm) var(--spacing-md);
-    transition: background-color var(--transition-fast);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color: var(--color-text-secondary);
-}
-.select2-results__option--highlighted[aria-selected] {
-    background-color: var(--color-primary-base);
-    color: var(--color-text-on-primary);
-}
-.select2-results__option--highlighted[aria-selected] .select2-team-name,
-.select2-results__option--highlighted[aria-selected] {
-     color: var(--color-text-on-primary) !important;
-}
-
-.select2-results__option[aria-disabled=true] {
-    color: var(--color-text-muted);
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-/* Loading Indicator */
-.select2-results__option--loading {
-    display: block;
-    text-align: center;
-    color: var(--color-text-muted);
-    padding: var(--spacing-sm);
-}
-
-/* No Results Message */
-.select2-results__message {
-    color: var(--color-text-muted);
-    padding: var(--spacing-sm) var(--spacing-md);
-}
-
-/* Team Logo and Name Styles within Select2 */
-.select2-team-option, .select2-team-selection {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    overflow: hidden;
-}
-
-.select2-team-logo, .select2-team-logo-selected {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-    border-radius: 4px;
-    object-fit: contain;
-    background-color: rgba(255,255,255,0.1);
-    flex-shrink: 0;
-    vertical-align: middle;
-}
-
-.select2-team-logo-selected {
-    width: 18px;
-    height: 18px;
-    margin-right: 6px;
-}
-
-.select2-team-name, .select2-team-name-selected {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    vertical-align: middle;
-    color: inherit;
-}
-.select2-results__option .select2-team-name {
-    color: var(--color-text-primary);
-}
-
-/* Hide original select when Select2 is active */
-select.team-select.select2-hidden-accessible,
-select.control-select.select2-hidden-accessible {
-  appearance: none !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  background-image: none !important;
-  position: absolute !important;
-  overflow: hidden !important;
-  clip: rect(0 0 0 0) !important;
-  height: 1px !important;
-  width: 1px !important;
-  margin: -1px !important;
-  padding: 0 !important;
-  border: 0 !important;
-}
-/* == End Select2 Integration Styles == */
 
 
 /* Адаптивность */
@@ -1476,24 +1147,12 @@ select.control-select.select2-hidden-accessible {
     .tabs-content {
         border-radius: var(--border-radius-lg);
     }
-    .team-block .select2-container {
-        width: 100% !important;
-    }
 }
 
 @media (max-width: 480px) {
     h1 { font-size: 1.6rem; }
     h2 { font-size: 1.1rem; }
-    .header-input, .styled-select, .map-score-input, .time-input,
-    .select2-container .select2-selection--single
-    {
-        padding: var(--spacing-sm);
-        font-size: 0.9rem;
-    }
-    .select2-container .select2-selection--single {
-        padding-right: calc(var(--spacing-sm) + 20px); /* Ensure arrow space */
-    }
-
+    .header-input, .styled-select, .map-score-input, .time-input { padding: var(--spacing-sm); font-size: 0.9rem; }
     .app-button, button { padding: var(--spacing-sm); font-size: 0.9rem; }
     .map-row { flex-direction: column; align-items: stretch; }
     .map-row .map-name-select, .map-row .map-score-input { width: 100%; }
@@ -1505,7 +1164,7 @@ select.control-select.select2-hidden-accessible {
     .tabs-nav .tab-link { padding: var(--spacing-sm) var(--spacing-md); font-size: 0.9rem; }
     #castersListContainer li { flex-direction: column; align-items: stretch; }
     #castersListContainer .caster-details { flex-direction: column; align-items: flex-start; gap: var(--spacing-xs); margin-bottom: var(--spacing-sm); }
-    #castersListContainer .caster-name { max-width: none; }
+    #castersListContainer .caster-name { max-width: none; } 
     #castersListContainer .caster-social { margin-left: 0; font-size: 0.8rem; }
     #castersListContainer .caster-actions { justify-content: flex-end; }
     #castersListContainer li.editing .caster-details { flex-direction: column; gap: var(--spacing-sm); }
