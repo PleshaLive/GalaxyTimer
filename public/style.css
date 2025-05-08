@@ -151,6 +151,27 @@
     --transition-fast: all 0.15s ease-out;
 }
 
+@keyframes savedPulse {
+    0% {
+      /* Начинаем с немного уменьшенного размера и базового свечения */
+      transform: scale(0.98);
+      box-shadow: var(--glow-success); /* Базовое свечение 'saved' */
+      opacity: 0.9;
+    }
+    50% {
+      /* Увеличиваемся чуть больше нормы и усиливаем свечение */
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(var(--rgb-success), 1), 0 0 50px rgba(var(--rgb-success), 0.7); /* Яркая пульсация */
+      opacity: 1;
+    }
+    100% {
+      /* Возвращаемся к нормальному размеру и базовому свечению */
+      transform: scale(1);
+      box-shadow: var(--glow-success); /* Базовое свечение 'saved' */
+      opacity: 1;
+    }
+  }
+
 /* Базовые стили и сброс */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 100%; scroll-behavior: smooth; }
@@ -446,10 +467,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-color: var(--color-success-dark) !important;
     border-width: 1px !important;
     color: var(--color-text-on-primary) !important;
-    box-shadow: var(--glow-success) !important;
-    transform: none !important;
+    box-shadow: var(--glow-success) !important; /* Оставляем базовое свечение как основу */
+    /* transform: none !important; */ /* УБРАНО или ЗАКОММЕНТИРОВАНО, чтобы разрешить анимацию transform */
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
+    opacity: 1; /* Убедимся, что непрозрачность установлена на 1 */
+    /* Применяем анимацию */
+    animation: savedPulse 0.6s ease-out forwards; /* Длительность 0.6s, запускается один раз */
 }
 /* Состояние Error */
 .app-button.error, button.error {
