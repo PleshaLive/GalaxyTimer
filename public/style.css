@@ -139,7 +139,7 @@
     --border-radius-xl: 16px;
     --border-radius-round: 50%;
 
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4); /* Тени можно оставить или настроить */
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
     --shadow-md: 0 5px 15px rgba(0,0,0,0.5);
     --shadow-lg: 0 10px 30px rgba(0,0,0,0.6);
     --shadow-inset: inset 0 2px 5px rgba(0,0,0,0.5);
@@ -286,7 +286,8 @@ label i {
     color: var(--color-text-placeholder);
     opacity: 0.8;
 }
-.styled-select { /* Стили для стандартных select, которые НЕ будут Select2 */
+/* Стили для стандартных select, которые НЕ будут Select2 */
+.styled-select {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -304,96 +305,96 @@ label i {
 
 /* Кнопки */
 .app-button, button {
-    /* ... (основные стили: padding, font, border-radius) ... */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Оставляем рамку от glass */
+    padding: calc(var(--spacing-sm) + 2px) var(--spacing-lg);
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Начальная граница для glass */
     background-color: var(--color-primary-base); /* Базовый цвет */
     color: var(--color-text-on-primary);
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, backdrop-filter 0.3s ease;
-    position: relative; /* Необходимо для позиционирования ::before */
-    overflow: hidden;   /* Обязательно, чтобы блик не выходил за пределы */
+    position: relative; /* Для ::before и z-index */
+    overflow: hidden;   /* Для ::before и border-radius */
     z-index: 1;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     vertical-align: middle;
-    /* Стили glassmorphism для базового состояния (если нужно) - пока убраны */
-    /* background-color: rgba(255, 255, 255, 0.15); */
-    /* -webkit-backdrop-filter: blur(8px); */
-    /* backdrop-filter: blur(8px); */
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 0.03em;
+    min-width: 140px;
+    text-transform: uppercase;
 }
+/* Иконка и текст внутри кнопки */
 .app-button i, button i {
     margin-right: var(--spacing-sm);
     font-size: 0.95em;
-    position: relative; /* Ставим иконку и текст поверх блика */
+    position: relative; /* Поверх блика */
     z-index: 2;
 }
-/* Стилизация текста внутри кнопки, чтобы он был поверх блика */
-.app-button span, button span { /* Если текст обернут в span */
+/* Текст внутри кнопки (если он не в span, могут быть проблемы) */
+.app-button span, button span {
     position: relative;
     z-index: 2;
 }
-/* Если текст не обернут, применяется ко всем текстовым узлам (менее надежно) */
-/* .app-button, button { position: relative; z-index: 2; } */
-
 
 /* === Псевдоэлемент для блика === */
 .app-button::before, button::before {
-    content: ""; /* Восстанавливаем контент */
+    content: "";
     position: absolute;
     top: 0;
     left: -85%; /* Начинаем сильно левее */
     width: 60%; /* Ширина самого блика */
     height: 100%;
-    /* Диагональный градиент для блика */
     background: linear-gradient(
         75deg, /* Угол наклона блика */
         transparent 0%,
         rgba(255, 255, 255, 0.35) 50%, /* Цвет и прозрачность блика */
         transparent 100%
     );
-    /* Небольшой наклон самого блика */
-    transform: skewX(-25deg);
-    /* Начальное состояние - невидимый и за пределами */
-    opacity: 0;
-    /* Анимация для движения и появления/исчезновения */
-    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1), /* Плавное движение */
-                opacity 0.4s ease-in-out;
-    z-index: 1; /* Блик под текстом/иконкой (z-index: 2), но над фоном */
+    transform: skewX(-25deg); /* Наклон блика */
+    opacity: 0; /* Скрыт по умолчанию */
+    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1), /* Анимация движения */
+                opacity 0.4s ease-in-out; /* Анимация появления/исчезновения */
+    z-index: 1; /* Под текстом/иконкой, над фоном */
 }
 
-/* === Новый Glassmorphism Hover Effect === */
+/* === Hover State - Glassmorphism + Анимация блика === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover {
-    /* Стили для фона (glassmorphism) */
+    /* Glassmorphism фон */
     background-color: rgba(255, 255, 255, 0.15);
-    -webkit-backdrop-filter: blur(5px); /* Можно уменьшить блюр */
+    -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
     border-color: rgba(255, 255, 255, 0.25);
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     color: var(--color-text-primary);
-    transform: translateY(-2px);
+    transform: translateY(-2px); /* Небольшой подъем */
 }
 
-/* === Active State для Glassmorphism === */
+/* Запуск анимации блика при наведении */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):hover::before {
-    left: 125%; /* Двигаем блик направо за пределы кнопки */
-    opacity: 1; /* Делаем видимым */
-    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1), /* Та же скорость движения */
-                opacity 0.2s ease-in-out; /* Быстрое появление/исчезновение */
+    left: 125%; /* Двигаем блик направо */
+    opacity: 1; /* Показываем */
+    transition: left 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.2s ease-in-out;
 }
 
+/* === Active State === */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active {
     background-color: rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
-    transform: translateY(0px);
+    transform: translateY(0px); /* Возвращаем на место */
     box-shadow: inset 0 1px 4px rgba(0,0,0,0.4);
     border-color: rgba(255, 255, 255, 0.15);
 }
+/* Мгновенно скрываем блик при нажатии */
 .app-button:not(:disabled):not(.saving):not(.saved):not(.error):active::before,
 button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     opacity: 0;
@@ -401,12 +402,19 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 }
 
 /* === Стили для особых типов кнопок === */
-/* Например, для .tertiary оставим старое поведение или адаптируем */
+/* Кнопка Tertiary (без glass/блика) */
+.app-button.tertiary {
+    background-color: transparent;
+    border-color: var(--color-secondary-light);
+    color: var(--color-secondary-light);
+    box-shadow: none;
+     -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
 .app-button.tertiary::before {
-    content: none;
+    content: none; /* Убираем блик */
 }
 .app-button.tertiary:hover {
-    /* Стили ховера для tertiary остаются без glass/блика */
     background-color: var(--color-secondary-base);
     color: var(--color-text-on-accent);
     border-color: var(--color-secondary-base);
@@ -415,6 +423,60 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
      -webkit-backdrop-filter: none;
     backdrop-filter: none;
 }
+
+/* --- Button States (Saving, Saved, Error, Disabled) --- */
+/* Важно: Убеждаемся, что эти состояния ПЕРЕОПРЕДЕЛЯЮТ glassmorphism и блик */
+/* Состояния Saving и Disabled */
+.app-button.saving, button.saving,
+.app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
+    background-color: var(--color-text-muted) !important;
+    border-color: var(--color-text-muted) !important;
+    border-width: 1px !important;
+    color: var(--color-surface) !important;
+    cursor: wait !important;
+    opacity: 0.7;
+    transform: none !important;
+    box-shadow: var(--shadow-inset) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+/* Состояние Saved */
+.app-button.saved, button.saved {
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success-dark) !important;
+    border-width: 1px !important;
+    color: var(--color-text-on-primary) !important;
+    box-shadow: var(--glow-success) !important;
+    transform: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+/* Состояние Error */
+.app-button.error, button.error {
+    background-color: var(--color-error) !important;
+    border-color: var(--color-error-dark) !important;
+    border-width: 1px !important;
+    color: var(--color-text-on-accent) !important;
+    box-shadow: var(--glow-error) !important;
+    transform: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+/* Гарантированно убираем блик (псевдоэлемент ::before) для этих состояний */
+.app-button.saving::before, button.saving::before,
+.app-button:disabled:not(.winner-btn)::before, button:disabled:not(.winner-btn)::before,
+.app-button.saved::before, button.saved::before,
+.app-button.error::before, button.error::before {
+    content: none !important;
+}
+
+/* --- Winner Buttons --- */
+/* Оставляем их стиль без изменений, убираем блик */
+.winner-btn::before {
+    content: none;
+}
+/* Стили для .winner-btn определены ниже и не будут затронуты общими правилами hover */
+
 
 /* Хедер */
 .site-header {
@@ -457,7 +519,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .date-input {
     width: auto;
     min-width: 150px;
-    color-scheme: dark; /* Helps browser style the date picker */
+    color-scheme: dark;
 }
 .tournament-day {
     font-weight: var(--font-weight-semibold);
@@ -546,7 +608,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     color: var(--color-primary-light);
     background-color: var(--color-surface);
     border-color: var(--color-border);
-    border-bottom-color: var(--color-surface); /* Hide bottom border of active tab */
+    border-bottom-color: var(--color-surface);
     font-weight: var(--font-weight-semibold);
     box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
 }
@@ -555,7 +617,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 }
 .tabs-content {
     padding: var(--spacing-lg);
-    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg); /* Adjust top-left radius */
+    border-radius: 0 var(--border-radius-lg) var(--border-radius-lg) var(--border-radius-lg);
 }
 .tab-panel {
     display: none;
@@ -578,16 +640,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .match-column {
     background-color: var(--color-surface-secondary);
     border-radius: var(--border-radius-lg);
-    /* overflow: hidden; */ /* <--- ЗАКОММЕНТИРОВАНО ИЛИ УДАЛЕНО */
+    /* overflow: hidden; */ /* УБРАНО - для Select2 dropdown */
     display: flex;
     flex-direction: column;
     border: 1px solid var(--color-border);
     transition: var(--transition-base);
     box-shadow: var(--shadow-sm);
-    /* Примечание: Если после удаления overflow возникнут другие проблемы с макетом,
-       возможно, понадобится добавить position: relative; этому элементу,
-       но сначала попробуйте просто убрать overflow. */
-    /* position: relative; */
+    /* position: relative; */ /* Может понадобиться, если будут проблемы с позиционированием */
 }
 .match-column:hover {
     transform: translateY(-5px);
@@ -622,7 +681,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     font-weight: var(--font-weight-semibold);
     padding: var(--spacing-xs) var(--spacing-sm);
     text-align: center;
-    text-align-last: center; /* For Firefox */
+    text-align-last: center;
 }
 .match-header .time-input {
     width: 75px;
@@ -645,7 +704,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 .match-teams {
     display: flex;
-    align-items: stretch; /* Stretch blocks vertically */
+    align-items: stretch;
     justify-content: space-between;
     gap: var(--spacing-sm);
 }
@@ -657,16 +716,15 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-radius: var(--border-radius-md);
     transition: background-color 0.2s ease, border-color 0.3s ease;
     border: 1px solid var(--color-border);
-    position: relative; /* <-- ДОБАВИТЬ ЭТУ СТРОКУ */
+    position: relative; /* Для позиционирования Select2 dropdown */
 }
 
-/* Team Logo above Select2 */
+/* Team Logo above Select */
 .team-info-header {
     display: flex;
     align-items: center;
     margin-bottom: var(--spacing-xs);
 }
-
 .team-logo {
     width: 24px;
     height: 24px;
@@ -677,17 +735,14 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border: 1px solid var(--color-border);
     flex-shrink: 0;
 }
-
 .team-block label {
     margin-bottom: 0;
     flex-grow: 1;
 }
-
-.team-block .team-select { /* Styles for the original select, now mostly hidden by Select2 */
+.team-block .team-select {
     width: 100%;
-    margin-top: auto; /* Push Select2 down if needed */
+    margin-top: auto;
 }
-
 
 /* Team Block Specific Styles */
 .team-1-block {
@@ -711,12 +766,12 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     font-weight: var(--font-weight-bold);
     color: var(--color-text-muted);
     font-size: 1.1rem;
-    align-self: center; /* Align vertically */
+    align-self: center;
     padding: 0 var(--spacing-xs);
     border: 1px dashed var(--color-divider);
     border-radius: var(--border-radius-round);
     width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; /* Prevent shrinking */
+    flex-shrink: 0;
 }
 
 .winner-buttons {
@@ -739,6 +794,11 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     transition: var(--transition-fast);
     min-width: auto;
     text-transform: none;
+    /* Ensure no ::before from general button styles */
+    /* content: none !important; */ /* Already handled by .winner-btn::before below */
+}
+.winner-btn::before {
+    content: none; /* Disable glare for winner buttons */
 }
 
 /* Winner Button Styles */
@@ -749,6 +809,10 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .winner-btn.team-1-accent-border:hover {
     background-color: var(--team1-color-bg);
     box-shadow: var(--team1-glow);
+    /* Keep specific hover, no glass */
+    transform: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 .winner-btn.team-1-accent-border.winner-selected {
     background-color: var(--team1-color-accent);
@@ -763,6 +827,10 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .winner-btn.team-2-accent-border:hover {
     background-color: var(--team2-color-bg);
     box-shadow: var(--team2-glow);
+     /* Keep specific hover, no glass */
+    transform: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 .winner-btn.team-2-accent-border.winner-selected {
     background-color: var(--team2-color-accent);
@@ -803,7 +871,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .match-footer {
     padding: var(--spacing-md);
     border-top: 1px solid var(--color-divider);
-    background-color: var(--color-surface); /* Match card background */
+    background-color: var(--color-surface);
 }
 .save-match-button { width: 100%; }
 
@@ -912,67 +980,17 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 .json-output-container { margin-top: 0; padding: 0; }
 .json-output {
     background: var(--color-surface-tertiary);
-    color: #b0c4de; /* Lighter color for JSON text */
+    color: #b0c4de;
     padding: var(--spacing-lg);
     border-radius: var(--border-radius-lg);
-    white-space: pre-wrap; /* Wrap long lines */
+    white-space: pre-wrap;
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
     font-size: 0.9rem;
     border: 1px solid var(--color-border);
-    max-height: calc(100vh - 350px); /* Limit height */
+    max-height: calc(100vh - 350px);
     overflow-y: auto;
     box-shadow: var(--shadow-neumorphic-inset);
     line-height: 1.6;
-}
-
-/* Button States */
-.app-button.saving, button.saving,
-.app-button:disabled:not(.winner-btn), button:disabled:not(.winner-btn) {
-    /* Используем цвета для неактивного состояния */
-    background-color: var(--color-text-muted) !important;
-    border-color: var(--color-text-muted) !important;
-    border-width: 1px !important; /* Согласуем толщину рамки с glass */
-    color: var(--color-surface) !important; /* Темный текст на сером фоне */
-    cursor: wait !important;
-    opacity: 0.7;
-    transform: none !important; /* Убираем эффекты трансформации */
-    box-shadow: var(--shadow-inset) !important; /* Тень внутрь */
-    -webkit-backdrop-filter: none !important; /* Убираем размытие */
-    backdrop-filter: none !important;
-}
-
-/* Состояние Saved */
-.app-button.saved, button.saved {
-    /* Используем цвета успеха */
-    background-color: var(--color-success) !important;
-    border-color: var(--color-success-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-primary) !important; /* Белый текст */
-    box-shadow: var(--glow-success) !important; /* Свечение успеха */
-    transform: none !important;
-    -webkit-backdrop-filter: none !important; /* Убираем размытие */
-    backdrop-filter: none !important;
-}
-
-/* Состояние Error */
-.app-button.error, button.error {
-    /* Используем цвета ошибки */
-    background-color: var(--color-error) !important;
-    border-color: var(--color-error-dark) !important;
-    border-width: 1px !important;
-    color: var(--color-text-on-accent) !important; /* Белый текст */
-    box-shadow: var(--glow-error) !important; /* Свечение ошибки */
-    transform: none !important;
-    -webkit-backdrop-filter: none !important; /* Убираем размытие */
-    backdrop-filter: none !important;
-}
-
-/* Гарантированно убираем блик (псевдоэлемент ::before) для этих состояний */
-.app-button.saving::before, button.saving::before,
-.app-button:disabled:not(.winner-btn)::before, button:disabled:not(.winner-btn)::before,
-.app-button.saved::before, button.saved::before,
-.app-button.error::before, button.error::before {
-    content: none !important; /* Убираем псевдоэлемент */
 }
 
 /* Styled Scrollbar */
@@ -1069,11 +1087,11 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
-    min-width: 0; /* Prevent overflow issues */
+    min-width: 0;
 }
 
 #castersListContainer li:not(.editing) .caster-details {
-     align-items: baseline; /* Align text baseline when not editing */
+     align-items: baseline;
 }
 
 #castersListContainer .caster-name {
@@ -1082,13 +1100,13 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px; /* Limit name width */
+    max-width: 150px;
 }
 
 #castersListContainer .caster-social {
     font-size: 0.85rem;
     color: var(--color-text-muted);
-    word-break: break-all; /* Break long URLs/nicks */
+    word-break: break-all;
     flex-shrink: 1;
     min-width: 50px;
 }
@@ -1096,7 +1114,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 #castersListContainer .caster-actions {
     display: flex;
     align-items: center;
-    flex-shrink: 0; /* Prevent buttons wrapping */
+    flex-shrink: 0;
 }
 #castersListContainer .caster-actions button {
     margin-left: var(--spacing-sm);
@@ -1107,7 +1125,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     box-shadow: none;
 }
 #castersListContainer .caster-actions button i {
-    margin-right: 0; /* Remove margin for icon-only buttons */
+    margin-right: 0;
 }
 
 
@@ -1124,8 +1142,8 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     flex-grow: 1;
 }
 #castersListContainer li .caster-details .caster-name-input {
-   flex-grow: 0; /* Don't grow */
-   flex-basis: 150px; /* Initial width */
+   flex-grow: 0;
+   flex-basis: 150px;
    min-width: 100px;
 }
 #castersListContainer li .caster-details .caster-social-input {
@@ -1177,22 +1195,22 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 /* Container and Single Selection Field */
 .select2-container {
-    width: 100% !important; /* Force Select2 to take full width like other inputs */
+    width: 100% !important; /* Force Select2 to take full width */
     font-size: 0.9rem;      /* Match general input font size */
     font-family: var(--font-family-base);
-    vertical-align: middle; /* Better alignment with adjacent elements */
+    vertical-align: middle; /* Better alignment */
+    position: relative;     /* Needed for dropdown positioning context */
 }
 .select2-container .select2-selection--single {
-    background-color: var(--color-surface-tertiary); /* Match input background */
-    border: 1px solid var(--color-border);          /* Match input border */
-    border-radius: var(--border-radius-md);         /* Match input border-radius */
+    background-color: var(--color-surface-tertiary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
     height: auto; /* Adjust height to content */
-    /* Use padding similar to other inputs, adjust right for arrow */
-    padding: var(--spacing-sm) calc(var(--spacing-sm) + 20px) var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-sm) calc(var(--spacing-sm) + 20px) var(--spacing-sm) var(--spacing-md); /* Adjust right padding for arrow */
     box-shadow: var(--shadow-inset);
     transition: var(--transition-base);
     outline: none;
-    display: flex; /* Use flex to align items vertically */
+    display: flex;
     align-items: center;
 }
 .select2-container--default.select2-container--focus .select2-selection--single,
@@ -1203,24 +1221,24 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 
 /* Rendered Selection (Text and Logo) */
 .select2-container .select2-selection--single .select2-selection__rendered {
-    color: var(--color-text-primary); /* Match input text color */
-    line-height: normal; /* Reset line-height for flex alignment */
+    color: var(--color-text-primary);
+    line-height: normal;
     padding-left: 0;
-    padding-right: 0; /* Remove default padding */
-    display: flex;    /* Use flex to align logo and text */
+    padding-right: 0;
+    display: flex;
     align-items: center;
     width: 100%;
-    overflow: hidden; /* Prevent long text from pushing arrow */
+    overflow: hidden;
 }
 .select2-container--default .select2-selection--single .select2-selection__placeholder {
     color: var(--color-text-placeholder);
-    display: flex; /* Align placeholder text */
+    display: flex;
     align-items: center;
 }
 
 /* Arrow */
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-    height: 100%; /* Make arrow container full height */
+    height: 100%;
     position: absolute;
     top: 0;
     right: var(--spacing-sm);
@@ -1247,50 +1265,24 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     border-width: 0 4px 5px 4px;
 }
 
-/* Clear Button (X) - Requires allowClear: true */
+/* Clear Button (X) - Should be hidden via JS allowClear: false */
 .select2-container--default .select2-selection--single .select2-selection__clear {
-    cursor: pointer;
-    float: right; /* Needs float to position correctly */
-    font-weight: bold;
-    height: 100%; /* Take full height for vertical alignment */
-    /* Adjust positioning relative to arrow */
-    position: absolute;
-    top: 0;
-    right: calc(var(--spacing-sm) + 20px); /* Position left of the arrow */
-    padding: 0 var(--spacing-xs);
-    color: var(--color-text-muted);
-    display: flex;
-    align-items: center;
-    line-height: 1; /* Ensure 'x' aligns well */
-    font-size: 1.2em;
-}
-.select2-container--default .select2-selection--single .select2-selection__clear:hover {
-    color: var(--color-error);
+    display: none; /* Hide it explicitly just in case */
 }
 
-
-/* Dropdown */
-/* Dropdown */
 /* Dropdown */
 .select2-dropdown {
     background-color: var(--color-surface-secondary);
     border: 1px solid var(--color-border-light);
     border-radius: var(--border-radius-md);
     box-shadow: var(--shadow-md);
-    overflow: hidden; /* Оставляем для скругления углов */
-
-    /* === УВЕЛИЧИВАЕМ Z-INDEX === */
-    z-index: 99999 !important; /* Очень высокое значение + !important для переопределения */
-    /* === КОНЕЦ ИЗМЕНЕНИЯ === */
-
-    /* Настройки ширины (оставляем) */
+    overflow: hidden;
+    z-index: 99999 !important; /* Ensure high z-index */
     width: auto;
-    min-width: 350px; /* Или ваше значение */
-
-    /* Убедитесь, что здесь нет ручного смещения */
+    min-width: 350px; /* Adjust minimum width */
+    /* Ensure no manual offset */
     /* margin-left: -15px; */
 }
-/* Adjust border radius when dropdown opens below/above */
 .select2-container--default.select2-container--open .select2-dropdown--below {
     border-top: none;
     border-top-left-radius: 0;
@@ -1305,7 +1297,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
 /* Search Field inside Dropdown */
 .select2-search--dropdown {
     padding: var(--spacing-sm);
-    background-color: var(--color-surface); /* Slightly different background for search */
+    background-color: var(--color-surface);
 }
 .select2-search--dropdown .select2-search__field {
     background-color: var(--color-surface-tertiary);
@@ -1326,7 +1318,7 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     list-style: none;
     margin: 0;
     padding: 0;
-    max-height: 250px; /* Limit dropdown height */
+    max-height: 250px;
     overflow-y: auto;
 }
 
@@ -1335,18 +1327,17 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     padding: var(--spacing-sm) var(--spacing-md);
     transition: background-color var(--transition-fast);
     cursor: pointer;
-    display: flex; /* Needed for team option alignment */
+    display: flex;
     align-items: center;
-    color: var(--color-text-secondary); /* Base color for option text */
+    color: var(--color-text-secondary);
 }
 .select2-results__option--highlighted[aria-selected] {
     background-color: var(--color-primary-base);
     color: var(--color-text-on-primary);
 }
-/* Ensure text within highlighted option is also correct color */
 .select2-results__option--highlighted[aria-selected] .select2-team-name,
 .select2-results__option--highlighted[aria-selected] {
-     color: var(--color-text-on-primary) !important; /* Use important if needed */
+     color: var(--color-text-on-primary) !important;
 }
 
 .select2-results__option[aria-disabled=true] {
@@ -1369,13 +1360,12 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     padding: var(--spacing-sm) var(--spacing-md);
 }
 
-
 /* Team Logo and Name Styles within Select2 */
 .select2-team-option, .select2-team-selection {
     display: flex;
     align-items: center;
-    width: 100%; /* Ensure it takes full width */
-    overflow: hidden; /* Prevent content overflow */
+    width: 100%;
+    overflow: hidden;
 }
 
 .select2-team-logo, .select2-team-logo-selected {
@@ -1384,9 +1374,9 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     margin-right: 8px;
     border-radius: 4px;
     object-fit: contain;
-    background-color: rgba(255,255,255,0.1); /* Placeholder bg */
-    flex-shrink: 0; /* Prevent logo shrinking */
-    vertical-align: middle; /* Align better with text if not using flex */
+    background-color: rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    vertical-align: middle;
 }
 
 .select2-team-logo-selected {
@@ -1399,24 +1389,21 @@ button:not(:disabled):not(.saving):not(.saved):not(.error):active::before {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    flex-grow: 1; /* Allow name to take remaining space */
+    flex-grow: 1;
     vertical-align: middle;
-    color: inherit; /* Inherit color from parent (.select2-selection__rendered or .select2-results__option) */
+    color: inherit;
 }
-/* Ensure primary text color for name inside options */
 .select2-results__option .select2-team-name {
     color: var(--color-text-primary);
 }
 
-/* Hide original select styled with .styled-select when Select2 is active */
-/* Target both .team-select and .control-select that might be used with Select2 */
+/* Hide original select when Select2 is active */
 select.team-select.select2-hidden-accessible,
 select.control-select.select2-hidden-accessible {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
   background-image: none !important;
-  /* Hide visually and from accessibility tree */
   position: absolute !important;
   overflow: hidden !important;
   clip: rect(0 0 0 0) !important;
@@ -1479,12 +1466,12 @@ select.control-select.select2-hidden-accessible {
         justify-content: center;
     }
     .tabs-nav .tab-link.active {
-        border-bottom-color: var(--color-border); /* Keep border consistent when tabs stack */
+        border-bottom-color: var(--color-border);
     }
     .tabs-content {
-        border-radius: var(--border-radius-lg); /* Apply radius to all corners when tabs stack */
+        border-radius: var(--border-radius-lg);
     }
-    .team-block .select2-container { /* Ensure Select2 takes full width in stacked view */
+    .team-block .select2-container {
         width: 100% !important;
     }
 }
@@ -1493,12 +1480,11 @@ select.control-select.select2-hidden-accessible {
     h1 { font-size: 1.6rem; }
     h2 { font-size: 1.1rem; }
     .header-input, .styled-select, .map-score-input, .time-input,
-    .select2-container .select2-selection--single /* Adjust Select2 padding */
+    .select2-container .select2-selection--single
     {
         padding: var(--spacing-sm);
         font-size: 0.9rem;
     }
-    /* Re-adjust Select2 single selection padding for smaller screens */
     .select2-container .select2-selection--single {
         padding-right: calc(var(--spacing-sm) + 20px); /* Ensure arrow space */
     }
