@@ -13,7 +13,8 @@ import {
     initMapVeto,
     gatherMapVetoData,
     updateVetoTeamOptions,
-    styleVetoActionSelect
+    styleVetoActionSelect,
+    updateMapVetoDisplay // <-- Добавьте сюда импорт новой функции
 } from "./mapVeto.js";
 import {
     initVRS,
@@ -37,7 +38,7 @@ console.log("[Init] Socket.IO client initialized.");
 // Промис для отслеживания инициализации данных команд (важно для селектов)
 const initPromise = initMatches(); // Запускает загрузку списка команд, заполнение селектов и ПРИВЯЗКУ КНОПОК ПОБЕДИТЕЛЯ
 initMapVeto(); // Инициализация элементов управления и логики для Map Veto
-initVRS();     // Инициализация элементов управления и логики для VRS блоков
+initVRS();      // Инициализация элементов управления и логики для VRS блоков
 initCasters(); // Инициализация модуля кастеров (загружает данные внутри)
 
 // --- Обработчики событий Socket.IO ---
@@ -68,6 +69,10 @@ socket.on("mapVetoUpdate", (updatedMapVeto) => {
         // Проверяем, что функция updateVetoTeamOptions существует перед вызовом
         if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
             updateVetoTeamOptions(matchSelectElement.value); // Обновляем с учетом текущего выбранного матча в Veto
+        }
+        // Обновляем дисплей команд НАД таблицей вето при обновлении по сокету
+        if (matchSelectElement && typeof updateMapVetoDisplay === 'function') {
+            updateMapVetoDisplay(matchSelectElement.value);
         }
     }
 });
@@ -134,9 +139,9 @@ socket.on("selectedCastersUpdate", (selectedCasters) => {
 
 // --- Функция стилизации селекта выбора стороны в Map Veto ---
 /**
- * Обновляет CSS классы для элемента select выбора стороны в MapVeto.
- * @param {HTMLSelectElement} selectElement - Элемент select.
- */
+ * Обновляет CSS классы для элемента select выбора стороны в MapVeto.
+ * @param {HTMLSelectElement} selectElement - Элемент select.
+ */
 function updateSideSelectStyle(selectElement) {
     if (!selectElement) return;
     const selectedValue = selectElement.value;
@@ -153,10 +158,10 @@ function updateSideSelectStyle(selectElement) {
 // --- Функции обновления UI ---
 
 /**
- * Обновляет весь интерфейс матчей на основе полученных данных.
- * Учитывает использование Select2 для выбора команд.
- * @param {Array<Object>} matches - Массив объектов с данными по каждому матчу.
- */
+ * Обновляет весь интерфейс матчей на основе полученных данных.
+ * Учитывает использование Select2 для выбора команд.
+ * @param {Array<Object>} matches - Массив объектов с данными по каждому матчу.
+ */
 function updateMatchesUI(matches) {
     console.log("[UI] Attempting to update matches UI. Data:", matches);
     if (!Array.isArray(matches)) {
@@ -265,7 +270,7 @@ function updateMatchesUI(matches) {
                          if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
                     }
                 } else if (mapSelect.options.length > 0) {
-                        if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
+                     if (mapSelect.value !== mapSelect.options[0].value) mapSelect.value = mapSelect.options[0].value;
                 }
             }
 
@@ -326,8 +331,8 @@ function updateMatchesUI(matches) {
 }
 
 /**
- * Обновляет интерфейс Map Veto.
- */
+ * Обновляет интерфейс Map Veto.
+ */
 function updateMapVetoUI(mapVetoData) {
     console.log("[UI] Attempting to update Map Veto UI. Data:", mapVetoData);
     if (!mapVetoData || !mapVetoData.veto || !Array.isArray(mapVetoData.veto)) {
@@ -338,6 +343,10 @@ function updateMapVetoUI(mapVetoData) {
 
     if (matchSelectElement && typeof mapVetoData.matchIndex !== 'undefined' && matchSelectElement.value != mapVetoData.matchIndex) {
         matchSelectElement.value = mapVetoData.matchIndex;
+        // При обновлении UI MapVeto по сокету для ДРУГОГО матча, также обновить дисплей команд
+        if (typeof updateMapVetoDisplay === 'function') {
+            updateMapVetoDisplay(matchSelectElement.value);
+        }
     }
 
     mapVetoData.veto.forEach((vetoItem, idx) => {
@@ -395,8 +404,8 @@ function updateMapVetoUI(mapVetoData) {
 }
 
 /**
- * Обновляет интерфейс VRS-блоков.
- */
+ * Обновляет интерфейс VRS-блоков.
+ */
 function updateVRSUI(rawVrsData) {
     console.log("[UI] Attempting to update VRS UI. Data:", rawVrsData);
     if (!rawVrsData || typeof rawVrsData !== 'object') {
@@ -448,8 +457,8 @@ function clearVRSFieldsForMatch(matchIndex) {
 }
 
 /**
- * Обновляет интерфейс кастомных полей (в хедере).
- */
+ * Обновляет интерфейс кастомных полей (в хедере).
+ */
 function updateCustomFieldsUI(fields) {
     // console.log("[UI] Attempting to update custom fields UI. Data:", fields);
     if (!fields || typeof fields !== 'object') {
@@ -523,11 +532,19 @@ async function loadMapVetoFromServer() {
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const mapVetoData = await response.json();
         console.log("[Data] Map veto data loaded successfully:", mapVetoData);
-        updateMapVetoUI(mapVetoData);
-        if (mapVetoData && typeof mapVetoData.matchIndex !== 'undefined') {
-            const matchSelectElement = document.getElementById("matchSelect");
-            if (matchSelectElement && typeof updateVetoTeamOptions === 'function') {
+        updateMapVetoUI(mapVetoData); // Обновляем UI таблицы вето
+        
+        // Обновляем опции команд и дисплей над таблицей вето
+        // после загрузки данных вето и потенциального обновления matchSelect
+        const matchSelectElement = document.getElementById("matchSelect");
+        if (matchSelectElement?.value) {
+            if (typeof updateVetoTeamOptions === 'function') {
                 updateVetoTeamOptions(matchSelectElement.value);
+            }
+            if (typeof updateMapVetoDisplay === 'function') {
+                // Этот вызов может быть избыточным, если updateMapVetoUI уже вызвал updateMapVetoDisplay
+                // при смене mapVetoData.matchIndex. Но для надежности оставим, если matchIndex не менялся.
+                updateMapVetoDisplay(matchSelectElement.value);
             }
         }
     } catch (error) {
@@ -831,11 +848,27 @@ function setupListeners() {
     // Слушатель изменения матча в Map Veto
     const matchSelectElement = document.getElementById("matchSelect");
     if (matchSelectElement) {
-        matchSelectElement.addEventListener('change', () => {
+        // Обернем логику в именованную функцию для ясности (опционально)
+        const handleMatchSelectChange = () => {
+            const selectedMatchIndex = matchSelectElement.value;
+            console.log(`[MapVeto] Match selection changed to: ${selectedMatchIndex}`);
+
+            // Обновляем опции команд ВНУТРИ таблицы вето
             if (typeof updateVetoTeamOptions === 'function') {
-                updateVetoTeamOptions(matchSelectElement.value);
+                 updateVetoTeamOptions(selectedMatchIndex);
+            } else {
+                 console.warn("updateVetoTeamOptions function not found");
             }
-        });
+
+            // Обновляем дисплей команд НАД таблицей вето (НОВЫЙ ВЫЗОВ)
+            if (typeof updateMapVetoDisplay === 'function') {
+                 updateMapVetoDisplay(selectedMatchIndex);
+            } else {
+                 console.warn("updateMapVetoDisplay function not found");
+            }
+        };
+
+        matchSelectElement.addEventListener('change', handleMatchSelectChange);
     }
 
     // Слушатели для селектов команд УДАЛЕНЫ из main.js, так как они теперь обрабатываются
@@ -929,7 +962,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
         // Загружаем все остальные данные параллельно
         await Promise.all([
-            loadMatchesFromServer(),
+            loadMatchesFromServer(), // Важно, чтобы это завершилось ДО первоначального вызова updateMapVetoDisplay
             loadRawVRSData(),
             loadCustomFieldsFromServer(),
             loadMapVetoFromServer(),
@@ -946,9 +979,23 @@ window.addEventListener("DOMContentLoaded", async () => {
         initTabs();
 
         // Первичная настройка UI после загрузки данных
-        const matchSelectElement = document.getElementById("matchSelect");
-        if (matchSelectElement?.value && typeof updateVetoTeamOptions === 'function') {
-            updateVetoTeamOptions(matchSelectElement.value);
+
+        // Сначала обновляем опции команд в таблице Veto (если нужно)
+        const initialMatchSelect = document.getElementById("matchSelect");
+        if (initialMatchSelect?.value && typeof updateVetoTeamOptions === 'function') {
+            updateVetoTeamOptions(initialMatchSelect.value);
+        }
+
+        // --> ВАЖНО: Вызываем обновление дисплея команд ПОСЛЕ того, как отработал loadMatchesFromServer()
+        // и потенциально обновил селекты команд на вкладке "Матчи"
+        // Также важно, чтобы это было ПОСЛЕ loadMapVetoFromServer(), который может изменить initialMatchSelect.value
+        if (initialMatchSelect?.value) {
+             if (typeof updateMapVetoDisplay === 'function') {
+                 console.log(`[Init] Calling initial updateMapVetoDisplay for Match ${initialMatchSelect.value}`);
+                 updateMapVetoDisplay(initialMatchSelect.value);
+             } else {
+                 console.warn("Initial call: updateMapVetoDisplay function not found");
+             }
         }
         
         // Применяем стили к элементам Veto (цвет BAN/PICK/DECIDER, цвет CT/T, цвет команды)
