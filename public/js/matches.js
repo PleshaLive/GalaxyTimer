@@ -510,27 +510,27 @@ export function gatherSingleMatchData(matchIndex) {
     const finRectLow = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png";
 
     // Формирование объектов с данными для каждого возможного статуса
-     const upcomObj = {
-      UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "",
-      UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "",
-      UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "",
-      UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
-      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogo,
-      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogo,
-      UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "",
-      UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
-      UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
-      UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "",
-      UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "",
-      UPCOM_MAP3_SCORE: statusText === "UPCOM" ? maps.MAP3_SCORE : "",
-      UPCOM_Cest: upcomCestValue,
-      UPCOM_RectangleUP: upcomRectUp,
-      UPCOM_RectangleLOW: upcomRectLow,
-      UPCOM_vs_mini: upcomVsMiniValue,
-      UPCOM_vs_big: upcomVsBigValue,
-      UPCOM_next: "",
-      UPCOM_next_photo: upcomNextPhotoValue
-    };
+const upcomObj = {
+      UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "",
+      UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "",
+      UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "",
+      UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
+      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogo,
+      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogo,
+      UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "",
+      UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
+      UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
+      UPCOM_MAP2_SCORE: statusText === "UPCOM" ? maps.MAP2_SCORE : "",
+      UPCOM_MAP3: statusText === "UPCOM" ? maps.MAP3 : "",
+      UPCOM_MAP3_SCORE: statusText === "UPCOM" ? `MATCH ${m}` : "",
+      UPCOM_Cest: upcomCestValue,
+      UPCOM_RectangleUP: upcomRectUp,
+      UPCOM_RectangleLOW: upcomRectLow,
+      UPCOM_vs_mini: upcomVsMiniValue,
+      UPCOM_vs_big: upcomVsBigValue,
+      UPCOM_next: "",
+      UPCOM_next_photo: upcomNextPhotoValue
+    };
 
     const liveObj = {
       LIVE_MATCH_STATUS: statusText === "LIVE" ? statusText : "",
