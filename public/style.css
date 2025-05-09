@@ -1971,27 +1971,30 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
 }
 
 #tab-timer .mode-group-timer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: var(--spacing-lg); /* Промежуток между радио-кнопками */
+    display: flex;            /* Располагает дочерние элементы (метки) в строку */
+    justify-content: center;  /* Центрирует группу меток внутри этого блока */
+    align-items: center;      /* Выравнивает метки по центру вертикально */
+    gap: var(--spacing-lg);   /* Промежуток между "Обратный отсчёт" и "По таргету" */
     margin-bottom: var(--spacing-xl);
-    padding: var(--spacing-sm) 0; /* Небольшой вертикальный паддинг */
+    padding: var(--spacing-sm) 0;
+    background-color: var(--color-surface-secondary); 
+     border-radius: var(--border-radius-md); 
 }
 
 #tab-timer .mode-group-timer .radio-label {
     color: var(--color-text-primary);
-    font-size: 1rem; /* Размер шрифта для меток радио-кнопок */
+    font-size: 1rem;
     font-weight: var(--font-weight-medium);
     cursor: pointer;
-    display: inline-flex;
+    display: inline-flex; /* Располагает radio-кнопку и текст внутри метки в строку */
     align-items: center;
+    margin-bottom: 0; /* Если метки находятся внутри form-group, это может быть нужно */
 }
 
 #tab-timer .mode-group-timer input[type="radio"] {
     margin-right: var(--spacing-sm);
-    accent-color: var(--color-primary-base); /* Цвет активной радио-кнопки */
-    transform: scale(1.1); /* Немного увеличить радио-кнопку */
+    accent-color: var(--color-primary-base);
+    transform: scale(1.1);
 }
 
 #tab-timer .timer-input-container {
