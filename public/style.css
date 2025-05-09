@@ -1953,3 +1953,102 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
         order: initial; /* Сбрасываем порядок на маленьких экранах */
     }
 }
+
+#tab-timer .timer-controls-wrapper {
+    /* .card-style уже должен применяться, можно добавить специфичные отступы, если нужно */
+    padding: var(--spacing-lg);
+}
+
+#tab-timer .tab-title { /* Если общий .tab-title не подходит */
+    color: var(--color-primary-light); /* Пример использования переменной */
+    /* text-align: center; уже должно быть */
+    margin-bottom: var(--spacing-xl); /* Больший отступ снизу для заголовка вкладки */
+}
+#tab-timer .tab-title i {
+    margin-right: var(--spacing-sm);
+}
+
+#tab-timer .mode-group-timer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--color-surface-secondary); /* Фон для группы переключателей */
+    border-radius: var(--border-radius-md);
+}
+
+#tab-timer .mode-group-timer .radio-label {
+    color: var(--color-text-primary);
+    font-size: 0.95rem; /* Немного крупнее стандартных label */
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    display: inline-flex; /* Для выравнивания radio и текста */
+    align-items: center;
+    margin-bottom: 0; /* Убираем стандартный отступ label из form-group */
+}
+
+#tab-timer .mode-group-timer input[type="radio"] {
+    margin-right: var(--spacing-sm);
+    accent-color: var(--color-primary-base); /* Стилизует сам radio button в современных браузерах */
+    transform: scale(1.2); /* Немного увеличим размер radio */
+}
+
+#tab-timer .timer-input-sections {
+    background-color: var(--color-surface); /* Может совпадать с card-style */
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-md);
+    border: 1px solid var(--color-border);
+    margin-bottom: var(--spacing-lg);
+}
+
+#tab-timer .timer-input-sections .form-section-description {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+    text-align: center;
+    font-weight: var(--font-weight-medium);
+}
+
+#tab-timer .timer-input-sections .form-group {
+    margin-bottom: var(--spacing-md); /* Отступы между группами label + input */
+}
+#tab-timer .timer-input-sections .form-group:last-child {
+    margin-bottom: 0;
+}
+
+#tab-timer .timer-input-sections label {
+    /* Стили для label уже должны быть в .form-group label, но можно переопределить */
+    color: var(--color-text-muted); /* Немного приглушенный цвет для подписей полей */
+    font-size: 0.85rem;
+}
+
+#tab-timer .timer-input-sections input[type="number"].header-input {
+    /* Класс .header-input должен уже задавать основные стили */
+    text-align: center; /* Оставляем выравнивание по центру для этих полей */
+    font-size: 1.1rem; /* Можем сделать цифры покрупнее */
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+
+#tab-timer #setTimerButton.app-button.primary {
+    /* Классы .app-button.primary должны уже стилизовать кнопку */
+    /* width: 100%; margin-top: var(--spacing-md); уже заданы инлайн, но можно и здесь */
+    font-size: 1.1rem; /* Можно сделать текст кнопки крупнее */
+    padding-top: calc(var(--spacing-sm) + 4px); /* Чуть больше вертикальный padding */
+    padding-bottom: calc(var(--spacing-sm) + 4px);
+    font-family: var(--font-family-base); /* Используем основной шрифт сайта */
+}
+
+#tab-timer .timer-message-feedback {
+    text-align: center;
+    margin-top: var(--spacing-md);
+    font-size: 0.95rem;
+    font-weight: var(--font-weight-medium);
+    min-height: 1.5em; /* Резервируем место, чтобы кнопка не прыгала */
+    color: var(--color-success); /* Зеленый для успеха по умолчанию */
+}
+/* Дополнительно можно добавить класс для сообщений об ошибках */
+#tab-timer .timer-message-feedback.error {
+    color: var(--color-error);
+}
