@@ -130,21 +130,21 @@ function updateSideSelectStyle(selectElement) {
  * @param {Array<Object>} matches - Массив объектов с данными по каждому матчу.
  */
 function updateMatchesUI(matches) {
-        console.log("[UI] Attempting to update matches UI. Data:", matches);
-        if (!Array.isArray(matches)) {
-            console.warn("[UI] updateMatchesUI received non-array data:", matches);
-            return;
-        }
-    
-        matches.forEach((match, index) => {
-            const matchIndex = index + 1;
-            const matchColumn = document.querySelector(`.match-column[data-match="${matchIndex}"]`);
-    
-            if (!matchColumn) {
-                console.warn(`[UI] Match column ${matchIndex} not found for UI update.`);
-                return;
-            }
-            console.log(`[UI] Updating Match ${matchIndex}...`);
+    console.log("[UI] Attempting to update matches UI. Data:", matches);
+    if (!Array.isArray(matches)) {
+        console.warn("[UI] updateMatchesUI received non-array data:", matches);
+        return;
+    }
+
+    matches.forEach((match, index) => {
+        const matchIndex = index + 1;
+        const matchColumn = document.querySelector(`.match-column[data-match="${matchIndex}"]`);
+
+        if (!matchColumn) {
+            console.warn(`[UI] Match column ${matchIndex} not found for UI update.`);
+            return;
+        }
+        console.log(`[UI] Updating Match ${matchIndex}...`);
 
         // Обновление времени
         const timeInput = document.getElementById(`timeInput${matchIndex}`);
@@ -180,46 +180,34 @@ function updateMatchesUI(matches) {
         }
 
         // Обновление Команды 1
-                const team1Select = document.getElementById(`team1Select${matchIndex}`);
-                const team1Name = match.UPCOM_TEAM1 || match.LIVE_TEAM1 || match.FINISHED_TEAM1 || "";
-                if (team1Select) {
-                    const optionExists = Array.from(team1Select.options).some(opt => opt.value === team1Name);
-                    let valueChanged = false;
-                    if (team1Name && optionExists) {
-                        if (team1Select.value !== team1Name) {
-                            team1Select.value = team1Name;
-                            valueChanged = true;
-                        }
-                    } else if (team1Select.value !== "" && team1Select.options.length > 0) {
-                        team1Select.value = team1Select.options[0].value; // Default to "-"
-                        valueChanged = true;
-                    }
-                    // Если значение было установлено или уже было правильным, триггерим Select2
-                    if (valueChanged || (team1Name && team1Select.value === team1Name)) {
-                        $(team1Select).trigger('change.select2');
-                    }
-                }
+        const team1Select = document.getElementById(`team1Select${matchIndex}`);
+        const team1Name = match.UPCOM_TEAM1 || match.LIVE_TEAM1 || match.FINISHED_TEAM1 || "";
+        if (team1Select) {
+            const optionExists = Array.from(team1Select.options).some(opt => opt.value === team1Name);
+            if (team1Name && optionExists) {
+                if (team1Select.value !== team1Name) team1Select.value = team1Name;
+            } else if (team1Select.value !== "" && team1Select.options.length > 0) {
+                team1Select.value = team1Select.options[0].value; // Default to "-"
+            }
+        }
 
         // Обновление Команды 2
-                const team2Select = document.getElementById(`team2Select${matchIndex}`);
-                const team2Name = match.UPCOM_TEAM2 || match.LIVE_TEAM2 || match.FINISHED_TEAM2 || "";
-                if (team2Select) {
-                    const optionExists = Array.from(team2Select.options).some(opt => opt.value === team2Name);
-                    let valueChanged = false;
-                    if (team2Name && optionExists) {
-                        if (team2Select.value !== team2Name) {
-                            team2Select.value = team2Name;
-                            valueChanged = true;
-                        }
-                    } else if (team2Select.value !== "" && team2Select.options.length > 0) {
-                        team2Select.value = team2Select.options[0].value; // Default to "-"
-                        valueChanged = true;
-                    }
-                    // Если значение было установлено или уже было правильным, триггерим Select2
-                    if (valueChanged || (team2Name && team2Select.value === team2Name)) {
-                        $(team2Select).trigger('change.select2');
-                    }
-                }
+        const team2Select = document.getElementById(`team2Select${matchIndex}`);
+        const team2Name = match.UPCOM_TEAM2 || match.LIVE_TEAM2 || match.FINISHED_TEAM2 || "";
+        if (team2Select) {
+            const optionExists = Array.from(team2Select.options).some(opt => opt.value === team2Name);
+            if (team2Name && optionExists) {
+                if (team2Select.value !== team2Name) team2Select.value = team2Name;
+            } else if (team2Select.value !== "" && team2Select.options.length > 0) {
+                team2Select.value = team2Select.options[0].value; // Default to "-"
+            }
+        }
+        
+        // Обновляем отображение команды (логотипы и текст кнопок) ПОСЛЕ установки значений селектов
+        // <-- ИЗМЕНЕНИЕ: Вызываем updateTeamDisplay -->
+        if (typeof updateTeamDisplay === 'function') {
+            updateTeamDisplay(matchIndex);
+        }
 
         // Префикс для карт
         let prefix = "";
