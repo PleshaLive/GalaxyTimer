@@ -184,16 +184,14 @@ export function populateTeamSelects(teamsList) {
 
 /**
  * Инициализирует Select2 для всех селектов команд.
+ * Используется версия из оригинального "Кода Б" пользователя.
  */
 function initSelect2ForTeams() {
     for (let m = 1; m <= 4; m++) {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
-        // Проверяем наличие элементов перед получением родителя
-        if (!sel1.length && !sel2.length) continue;
-
-        const parent1 = sel1.length ? sel1.parent() : null; // Получаем родителя ДО инициализации
-        const parent2 = sel2.length ? sel2.parent() : null;
+        const parent1 = sel1.parent(); // Получаем родителя ДО инициализации
+        const parent2 = sel2.parent();
 
         const commonSelect2Options = {
             templateResult: formatTeamOption,
@@ -203,10 +201,10 @@ function initSelect2ForTeams() {
             allowClear: false,
             // dropdownParent: parent1 // Раскомментируйте, если нужно и не ломает верстку
         };
-        if (sel1.length && parent1) { // Проверяем, что sel1 существует и parent1 найден
+        if (sel1.length) {
              sel1.select2({...commonSelect2Options, dropdownParent: parent1 });
         }
-        if (sel2.length && parent2) { // Проверяем, что sel2 существует и parent2 найден
+        if (sel2.length) {
              sel2.select2({...commonSelect2Options, dropdownParent: parent2 });
         }
     }
@@ -241,7 +239,7 @@ function attachSelect2ChangeListeners() {
 
         if (sel1.length) {
             sel1.off("change.select2").on("change.select2", updateDisplayListener); // Используем .off для предотвращения дублирования
-            sel1.on("change.select2", updateRelatedModulesListener); // Добавляем второй обработчик отдельно
+            sel1.on("change.select2", updateRelatedModulesListener);
         }
         if (sel2.length) {
             sel2.off("change.select2").on("change.select2", updateDisplayListener);
@@ -429,23 +427,23 @@ export function gatherSingleMatchData(matchIndex) {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         const isScore1Numeric = SCORE_REGEX.test(s1);
         const isScore2Numeric = SCORE_REGEX.test(s2);
-        const isScore3Numeric = SCORE_REGEX.test(s3);
+        const isScore3Numeric = SCORE_REGEX.test(s3); // В "Коде Б" isScore3Numeric не использовалась в условиях ниже, сохраняем это поведение
 
-        if (isScore1Numeric && !isScore2Numeric) {
+        if (isScore1Numeric && !isScore2Numeric) { // Логика как в "Коде Б"
             maps.MAP2_SCORE = "NEXT";
             maps.MAP3_SCORE = "DECIDER";
-        } else if (isScore1Numeric && isScore2Numeric && !isScore3Numeric) {
+        } else if (isScore1Numeric && isScore2Numeric && !isScore3Numeric) { // Логика как в "Коде Б"
             maps.MAP3_SCORE = "NEXT";
         }
     } else if (statusText === "FINISHED") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
-        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || !SCORE_REGEX.test(s3))) {
+        if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || !SCORE_REGEX.test(s3))) { // Логика как в "Коде Б"
             maps.MAP3_SCORE = "DECIDER";
         }
     } else if (statusText === "UPCOM") {
         if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
-        // Устанавливаем счет 3 карты в "MATCH X" для UPCOM, только если он не был введен вручную
-        if (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ")) { // Проверяем, не был ли он уже установлен или изменен
+        // Устанавливаем счет 3 карты в "MATCH X" для UPCOM, только если он не был введен вручную (как в "Коде Б")
+        if (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ")) {
              maps.MAP3_SCORE = `MATCH ${m}`;
         }
     }
@@ -453,7 +451,7 @@ export function gatherSingleMatchData(matchIndex) {
     // --- НАЧАЛО БЛОКА ИЗМЕНЕНИЙ ДЛЯ MP* ПЕРЕМЕННЫХ ---
     const mpLPath = "C:\\projects\\NewTimer\\files\\mp_L.png";
     const mpRPath = "C:\\projects\\NewTimer\\files\\mp_R.png";
-    const mpNonePath = "C:\\projects\\NewTimer\\files\\mp_none.png"; // Этот путь используется для UPCOM и как fallback в getScoreIcon
+    const mpNonePath = "C:\\projects\\NewTimer\\files\\mp_none.png";
 
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
@@ -477,12 +475,11 @@ export function gatherSingleMatchData(matchIndex) {
     if (statusText === "FINISHED") { finCest = "cest"; finResult = "Result"; finVictory = "VICTORY"; }
 
     // Определение победителя (TEAMWINNER) на основе атрибута data-winner (как в "Коде Б")
-    const winnerKey = column.getAttribute("data-winner") || ""; // "TEAM1", "TEAM2" или ""
+    const winnerKey = column.getAttribute("data-winner") || "";
     let teamWinner = "";
     let teamWinnerLogo = defaultLogo; // Используем локальный defaultLogo (как в "Коде Б")
-    // Победитель определяется только если статус FINISHED и кнопка была нажата
     if (statusText === "FINISHED" && winnerKey) {
-      if (winnerKey === "TEAM1" && team1Name) { // Проверяем, что имя команды выбрано
+      if (winnerKey === "TEAM1" && team1Name) {
           teamWinner = team1Name;
           teamWinnerLogo = team1Logo;
       } else if (winnerKey === "TEAM2" && team2Name) {
@@ -500,7 +497,7 @@ export function gatherSingleMatchData(matchIndex) {
     const liveRectLow = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectLow.png" : "C:\\projects\\NewTimer\\files\\none.png";
 
     // Определение путей к изображениям и текстам для статуса UPCOM (как в "Коде Б")
-    const upcomCestValue = statusText === "UPCOM" && timeVal ? "cest" : ""; // Показываем cest только если есть время
+    const upcomCestValue = statusText === "UPCOM" && timeVal ? "cest" : "";
     const upcomRectUp = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectUp.png" : defaultLogo;
     const upcomRectLow = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectLow.png" : defaultLogo;
     const upcomVsMiniValue = statusText === "UPCOM" ? "vs" : "";
@@ -517,8 +514,8 @@ export function gatherSingleMatchData(matchIndex) {
       UPCOM_TIME: statusText === "UPCOM" ? (timeVal ? timeVal + " CEST" : "") : "",
       UPCOM_TEAM1: statusText === "UPCOM" ? team1Name : "",
       UPCOM_TEAM2: statusText === "UPCOM" ? team2Name : "",
-      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogo, // Используем локальный defaultLogo
-      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogo, // Используем локальный defaultLogo
+      UPCOM_TEAM1_LOGO: statusText === "UPCOM" ? team1Logo : defaultLogo,
+      UPCOM_TEAM2_LOGO: statusText === "UPCOM" ? team2Logo : defaultLogo,
       UPCOM_MAP1: statusText === "UPCOM" ? maps.MAP1 : "",
       UPCOM_MAP1_SCORE: statusText === "UPCOM" ? maps.MAP1_SCORE : "",
       UPCOM_MAP2: statusText === "UPCOM" ? maps.MAP2 : "",
@@ -530,7 +527,7 @@ export function gatherSingleMatchData(matchIndex) {
       UPCOM_RectangleLOW: upcomRectLow,
       UPCOM_vs_mini: upcomVsMiniValue,
       UPCOM_vs_big: upcomVsBigValue,
-      UPCOM_next: "", // Как в "Коде Б"
+      UPCOM_next: "",
       UPCOM_next_photo: upcomNextPhotoValue
     };
 
@@ -539,8 +536,8 @@ export function gatherSingleMatchData(matchIndex) {
       LIVE_TIME: statusText === "LIVE" ? timeVal : "",
       LIVE_TEAM1: statusText === "LIVE" ? team1Name : "",
       LIVE_TEAM2: statusText === "LIVE" ? team2Name : "",
-      LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogo, // Используем локальный defaultLogo
-      LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogo, // Используем локальный defaultLogo
+      LIVE_TEAM1_LOGO: statusText === "LIVE" ? team1Logo : defaultLogo,
+      LIVE_TEAM2_LOGO: statusText === "LIVE" ? team2Logo : defaultLogo,
       LIVE_MAP1: statusText === "LIVE" ? maps.MAP1 : "",
       LIVE_MAP1_SCORE: statusText === "LIVE" ? maps.MAP1_SCORE : "",
       LIVE_MAP2: statusText === "LIVE" ? maps.MAP2 : "",
@@ -560,8 +557,8 @@ export function gatherSingleMatchData(matchIndex) {
       FINISHED_TIME: statusText === "FINISHED" ? (timeVal ? timeVal + " CEST" : "") : "",
       FINISHED_TEAM1: statusText === "FINISHED" ? team1Name : "",
       FINISHED_TEAM2: statusText === "FINISHED" ? team2Name : "",
-      FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogo, // Используем локальный defaultLogo
-      FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogo, // Используем локальный defaultLogo
+      FINISHED_TEAM1_LOGO: statusText === "FINISHED" ? team1Logo : defaultLogo,
+      FINISHED_TEAM2_LOGO: statusText === "FINISHED" ? team2Logo : defaultLogo,
       FINISHED_MAP1: statusText === "FINISHED" ? maps.MAP1 : "",
       FINISHED_MAP1_SCORE: statusText === "FINISHED" ? maps.MAP1_SCORE : "",
       FINISHED_MAP2: statusText === "FINISHED" ? maps.MAP2 : "",
@@ -578,29 +575,27 @@ export function gatherSingleMatchData(matchIndex) {
          const sc = maps[`MAP${i}_SCORE`];
          const isNum = SCORE_REGEX.test(sc);
          const show = (statusText === "LIVE" || statusText === "FINISHED") && isNum;
-         perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogo; // Используем локальный defaultLogo
-         perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogo; // Используем локальный defaultLogo
+         perMapLogos[`MAP${i}_TEAM1logo`] = show ? team1Logo : defaultLogo;
+         perMapLogos[`MAP${i}_TEAM2logo`] = show ? team2Logo : defaultLogo;
        });
 
     // Динамические логотипы уровня матча (как в "Коде Б")
     const matchLogos = {};
     const showFinishedLogos = statusText === "FINISHED";
     const showLiveLogos = statusText === "LIVE";
-    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogo; // Используем локальный defaultLogo
-    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogo; // Используем локальный defaultLogo
-    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogo;       // Используем локальный defaultLogo
-    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogo;       // Используем локальный defaultLogo
+    matchLogos[`FINISHED_TEAM1_LOGO_MATCH${m}`] = showFinishedLogos ? team1Logo : defaultLogo;
+    matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogo;
+    matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogo;
+    matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogo;
 
     // Собираем итоговый объект матча
     const matchObj = {
         ...upcomObj,
         ...liveObj,
         ...finishedObj,
-        // MP* переменные теперь будут заполнены новой логикой
         MP1_UPC, MP2_UPC, MP3_UPC,
         MP1_LIVE, MP2_LIVE, MP3_LIVE,
         MP1_FIN, MP2_FIN, MP3_FIN,
-        // Остальные поля из "Кода Б"
         Fin_cest: finCest,
         FIN_Result: finResult,
         FIN_VICTORY: finVictory,
