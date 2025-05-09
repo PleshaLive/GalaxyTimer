@@ -348,44 +348,43 @@
                                 <p class="form-section-description">Установите длительность таймера:</p>
                                 <div class="timer-fields-horizontal">
                                     <div class="form-group timer-field">
-                                        <label for="timerHoursInput">Часы</label>
-                                        <input type="number" id="timerHoursInput" class="header-input" min="0" value="0" placeholder="00">
+                                        <label for="timerHoursInput">ЧАСЫ</label> <input type="number" id="timerHoursInput" class="header-input timer-input-value" min="0" value="0" placeholder="00">
                                     </div>
                                     <span class="timer-field-separator">:</span>
                                     <div class="form-group timer-field">
-                                        <label for="timerMinutesInput">Минуты</label>
-                                        <input type="number" id="timerMinutesInput" class="header-input" min="0" max="59" value="0" placeholder="00">
+                                        <label for="timerMinutesInput">МИНУТЫ</label>
+                                        <input type="number" id="timerMinutesInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
                                     </div>
                                     <span class="timer-field-separator">:</span>
                                     <div class="form-group timer-field">
-                                        <label for="timerSecondsInput">Секунды</label>
-                                        <input type="number" id="timerSecondsInput" class="header-input" min="0" max="59" value="0" placeholder="00">
+                                        <label for="timerSecondsInput">СЕКУНДЫ</label>
+                                        <input type="number" id="timerSecondsInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
                                     </div>
                                 </div>
                             </div>
 
                             <div id="timerTargetInputs" class="timer-input-sections" style="display: none;">
-                                <p class="form-section-description">Установите целевое время (например, 20:00):</p>
+                                <p class="form-section-description">Установите целевое время:</p>
                                 <div class="timer-fields-horizontal">
                                     <div class="form-group timer-field">
-                                        <label for="timerTargetHoursInput">Часы</label>
-                                        <input type="number" id="timerTargetHoursInput" class="header-input" min="0" max="23" value="20" placeholder="ЧЧ">
+                                        <label for="timerTargetHoursInput">ЧАСЫ</label>
+                                        <input type="number" id="timerTargetHoursInput" class="header-input timer-input-value" min="0" max="23" value="20" placeholder="00">
                                     </div>
                                     <span class="timer-field-separator">:</span>
                                     <div class="form-group timer-field">
-                                        <label for="timerTargetMinutesInput">Минуты</label>
-                                        <input type="number" id="timerTargetMinutesInput" class="header-input" min="0" max="59" value="0" placeholder="ММ">
+                                        <label for="timerTargetMinutesInput">МИНУТЫ</label>
+                                        <input type="number" id="timerTargetMinutesInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <button id="setTimerButton" class="app-button primary" style="width: 100%; margin-top: var(--spacing-xl);">Запустить/Обновить таймер</button>
-                        <div id="timerMessage" class="timer-message-feedback" style="min-height: 1.5em; margin-top: var(--spacing-md);"></div>
+                        <button id="setTimerButton" class="app-button primary timer-action-button">Запустить/Обновить таймер</button>
+                        <div id="timerMessage" class="timer-message-feedback"></div>
                     </div>
 
                     <div style="margin-top: 20px; text-align: center; padding: var(--spacing-md); background-color: var(--color-surface-secondary); border-radius: var(--border-radius-md);">
-                        <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">Ссылка на страницу таймера:</p>
+                        <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">Ссылка на страницу таймера (для OBS/vMix):</p>
                         <a href="/timer.html" target="_blank" class="app-button tertiary">Открыть /timer.html</a>
                     </div>
                 </div>
