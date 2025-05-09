@@ -1,5 +1,8 @@
 // public/js/matches.js
 
+// Импорт необходимых модулей и функций (если они есть в других файлах)
+// import { someFunction } from './helpers.js';
+
 // Флаг и промис для отслеживания завершения инициализации команд
 let teamsInitialized = false;
 let teamsInitializationPromise = null;
@@ -35,7 +38,7 @@ function formatTeamSelection(team) {
     if (!team.id) {
         return team.text; // Для плейсхолдера
     }
-    // Используем data-logo из option, если он есть, иначе дефолтный
+     // Используем data-logo из option, если он есть, иначе дефолтный
     const logoUrl = team.element && team.element.dataset.logo ? team.element.dataset.logo : defaultLogoPath;
     const $container = $(
         // ВАЖНО: обертка .select2-team-selection нужна для CSS
@@ -46,6 +49,7 @@ function formatTeamSelection(team) {
     );
     return $container;
 }
+
 
 // ----------------------
 // Инициализация модуля матчей
@@ -61,13 +65,13 @@ export async function initMatches() {
             const response = await fetch("https://waywayway-production.up.railway.app/api/teams");
             if (!response.ok) {
                 let errorText = `HTTP error! status: ${response.status}`;
-                try {
-                    const errorData = await response.json();
-                    errorText += ` - ${errorData.message || JSON.stringify(errorData).substring(0, 100)}`;
-                } catch (e) {
-                    const textResponse = await response.text().catch(() => "");
-                    if (textResponse) errorText += ` - Server response: ${textResponse.substring(0, 100)}`;
-                }
+                 try {
+                     const errorData = await response.json();
+                     errorText += ` - ${errorData.message || JSON.stringify(errorData).substring(0,100)}`;
+                 } catch (e) {
+                     const textResponse = await response.text().catch(() => "");
+                     if(textResponse) errorText += ` - Server response: ${textResponse.substring(0,100)}`;
+                 }
                 throw new Error(errorText);
             }
             const data = await response.json();
@@ -128,13 +132,15 @@ export function populateTeamSelects(teamsList) {
         const team2Select = document.getElementById(`team2Select${m}`);
         if (!team1Select || !team2Select) continue;
 
+        // Сохраняем текущее значение перед очисткой
         const currentVal1 = team1Select.value;
         const currentVal2 = team2Select.value;
 
+        // Уничтожаем Select2 перед очисткой, если он уже был инициализирован
         if ($(team1Select).data('select2')) $(team1Select).select2('destroy');
         if ($(team2Select).data('select2')) $(team2Select).select2('destroy');
 
-        team1Select.innerHTML = '';
+        team1Select.innerHTML = ''; // Очищаем старые опции
         team2Select.innerHTML = '';
 
         team1Select.appendChild(defaultOption.cloneNode(true));
@@ -150,28 +156,30 @@ export function populateTeamSelects(teamsList) {
             if (team.logo) {
                 if (team.logo.startsWith('http://') || team.logo.startsWith('https://')) {
                     logoUrl = team.logo;
-                } else if (team.logo.startsWith('/')) {
+                } else if (team.logo.startsWith('/')) { // Если путь относительный от корня API
                     logoUrl = externalApiBaseUrl + team.logo;
-                } else {
-                    logoUrl = `${externalApiBaseUrl}/logos/${team.logo.replace(/\.png$/i, '')}.png`;
+                } else { // Если просто имя файла
+                    logoUrl = `${externalApiBaseUrl}/logos/${team.logo.replace(/\.png$/i, '')}.png`; // Предполагаем структуру
                 }
             }
-            option.dataset.logo = logoUrl;
+            option.dataset.logo = logoUrl; // Сохраняем URL лого в data-атрибуте
             team1Select.appendChild(option.cloneNode(true));
             team2Select.appendChild(option.cloneNode(true));
         });
 
+        // Восстанавливаем значения
         if (currentVal1 && team1Select.querySelector(`option[value="${CSS.escape(currentVal1)}"]`)) {
-            team1Select.value = currentVal1;
+           team1Select.value = currentVal1;
         } else if (team1Select.options.length > 0) {
-            team1Select.value = "";
+           team1Select.value = ""; // Сброс на "-"
         }
         if (currentVal2 && team2Select.querySelector(`option[value="${CSS.escape(currentVal2)}"]`)) {
-            team2Select.value = currentVal2;
+           team2Select.value = currentVal2;
         } else if (team2Select.options.length > 0) {
-            team2Select.value = "";
+           team2Select.value = ""; // Сброс на "-"
         }
     }
+    // console.log("[Matches] Team selects populated.");
 }
 
 /**
@@ -181,6 +189,7 @@ function initSelect2ForTeams() {
     for (let m = 1; m <= 4; m++) {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
+        // Проверяем наличие элементов перед получением родителя
         if (!sel1.length && !sel2.length) continue;
 
         const parent1 = sel1.length ? sel1.parent() : null;
@@ -194,12 +203,13 @@ function initSelect2ForTeams() {
             allowClear: false, // Устанавливаем в false, так как у нас всегда есть "-"
         };
         if (sel1.length && parent1) {
-            sel1.select2({ ...commonSelect2Options, dropdownParent: parent1 });
+             sel1.select2({...commonSelect2Options, dropdownParent: parent1 });
         }
         if (sel2.length && parent2) {
-            sel2.select2({ ...commonSelect2Options, dropdownParent: parent2 });
+             sel2.select2({...commonSelect2Options, dropdownParent: parent2 });
         }
     }
+     // console.log("[Matches] Select2 initialized for team selects.");
 }
 
 /**
@@ -210,22 +220,24 @@ function attachSelect2ChangeListeners() {
         const sel1 = $(`#team1Select${m}`);
         const sel2 = $(`#team2Select${m}`);
 
+        // Обработчик для обновления лого над селектом и текста кнопки победителя
         const updateDisplayListener = () => {
-            updateTeamDisplay(m);
+             updateTeamDisplay(m); // Эта функция теперь обновит <img> над селектом и текст кнопки
         };
 
+        // Обработчик для обновления связанных элементов (MapVeto, VRS)
         const updateRelatedModulesListener = () => {
-            // Для доступа к функциям из main.js, main.js должен экспортировать их 
+            // Для доступа к функциям из main.js, main.js должен экспортировать их
             // или они должны быть доступны глобально (менее предпочтительно).
             // Если main.js экспортирует, то в matches.js их нужно импортировать.
             // Пример, если бы они были глобальны (не рекомендуется):
-            // const currentVetoMatchIndex = document.getElementById("matchSelect")?.value;
-            // if (typeof window.updateVetoTeamOptions === 'function' && currentVetoMatchIndex && currentVetoMatchIndex == m) {
-            //     window.updateVetoTeamOptions(String(m));
-            // }
-            // if (typeof window.updateVRSTeamNames === 'function') {
-            //     window.updateVRSTeamNames();
-            // }
+            const currentVetoMatchIndex = document.getElementById("matchSelect")?.value;
+            if (typeof window.updateVetoTeamOptions === 'function' && currentVetoMatchIndex && currentVetoMatchIndex == m) {
+                window.updateVetoTeamOptions(String(m));
+            }
+            if (typeof window.updateVRSTeamNames === 'function') {
+                window.updateVRSTeamNames();
+            }
             // ПРАВИЛЬНЫЙ СПОСОБ: использовать кастомные события или колбэки, если модули не могут напрямую импортировать друг друга.
             // Либо, если main.js импортирует функции из matches.js, то эта логика должна быть в main.js
         };
@@ -233,7 +245,7 @@ function attachSelect2ChangeListeners() {
         if (sel1.length) {
             sel1.off("change.select2").on("change.select2", function() { // Используем .off для предотвращения дублирования
                 updateDisplayListener();
-                updateRelatedModulesListener(); // Возможно, эту логику лучше вызывать из main.js при изменении команд
+                updateRelatedModulesListener();
             });
         }
         if (sel2.length) {
@@ -247,6 +259,7 @@ function attachSelect2ChangeListeners() {
 
 // ----------------------
 // Обновление отображения команды (ЛОГО НАД СЕЛЕКТОМ и текст кнопки победителя)
+// НЕ обновляет сам Select2, это делает Select2 при выборе опции
 // ----------------------
 export function updateTeamDisplay(matchIndex) {
     const sel1 = document.getElementById(`team1Select${matchIndex}`);
@@ -255,9 +268,9 @@ export function updateTeamDisplay(matchIndex) {
     const logo2Img = document.getElementById(`team2Logo${matchIndex}`);
 
     if (sel1) {
-        const team1Name = sel1.value || "Team 1";
+        const team1Name = sel1.value || "Team 1"; // Используем имя из value селекта
         const btn1 = document.querySelector(`.match-column[data-match="${matchIndex}"] .winner-btn[data-team="TEAM1"]`);
-        if (btn1) btn1.textContent = ` ${team1Name}`;
+        if (btn1) btn1.textContent = ` ${team1Name}`; // Обновляем текст на кнопке
 
         if (logo1Img) {
             const selectedOption1 = sel1.options[sel1.selectedIndex];
@@ -290,6 +303,7 @@ export function updateTeamDisplay(matchIndex) {
  */
 export function attachWinnerButtons() {
     document.querySelectorAll(".winner-btn").forEach(btn => {
+        // Проверяем, не добавлен ли уже слушатель
         if (btn.dataset.winnerListenerAttached === 'true') return;
         btn.dataset.winnerListenerAttached = 'true';
 
@@ -330,7 +344,7 @@ export function attachStatusChangeHandlers() {
         if (select.dataset.statusListenerAttached === 'true') return;
         select.dataset.statusListenerAttached = 'true';
 
-        select.addEventListener('change', function () {
+        select.addEventListener('change', function() {
             updateStatusColor(this);
             const matchColumn = this.closest('.match-column');
             if (matchColumn) {
@@ -339,18 +353,21 @@ export function attachStatusChangeHandlers() {
                 if (newStatus) {
                     matchColumn.classList.add(`status-${newStatus}`);
                 }
+                 // Логика для автозаполнения MATCH X для UPCOM
                 const m = matchColumn.dataset.match;
                 if (this.value === 'UPCOM') {
                     const mapRows = matchColumn.querySelectorAll('.map-row');
                     if (mapRows.length >= 3) {
                         const thirdMapScoreInput = mapRows[2].querySelector('.map-score-input');
-                        if (thirdMapScoreInput && (!thirdMapScoreInput.value || thirdMapScoreInput.value.startsWith("MATCH "))) {
+                        // Обновляем MATCH X только если поле пусто или уже содержит MATCH/DECIDER/NEXT (логика из Кода А)
+                        if (thirdMapScoreInput && (!thirdMapScoreInput.value || thirdMapScoreInput.value.startsWith("MATCH ") || thirdMapScoreInput.value.toUpperCase() === "DECIDER" || thirdMapScoreInput.value.toUpperCase() === "NEXT")) {
                             thirdMapScoreInput.value = `MATCH ${m}`;
                         }
                     }
                 }
             }
         });
+        // Первоначальное обновление цвета при загрузке
         updateStatusColor(select);
     });
 }
@@ -371,29 +388,14 @@ export function updateStatusColor(selectElement) {
     }
 }
 
-// Эта функция является локальной для модуля matches.js
-function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
-    if (!scoreStr || typeof scoreStr !== 'string') return nonePath;
-    const parts = scoreStr.split(':');
-    if (parts.length === 2) {
-        const score1 = parseInt(parts[0], 10);
-        const score2 = parseInt(parts[1], 10);
-        if (!isNaN(score1) && !isNaN(score2)) {
-            if (score1 > score2) return lPath;
-            if (score2 > score1) return rPath;
-            return mpNonePath; // Используем mp_none для ничьей или 0:0
-        }
-    }
-    return nonePath; // Используем nonePath (который mpNonePath при вызове) для нечисловых
-}
-
-
 /**
  * Собирает данные одного матча (версия для Select2).
  */
 export function gatherSingleMatchData(matchIndex) {
     const m = matchIndex;
-    const defaultLocalLogo = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Локальный путь для сборки данных, если не веб
+    // Используем глобальный defaultLogoPath для консистентности с populateTeamSelects и форматерами Select2
+    // Локальный defaultLogo для специфичных локальных файлов, не являющихся логотипами команд по умолчанию
+    const localNoneLogo = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Локальный путь для некоторых значений по умолчанию
     const SCORE_REGEX = /^\d+:\d+$/;
 
     const column = document.querySelector(`.match-column[data-match="${m}"]`);
@@ -412,8 +414,10 @@ export function gatherSingleMatchData(matchIndex) {
     const team1Name = selTeam1 ? selTeam1.value : "";
     const team2Name = selTeam2 ? selTeam2.value : "";
 
-    const team1Logo = selTeam1 && selTeam1.selectedIndex >= 0 && selTeam1.options[selTeam1.selectedIndex] // selTeam1.selectedIndex >= 0 to include placeholder with defaultLogoPath
-        ? (selTeam1.options[selTeam1.selectedIndex].dataset.logo || defaultLogoPath) // Используем веб-путь defaultLogoPath
+    // Получаем лого из data-атрибута ВЫБРАННОЙ опции, или глобальный defaultLogoPath
+    // Используем selTeamX.selectedIndex >= 0 чтобы корректно обрабатывать плейсхолдер, у которого data-logo=defaultLogoPath
+    const team1Logo = selTeam1 && selTeam1.selectedIndex >= 0 && selTeam1.options[selTeam1.selectedIndex]
+        ? (selTeam1.options[selTeam1.selectedIndex].dataset.logo || defaultLogoPath)
         : defaultLogoPath;
     const team2Logo = selTeam2 && selTeam2.selectedIndex >= 0 && selTeam2.options[selTeam2.selectedIndex]
         ? (selTeam2.options[selTeam2.selectedIndex].dataset.logo || defaultLogoPath)
@@ -427,34 +431,35 @@ export function gatherSingleMatchData(matchIndex) {
         maps[`MAP${i + 1}_SCORE`] = scoreInput ? scoreInput.value.trim() : "";
     });
 
+    // Автозаполнение счета карт ("NEXT", "DECIDER", "MATCH X") в зависимости от статуса (логика из Кода А)
     if (statusText === "LIVE") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         const isScore1Numeric = SCORE_REGEX.test(s1);
         const isScore2Numeric = SCORE_REGEX.test(s2);
         const isScore3Numeric = SCORE_REGEX.test(s3);
 
-        if (isScore1Numeric && (!s2 || !isScore2Numeric)) { // Если есть счет на 1, а на 2й нет или не число
-             if (s2 !== "NEXT" && s2 !== "DECIDER") maps.MAP2_SCORE = "NEXT"; // Не перезаписывать, если уже стоит специальное значение
-             if (s3 !== "NEXT" && s3 !== "DECIDER") maps.MAP3_SCORE = "DECIDER";
-        } else if (isScore1Numeric && isScore2Numeric && (!s3 || !isScore3Numeric)) { // Если есть на 1 и 2, а на 3й нет
-             if (s3 !== "NEXT" && s3 !== "DECIDER") maps.MAP3_SCORE = "NEXT";
+        if (isScore1Numeric && (!s2 || !isScore2Numeric)) {
+            if (s2 !== "NEXT" && s2 !== "DECIDER") maps.MAP2_SCORE = "NEXT";
+            if (s3 !== "NEXT" && s3 !== "DECIDER") maps.MAP3_SCORE = "DECIDER";
+        } else if (isScore1Numeric && isScore2Numeric && (!s3 || !isScore3Numeric)) {
+            if (s3 !== "NEXT" && s3 !== "DECIDER") maps.MAP3_SCORE = "NEXT";
         }
     } else if (statusText === "FINISHED") {
         const s1 = maps.MAP1_SCORE, s2 = maps.MAP2_SCORE, s3 = maps.MAP3_SCORE;
         if (s1 && SCORE_REGEX.test(s1) && s2 && SCORE_REGEX.test(s2) && (!s3 || s3 === "" || s3.toUpperCase() === "NEXT")) {
-            // Если есть счет на 1 и 2, а на 3й пусто, NEXT или не число, то ставим DECIDER
-             if (s3 !== "DECIDER") maps.MAP3_SCORE = "DECIDER";
+            if (s3 !== "DECIDER") maps.MAP3_SCORE = "DECIDER";
         }
     } else if (statusText === "UPCOM") {
         if (!maps.MAP1_SCORE) maps.MAP1_SCORE = "NEXT";
         if (maps.MAP1_SCORE && maps.MAP1_SCORE.toUpperCase() !== "NEXT" && !maps.MAP2_SCORE) {
-             maps.MAP2_SCORE = "NEXT"; // Если на 1й что-то введено (не NEXT), а на 2й пусто - ставим NEXT
+            maps.MAP2_SCORE = "NEXT";
         }
         if (!maps.MAP3_SCORE || maps.MAP3_SCORE.startsWith("MATCH ") || maps.MAP3_SCORE.toUpperCase() === "DECIDER" || maps.MAP3_SCORE.toUpperCase() === "NEXT") {
             maps.MAP3_SCORE = `MATCH ${m}`;
         }
     }
-    
+     
+    // --- Начало логики для MP*_UPC, MP*_LIVE, MP*_FIN из Кода А ---
     let MP1_UPC = "", MP2_UPC = "", MP3_UPC = "";
     let MP1_LIVE = "", MP2_LIVE = "", MP3_LIVE = "";
     let MP1_FIN = "", MP2_FIN = "", MP3_FIN = "";
@@ -474,13 +479,14 @@ export function gatherSingleMatchData(matchIndex) {
         MP2_FIN = getScoreIcon(maps.MAP2_SCORE, mpLPath, mpRPath, mpNonePath, mpNonePath);
         MP3_FIN = getScoreIcon(maps.MAP3_SCORE, mpLPath, mpRPath, mpNonePath, mpNonePath);
     }
+    // --- Конец логики для MP*_UPC, MP*_LIVE, MP*_FIN из Кода А ---
 
     let finCest = "", finResult = "", finVictory = "";
     if (statusText === "FINISHED") { finCest = "cest"; finResult = "Result"; finVictory = "VICTORY"; }
 
     const winnerKey = column.getAttribute("data-winner") || "";
     let teamWinner = "";
-    let teamWinnerLogo = defaultLogoPath; // Используем веб-путь по умолчанию
+    let teamWinnerLogo = defaultLogoPath; // Используем web-путь по умолчанию (как в Коде А для teamWinnerLogo)
     if (statusText === "FINISHED" && winnerKey) {
         if (winnerKey === "TEAM1" && team1Name) {
             teamWinner = team1Name;
@@ -490,25 +496,23 @@ export function gatherSingleMatchData(matchIndex) {
             teamWinnerLogo = team2Logo;
         }
     }
-    
-    // Пути для изображений и текста, убедитесь, что они корректны и доступны (локальные или веб)
-    // Для простоты, используем defaultLocalLogo или defaultLogoPath для тех, что не должны быть видны
-    const liveStatusValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live.png" : defaultLocalLogo;
-    const liveBgValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\LIVEBG.png" : defaultLocalLogo;
+     
+    const liveStatusValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live.png" : localNoneLogo;
+    const liveBgValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\LIVEBG.png" : localNoneLogo;
     const liveVs = statusText === "LIVE" ? "vs" : "";
-    const liveCestValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\ongoing.png" : defaultLocalLogo;
-    const liveRectUp = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectUp.png" : defaultLocalLogo; // Использовал defaultLocalLogo для примера, если none.png не подходит
-    const liveRectLow = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectLow.png" : defaultLocalLogo;
+    const liveCestValue = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\ongoing.png" : localNoneLogo;
+    const liveRectUp = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectUp.png" : localNoneLogo;
+    const liveRectLow = statusText === "LIVE" ? "C:\\projects\\NewTimer\\files\\live_rectLow.png" : localNoneLogo;
 
     const upcomCestValue = statusText === "UPCOM" && timeVal ? "cest" : "";
-    const upcomRectUp = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectUp.png" : defaultLocalLogo;
-    const upcomRectLow = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectLow.png" : defaultLocalLogo;
+    const upcomRectUp = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectUp.png" : localNoneLogo;
+    const upcomRectLow = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\rectLow.png" : localNoneLogo;
     const upcomVsMiniValue = statusText === "UPCOM" ? "vs" : "";
     const upcomVsBigValue = statusText === "UPCOM" ? "vs" : "";
-    const upcomNextPhotoValue = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\bg_next_upcom.png" : ""; // Пустая строка если не UPCOM
+    const upcomNextPhotoValue = statusText === "UPCOM" ? "C:\\projects\\NewTimer\\files\\bg_next_upcom.png" : "";
 
-    const finRectUp = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectUp.png" : defaultLocalLogo;
-    const finRectLow = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectLow.png" : defaultLocalLogo;
+    const finRectUp = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectUp.png" : localNoneLogo;
+    const finRectLow = statusText === "FINISHED" ? "C:\\projects\\NewTimer\\files\\fin_rectLow.png" : localNoneLogo;
 
     const upcomObj = {
         UPCOM_MATCH_STATUS: statusText === "UPCOM" ? statusText : "",
@@ -528,7 +532,7 @@ export function gatherSingleMatchData(matchIndex) {
         UPCOM_RectangleLOW: upcomRectLow,
         UPCOM_vs_mini: upcomVsMiniValue,
         UPCOM_vs_big: upcomVsBigValue,
-        UPCOM_next: statusText === "UPCOM" ? (document.getElementById(`upcomNext${m}`)?.value || "") : "", // Пример если есть доп поле
+        UPCOM_next: statusText === "UPCOM" ? (document.getElementById(`upcomNext${m}`)?.value || "") : "",
         UPCOM_next_photo: upcomNextPhotoValue
     };
 
@@ -586,7 +590,7 @@ export function gatherSingleMatchData(matchIndex) {
     matchLogos[`FINISHED_TEAM2_LOGO_MATCH${m}`] = showFinishedLogos ? team2Logo : defaultLogoPath;
     matchLogos[`LIVE_TEAM1_LOGO_MATCH${m}`] = showLiveLogos ? team1Logo : defaultLogoPath;
     matchLogos[`LIVE_TEAM2_LOGO_MATCH${m}`] = showLiveLogos ? team2Logo : defaultLogoPath;
-    
+     
     const matchObj = {
         ...upcomObj,
         ...liveObj,
@@ -604,4 +608,24 @@ export function gatherSingleMatchData(matchIndex) {
     };
 
     return matchObj;
+}
+
+
+/**
+ * Помощник для иконок счета карты (L/R/None).
+ * Эта функция используется gatherSingleMatchData для определения MP* иконок.
+ */
+function getScoreIcon(scoreStr, lPath, rPath, mpNonePath, nonePath) {
+    if (!scoreStr || typeof scoreStr !== 'string') return nonePath;
+    const parts = scoreStr.split(':');
+    if (parts.length === 2) {
+        const score1 = parseInt(parts[0], 10);
+        const score2 = parseInt(parts[1], 10);
+        if (!isNaN(score1) && !isNaN(score2)) {
+            if (score1 > score2) return lPath;
+            if (score2 > score1) return rPath;
+            return mpNonePath; // Используем mp_none для ничьей или 0:0
+        }
+    }
+    return nonePath; // Используем nonePath для нечисловых (NEXT, DECIDER, пустая строка) или если формат не "X:Y"
 }
