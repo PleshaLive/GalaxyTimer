@@ -10,6 +10,86 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Следующие стили были предоставлены для одной из ранних версий таймера.
+           Классы в текущей разметке таймера изменились (например, .timer-controls-wrapper вместо .timer-control-container).
+           Эти стили могут потребовать адаптации или уже покрываются основным style.css.
+           Шрифт ProximaNova-Bold будет подключен.
+        */
+        @font-face {
+            font-family: 'ProximaNova-Bold';
+            src: url('fonts/ProximaNova-Bold.ttf') format('truetype'); /* Убедитесь, что путь к шрифту корректен */
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        /* Пример применения шрифта и стилей к новому контейнеру, если необходимо */
+        /*
+        .timer-controls-wrapper {
+            font-family: 'ProximaNova-Bold', sans-serif;
+            background: #222; 
+            color: #fff;
+            padding: 20px; // Уже задается через card-style, возможно
+            border-radius: var(--border-radius-md); 
+        }
+        */
+
+        /* Старые стили для .timer-control-container и его дочерних элементов: */
+         .timer-control-container { /* Этот класс больше не используется напрямую в разметке таймера */
+            font-family: 'ProximaNova-Bold', sans-serif;
+            background: #222;
+            color: #fff;
+            margin: 0; /* Может конфликтовать с layout */
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+        }
+         .timer-control-container .container { /* Этот вложенный .container также отсутствует в новой разметке */
+            max-width: 400px;
+            margin: 0 auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+         .timer-control-container h1 { /* Теперь используется .tab-title */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #fff;
+        }
+         .timer-control-container .mode-group label { /* Новые классы: .mode-group-timer .radio-label */
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff;
+        }
+         .timer-control-container input[type="number"] { /* Новые классы: .header-input .timer-input-value */
+            width: 100%; /* Может переопределяться стилями .timer-field */
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            text-align: center;
+            background: #444;
+            color: #fff;
+            box-sizing: border-box;
+        }
+         .timer-control-container button { /* Новые классы: .app-button .primary .timer-action-button */
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            text-transform: none;
+            font-family: 'ProximaNova-Bold', sans-serif;
+        }
+         .timer-control-container button:hover {
+            background: #45a049;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -391,8 +471,13 @@
                         <div class="timer-link-column">
                             <div class="card-style timer-link-wrapper">
                                 <h2 class="timer-link-title">Страница таймера</h2>
-                                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md); font-size: 0.9rem;">
-                                    Используйте эту ссылку для встраивания таймера в OBS, vMix или другую программу:
+
+                                <div class="mini-timer-preview-container">
+                                    <div id="miniTimerPreviewDisplay" class="mini-timer-time">00:00</div>
+                                    <div id="miniTimerPreviewStatus" class="mini-timer-status">(остановлен)</div>
+                                </div>
+                                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md); font-size: 0.9rem; text-align: center;">
+                                    Ссылка для OBS/vMix:
                                 </p>
                                 <div class="timer-url-display-container">
                                     <input type="text" id="timerPageUrl" class="header-input" value="/timer.html" readonly>
@@ -401,7 +486,7 @@
                                     </button>
                                 </div>
                                 <a href="/timer.html" target="_blank" class="app-button primary" style="margin-top: var(--spacing-md); display: block; text-align: center;">
-                                    <i class="fas fa-external-link-alt"></i> Открыть /timer.html
+                                    <i class="fas fa-external-link-alt"></i> Открыть в новой вкладке
                                 </a>
                             </div>
                         </div>
