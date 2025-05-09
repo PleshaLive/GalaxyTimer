@@ -10,95 +10,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
-    <style>
-        /* Подключаем шрифт ProximaNova-Bold из папки fonts */
-        @font-face {
-            font-family: 'ProximaNova-Bold';
-            src: url('fonts/ProximaNova-Bold.ttf') format('truetype'); /* Путь относительно public/ */
-            font-weight: bold;
-            font-style: normal;
-        }
-
-        /* Стили для контейнера таймера, если они нужны глобально для этой вкладки */
-        .timer-control-container {
-            font-family: 'ProximaNova-Bold', sans-serif;
-            background: #222; /* Фоновый цвет можно адаптировать под стиль Код2 */
-            color: #fff;
-            margin: 0;
-            padding: 20px;
-            border-radius: var(--border-radius-md); /* Используем переменную из style.css Код2 */
-        }
-        .timer-control-container .container { /* Переопределяем вложенный .container */
-            max-width: 400px;
-            margin: 0 auto;
-            background: #333;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        .timer-control-container h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-            color: #fff; /* Убедимся, что цвет заголовка видим */
-        }
-        .timer-control-container .mode-group {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .timer-control-container .mode-group label {
-            margin: 0 10px;
-            font-size: 16px;
-            cursor: pointer;
-            color: #fff; /* Явный цвет для label */
-        }
-        .timer-control-container .inputs-group {
-            margin-bottom: 20px;
-        }
-        .timer-control-container .inputs-group p {
-            margin: 0 0 10px;
-            font-size: 18px;
-            text-align: center;
-        }
-        .timer-control-container .inputs-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-size: 16px;
-             color: #fff; /* Явный цвет для label */
-        }
-        .timer-control-container input[type="number"] {
-            width: 100%;
-            padding: 8px; /* Немного увеличим padding */
-            font-size: 16px;
-            border: 1px solid #555;
-            border-radius: 4px;
-            text-align: center;
-            background: #444;
-            color: #fff;
-            box-sizing: border-box; /* Добавим для корректного расчета ширины */
-        }
-        .timer-control-container button { /* Стилизуем кнопку таймера */
-            width: 100%;
-            padding: 12px; /* Увеличим padding */
-            font-size: 18px;
-            border: none;
-            border-radius: 4px;
-            background: #4CAF50; /* Зеленый цвет кнопки */
-            color: #fff;
-            cursor: pointer;
-            text-transform: none; /* Убираем uppercase от общего стиля button */
-            font-family: 'ProximaNova-Bold', sans-serif; /* Применяем шрифт таймера */
-        }
-        .timer-control-container button:hover {
-            background: #45a049;
-        }
-        .timer-control-container .message {
-            text-align: center;
-            margin-top: 10px;
-            font-size: 16px;
-            color: #0f0;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -419,37 +330,54 @@
                          </div>
                 </div>
                 <div id="tab-timer" class="tab-panel">
-                    <div class="timer-control-container"> <div class="container"> <h1>Управление таймером</h1>
-                            <div class="mode-group">
-                                <label>
-                                    <input type="radio" name="timerMode" value="duration" checked> Обратный отсчёт
-                                </label>
-                                <label>
-                                    <input type="radio" name="timerMode" value="target">
-                                    По таргету
-                                </label>
-                            </div>
+                    <div class="card-style timer-controls-wrapper">
+                        <h1 class="tab-title"><i class="fas fa-stopwatch"></i> Управление таймером</h1>
 
-                            <div id="timerDurationInputs" class="inputs-group">
-                                <p>Введите время обратного отсчёта:</p>
-                                <label>Часы: <input type="number" id="timerHoursInput" min="0" value="0"></label>
-                                <label>Минуты: <input type="number" id="timerMinutesInput" min="0" value="0"></label>
-                                <label>Секунды: <input type="number" id="timerSecondsInput" min="0" value="0"></label>
-                            </div>
-
-                            <div id="timerTargetInputs" class="inputs-group" style="display: none;">
-                                <p>Введите целевое время (например, 20:00):</p>
-                                <label>Часы: <input type="number" id="timerTargetHoursInput" min="0" max="23" value="20"></label>
-                                <label>Минуты: <input type="number" id="timerTargetMinutesInput" min="0" max="59" value="0"></label>
-                            </div>
-
-                            <button id="setTimerButton">Запустить/Обновить таймер</button>
-                            <div class="message" id="timerMessage"></div>
+                        <div class="form-group mode-group-timer"> <label class="radio-label">
+                                <input type="radio" name="timerMode" value="duration" checked>
+                                Обратный отсчёт
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="timerMode" value="target">
+                                По таргету
+                            </label>
                         </div>
+
+                        <div id="timerDurationInputs" class="timer-input-sections">
+                            <p class="form-section-description">Введите время обратного отсчёта:</p>
+                            <div class="form-group">
+                                <label for="timerHoursInput">Часы:</label>
+                                <input type="number" id="timerHoursInput" class="header-input" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="timerMinutesInput">Минуты:</label>
+                                <input type="number" id="timerMinutesInput" class="header-input" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="timerSecondsInput">Секунды:</label>
+                                <input type="number" id="timerSecondsInput" class="header-input" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <div id="timerTargetInputs" class="timer-input-sections" style="display: none;">
+                            <p class="form-section-description">Введите целевое время (например, 20:00):</p>
+                            <div class="form-group">
+                                <label for="timerTargetHoursInput">Часы:</label>
+                                <input type="number" id="timerTargetHoursInput" class="header-input" min="0" max="23" value="20">
+                            </div>
+                            <div class="form-group">
+                                <label for="timerTargetMinutesInput">Минуты:</label>
+                                <input type="number" id="timerTargetMinutesInput" class="header-input" min="0" max="59" value="0">
+                            </div>
+                        </div>
+
+                        <button id="setTimerButton" class="app-button primary" style="width: 100%; margin-top: var(--spacing-md);">Запустить/Обновить таймер</button>
+                        <div id="timerMessage" class="timer-message-feedback"></div>
                     </div>
-                    <div style="margin-top: 20px; text-align: center;">
-                        <p>Ссылка на страницу таймера (для OBS/vMix):</p>
-                        <a href="/timer.html" target="_blank">/timer.html</a>
+
+                    <div style="margin-top: 20px; text-align: center; padding: var(--spacing-md); background-color: var(--color-surface-secondary); border-radius: var(--border-radius-md);">
+                        <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-sm);">Ссылка на страницу таймера (для OBS/vMix):</p>
+                        <a href="/timer.html" target="_blank" class="app-button tertiary">Открыть /timer.html</a>
                     </div>
                 </div>
                 <div id="tab-pause" class="tab-panel">
