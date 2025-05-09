@@ -1971,30 +1971,41 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
 }
 
 #tab-timer .mode-group-timer {
-    display: flex;            /* Располагает дочерние элементы (метки) в строку */
-    justify-content: center;  /* Центрирует группу меток внутри этого блока */
-    align-items: center;      /* Выравнивает метки по центру вертикально */
-    gap: var(--spacing-lg);   /* Промежуток между "Обратный отсчёт" и "По таргету" */
-    margin-bottom: var(--spacing-xl);
-    padding: var(--spacing-sm) 0;
-    background-color: var(--color-surface-secondary); 
-     border-radius: var(--border-radius-md); 
+    display: flex;            /* Включаем Flexbox */
+    flex-direction: row;      /* Явно указываем направление "в строку" */
+    justify-content: center;  /* Центрируем группу элементов по горизонтали */
+    align-items: center;      /* Выравниваем элементы по центру по вертикали */
+    flex-wrap: nowrap;        /* Запрещаем перенос элементов на новую строку */
+    gap: var(--spacing-lg, 20px); /* Промежуток между метками (используем переменную или значение по умолчанию) */
+    margin-bottom: var(--spacing-xl, 30px); /* Отступ снизу */
+    padding: var(--spacing-sm, 10px) 0; /* Внутренние отступы */
+    width: 100%;              /* Занимает всю доступную ширину для корректного justify-content */
+    /* background-color: var(--color-surface-secondary); /* Если нужен фон для этой группы */
+    /* border-radius: var(--border-radius-md); */
 }
 
 #tab-timer .mode-group-timer .radio-label {
-    color: var(--color-text-primary);
-    font-size: 1rem;
-    font-weight: var(--font-weight-medium);
+    display: inline-flex !important; /* Важно! Гарантирует, что метка ведет себя как inline-flex, располагаясь в строку */
+    align-items: center;             /* Выравнивает radio-кнопку и текст внутри метки по вертикали */
+    color: var(--color-text-primary, #fff); /* Цвет текста */
+    font-size: 1rem;                 /* Размер шрифта */
+    font-weight: var(--font-weight-medium, 500);
     cursor: pointer;
-    display: inline-flex; /* Располагает radio-кнопку и текст внутри метки в строку */
-    align-items: center;
-    margin-bottom: 0; /* Если метки находятся внутри form-group, это может быть нужно */
+    padding: var(--spacing-xs, 5px) var(--spacing-sm, 10px);
+    margin: 0; /* Убираем внешние отступы у самих label, если они были */
+    /* border: 1px solid transparent; /* Для отладки можно добавить рамку */
 }
 
 #tab-timer .mode-group-timer input[type="radio"] {
-    margin-right: var(--spacing-sm);
-    accent-color: var(--color-primary-base);
-    transform: scale(1.1);
+    margin-right: var(--spacing-sm, 10px); /* Отступ справа от radio-кнопки до текста */
+    accent-color: var(--color-primary-base, #7A64B9); /* Цвет самой radio-кнопки (для современных браузеров) */
+    transform: scale(1.1); /* Немного увеличить саму radio-кнопку */
+    vertical-align: middle; /* Помогает с выравниванием, если display: inline-flex не полностью справляется */
+}
+
+#tab-timer .mode-group-timer .radio-label:hover {
+    background-color: rgba(var(--rgb-primary, 122, 100, 185), 0.1); /* Легкая подсветка при наведении */
+    border-radius: var(--border-radius-sm, 6px);
 }
 
 #tab-timer .timer-input-container {
