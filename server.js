@@ -683,7 +683,7 @@ app.get('/timer', (req, res) => {
     res.json(timerData); // timerData уже { targetTime: ... }
 });
 
-// POST /timer – принять новое значение таймера
+// POST /timer – принять новое значение таймера (timestamp)
 app.post('/timer', async (req, res) => { // Добавляем async для await saveDbDataAsync
     const { targetTime } = req.body;
     if (typeof targetTime === 'number' && targetTime > 0) { // targetTime должен быть timestamp
@@ -696,6 +696,37 @@ app.post('/timer', async (req, res) => { // Добавляем async для awai
     } else {
         console.error('[API][POST] /timer - Invalid targetTime received:', targetTime);
         return res.status(400).json({ success: false, error: 'Некорректное значение targetTime. Ожидается timestamp.' });
+    }
+});
+
+// GET /set_timer – установить таймер по длительности (через query-параметр)
+// Пример: /set_timer?duration=300000 установит таймер на 5 минут (300000 мс)
+app.get('/set_timer', async (req, res) => {
+    const durationStr = req.query.duration;
+    if (typeof durationStr === 'undefined') {
+        console.log('[API][GET] /set_timer - Ошибка: Параметр duration отсутствует.');
+        return res.status(400).json({ success: false, error: 'Параметр duration отсутствует' });
+    }
+
+    const duration = parseInt(durationStr, 10);
+
+    if (isNaN(duration) || duration <= 0) {
+        console.log('[API][GET] /set_timer - Ошибка: Неверное значение длительности. Получено:', durationStr);
+        return res.status(400).json({ success: false, error: 'Неверное значение длительности. Ожидается положительное число миллисекунд.' });
+    }
+
+    timerData.targetTime = Date.now() + duration;
+    console.log(`[API][GET] /set_timer - Таймер установлен по длительности: ${duration} мс. Новое целевое время: ${new Date(timerData.targetTime).toLocaleString()} (Timestamp: ${timerData.targetTime})`);
+
+    try {
+        await saveDbDataAsync(); // Сохраняем изменение в db.json
+        io.emit('timerStateUpdate', timerData); // Оповещаем всех клиентов (включая timer.html)
+        console.log("[SOCKET] Emitted 'timerStateUpdate' after /set_timer call.");
+        res.json({ success: true, message: `Таймер установлен на ${duration / 1000} секунд`, targetTime: timerData.targetTime });
+    } catch (error) {
+        console.error("[API][GET] /set_timer - Ошибка при сохранении или отправке сокет сообщения:", error);
+        // Пытаемся все равно ответить клиенту, но сообщаем об ошибке на сервере
+        res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера при обновлении таймера.' });
     }
 });
 // --- КОНЕЦ НОВЫХ ЭНДПОИНТОВ ДЛЯ ТАЙМЕРА ---
