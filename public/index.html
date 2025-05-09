@@ -330,10 +330,10 @@
                          </div>
                 </div>
                 <div id="tab-timer" class="tab-panel">
-                    <div class="card-style timer-controls-wrapper">
-                        <h1 class="tab-title"><i class="fas fa-stopwatch"></i> Управление таймером</h1>
+                    <div class="card-style timer-controls-wrapper"> <h1 class="tab-title"><i class="fas fa-stopwatch"></i> Управление таймером</h1>
 
-                        <div class="form-group mode-group-timer"> <label class="radio-label">
+                        <div class="form-group mode-group-timer">
+                            <label class="radio-label">
                                 <input type="radio" name="timerMode" value="duration" checked>
                                 Обратный отсчёт
                             </label>
@@ -343,36 +343,45 @@
                             </label>
                         </div>
 
-                        <div id="timerDurationInputs" class="timer-input-sections">
-                            <p class="form-section-description">Введите время обратного отсчёта:</p>
-                            <div class="form-group">
-                                <label for="timerHoursInput">Часы:</label>
-                                <input type="number" id="timerHoursInput" class="header-input" min="0" value="0">
+                        <div class="timer-input-container">
+                            <div id="timerDurationInputs" class="timer-input-sections">
+                                <p class="form-section-description">Установите длительность таймера:</p>
+                                <div class="timer-fields-horizontal">
+                                    <div class="form-group timer-field">
+                                        <label for="timerHoursInput">Часы</label>
+                                        <input type="number" id="timerHoursInput" class="header-input" min="0" value="0" placeholder="00">
+                                    </div>
+                                    <span class="timer-field-separator">:</span>
+                                    <div class="form-group timer-field">
+                                        <label for="timerMinutesInput">Минуты</label>
+                                        <input type="number" id="timerMinutesInput" class="header-input" min="0" max="59" value="0" placeholder="00">
+                                    </div>
+                                    <span class="timer-field-separator">:</span>
+                                    <div class="form-group timer-field">
+                                        <label for="timerSecondsInput">Секунды</label>
+                                        <input type="number" id="timerSecondsInput" class="header-input" min="0" max="59" value="0" placeholder="00">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="timerMinutesInput">Минуты:</label>
-                                <input type="number" id="timerMinutesInput" class="header-input" min="0" value="0">
-                            </div>
-                            <div class="form-group">
-                                <label for="timerSecondsInput">Секунды:</label>
-                                <input type="number" id="timerSecondsInput" class="header-input" min="0" value="0">
+
+                            <div id="timerTargetInputs" class="timer-input-sections" style="display: none;">
+                                <p class="form-section-description">Установите целевое время (например, 20:00):</p>
+                                <div class="timer-fields-horizontal">
+                                    <div class="form-group timer-field">
+                                        <label for="timerTargetHoursInput">Часы</label>
+                                        <input type="number" id="timerTargetHoursInput" class="header-input" min="0" max="23" value="20" placeholder="ЧЧ">
+                                    </div>
+                                    <span class="timer-field-separator">:</span>
+                                    <div class="form-group timer-field">
+                                        <label for="timerTargetMinutesInput">Минуты</label>
+                                        <input type="number" id="timerTargetMinutesInput" class="header-input" min="0" max="59" value="0" placeholder="ММ">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div id="timerTargetInputs" class="timer-input-sections" style="display: none;">
-                            <p class="form-section-description">Введите целевое время (например, 20:00):</p>
-                            <div class="form-group">
-                                <label for="timerTargetHoursInput">Часы:</label>
-                                <input type="number" id="timerTargetHoursInput" class="header-input" min="0" max="23" value="20">
-                            </div>
-                            <div class="form-group">
-                                <label for="timerTargetMinutesInput">Минуты:</label>
-                                <input type="number" id="timerTargetMinutesInput" class="header-input" min="0" max="59" value="0">
-                            </div>
-                        </div>
-
-                        <button id="setTimerButton" class="app-button primary" style="width: 100%; margin-top: var(--spacing-md);">Запустить/Обновить таймер</button>
-                        <div id="timerMessage" class="timer-message-feedback"></div>
+                        <button id="setTimerButton" class="app-button primary" style="width: 100%; margin-top: var(--spacing-xl);">Запустить/Обновить таймер</button>
+                        <div id="timerMessage" class="timer-message-feedback" style="min-height: 1.5em; margin-top: var(--spacing-md);"></div>
                     </div>
 
                     <div style="margin-top: 20px; text-align: center; padding: var(--spacing-md); background-color: var(--color-surface-secondary); border-radius: var(--border-radius-md);">
