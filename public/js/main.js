@@ -8,6 +8,7 @@ import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionS
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 import { initCasters, loadCasters, updateCastersUIFromSocket, updateSelectedCastersUIFromSocket, loadSelectedCasters } from "./casters.js";
+import { initTimerControls } from "./timerControl.js"; 
 
 // Инициализация Socket.IO клиента
 const socket = io();
@@ -926,7 +927,11 @@ window.addEventListener("DOMContentLoaded", async () => {
             loadRawVRSData(),
             loadCustomFieldsFromServer(),
             loadMapVetoFromServer(), // Эта функция уже вызывает updateVetoTeamOptions и теперь будет updateMapVetoDisplay
-            loadPauseDataFromServer()
+            loadPauseDataFromServer(),
+            setupListeners(),
+            initTabs(),
+            initTimerControls(),
+            
         ]);
         console.log("DOMContentLoaded: All initial data loaded from server.");
 

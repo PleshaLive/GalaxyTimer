@@ -1,0 +1,106 @@
+<script>
+    const timerEl = document.getElementById('timerDisplay');
+    const startEl = document.getElementById('startText');
+    let currentTargetTime = null;
+    let intervalId = null;
+
+    function formatTime(distance) {
+        const hours = Math.floor(distance / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        const milliseconds = Math.floor((distance % 1000) / 1); // Убедимся, что это целое число
+
+        let displayText;
+        // Всегда показывать часы, если они есть, даже если 00, если общее время > 1 часа
+        // или если изначальная установка была с часами.
+        // Упростим: всегда показывать часы, если таймер больше часа.
+        if (hours > 0 || distance >= 3600000) {
+             displayText = ('0' + hours).slice(-2) + ':' +
+                           ('0' + minutes).slice(-2) + ':' +
+                           ('0' + seconds).slice(-2) + ':' +
+                           ('00' + milliseconds).slice(-3).padStart(3, '0');
+        } else { // Меньше часа
+             displayText = ('0' + minutes).slice(-2) + ':' +
+                           ('0' + seconds).slice(-2) + ':' +
+                           ('00' + milliseconds).slice(-3).padStart(3, '0');
+        }
+        return displayText;
+    }
+
+    function displayTime() {
+        if (!currentTargetTime) {
+            timerEl.textContent = formatTime(0); // или '00:00:00:000' / '00:00:000' в зависимости от желаемого формата по умолчанию
+            timerEl.classList.remove('fade-out');
+            startEl.classList.remove('fade-out');
+            return;
+        }
+
+        const now = Date.now();
+        const distance = currentTargetTime - now;
+
+        if (distance <= 0) {
+            timerEl.textContent = formatTime(0);
+            if (!timerEl.classList.contains('fade-out')) { // Применяем fade-out только один раз
+                 timerEl.classList.add('fade-out');
+                 startEl.classList.add('fade-out');
+            }
+            if(intervalId) { // Остановка интервала, если таймер дошел до нуля
+                // clearInterval(intervalId); // Не нужно, так как displayTime вызовется по событию сокета
+                // intervalId = null;
+            }
+            return;
+        } else {
+            timerEl.classList.remove('fade-out');
+            startEl.classList.remove('fade-out');
+        }
+        timerEl.textContent = formatTime(distance);
+    }
+
+    function setupTimerInterval() {
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
+        // Обновляем дисплей каждые ~30-50 мс для плавности миллисекунд
+        intervalId = setInterval(displayTime, 47); // Небольшая некруглая цифра
+        displayTime(); // Первоначальный вызов
+    }
+
+    // Загрузка начального состояния таймера
+    fetch('/timer')
+        .then(response => response.json())
+        .then(data => {
+            console.log("[TimerDisplay] Initial data fetched:", data);
+            currentTargetTime = data.targetTime;
+            setupTimerInterval();
+        })
+        .catch(err => {
+            console.error('[TimerDisplay] Error fetching initial timer data:', err);
+            timerEl.textContent = 'ERR';
+        });
+
+    // Настройка Socket.IO
+    const socket = io();
+
+    socket.on("connect", () => {
+        console.log("[TimerDisplay] Connected to Socket.IO server. ID:", socket.id);
+    });
+
+    socket.on("timerStateUpdate", (data) => {
+        console.log("[TimerDisplay] Received 'timerStateUpdate' from socket:", data);
+        currentTargetTime = data.targetTime;
+        // Перезапускаем интервал для обновления отображения с новым targetTime
+        // или просто обновляем displayTime, если интервал уже есть
+        setupTimerInterval();
+    });
+
+    socket.on("disconnect", (reason) => {
+        console.warn("[TimerDisplay] Disconnected from Socket.IO server. Reason:", reason);
+        // Можно добавить логику повторного подключения или уведомление пользователю
+    });
+    
+    socket.on("connect_error", (err) => {
+        console.error("[TimerDisplay] Socket.IO connection error:", err);
+        timerEl.textContent = 'N/C'; // No Connection
+    });
+
+</script>

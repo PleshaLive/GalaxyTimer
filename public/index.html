@@ -10,6 +10,95 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Подключаем шрифт ProximaNova-Bold из папки fonts */
+        @font-face {
+            font-family: 'ProximaNova-Bold';
+            src: url('fonts/ProximaNova-Bold.ttf') format('truetype'); /* Путь относительно public/ */
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        /* Стили для контейнера таймера, если они нужны глобально для этой вкладки */
+        .timer-control-container {
+            font-family: 'ProximaNova-Bold', sans-serif;
+            background: #222; /* Фоновый цвет можно адаптировать под стиль Код2 */
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            border-radius: var(--border-radius-md); /* Используем переменную из style.css Код2 */
+        }
+        .timer-control-container .container { /* Переопределяем вложенный .container */
+            max-width: 400px;
+            margin: 0 auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .timer-control-container h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #fff; /* Убедимся, что цвет заголовка видим */
+        }
+        .timer-control-container .mode-group {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .timer-control-container .mode-group label {
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff; /* Явный цвет для label */
+        }
+        .timer-control-container .inputs-group {
+            margin-bottom: 20px;
+        }
+        .timer-control-container .inputs-group p {
+            margin: 0 0 10px;
+            font-size: 18px;
+            text-align: center;
+        }
+        .timer-control-container .inputs-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+             color: #fff; /* Явный цвет для label */
+        }
+        .timer-control-container input[type="number"] {
+            width: 100%;
+            padding: 8px; /* Немного увеличим padding */
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            text-align: center;
+            background: #444;
+            color: #fff;
+            box-sizing: border-box; /* Добавим для корректного расчета ширины */
+        }
+        .timer-control-container button { /* Стилизуем кнопку таймера */
+            width: 100%;
+            padding: 12px; /* Увеличим padding */
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50; /* Зеленый цвет кнопки */
+            color: #fff;
+            cursor: pointer;
+            text-transform: none; /* Убираем uppercase от общего стиля button */
+            font-family: 'ProximaNova-Bold', sans-serif; /* Применяем шрифт таймера */
+        }
+        .timer-control-container button:hover {
+            background: #45a049;
+        }
+        .timer-control-container .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 16px;
+            color: #0f0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -51,6 +140,7 @@
                 <li class="tab-link active" data-tab="tab-matches"><i class="fas fa-gamepad"></i> Матчи</li>
                 <li class="tab-link" data-tab="tab-mapveto"><i class="fas fa-map-signs"></i> Map Veto</li>
                 <li class="tab-link" data-tab="tab-casters"><i class="fas fa-microphone-alt"></i> Кастеры</li>
+                <li class="tab-link" data-tab="tab-timer"><i class="fas fa-stopwatch"></i> Таймер</li>
                 <li class="tab-link" data-tab="tab-pause"><i class="fas fa-pause-circle"></i> Пауза</li>
                 <li class="tab-link" data-tab="tab-json"><i class="fas fa-code"></i> JSON</li>
             </ul>
@@ -143,7 +233,7 @@
                                     </div>
                                     <div class="vs-indicator">VS</div>
                                     <div class="team-block team-2-block">
-                                          <div class="team-info-header">
+                                        <div class="team-info-header">
                                             <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo2">
                                             <label for="team2Select2">Команда 2</label>
                                         </div>
@@ -210,21 +300,21 @@
                             </div>
                             <div class="match-body">
                                 <div class="match-teams">
-                                      <div class="team-block team-1-block">
-                                        <div class="team-info-header">
-                                            <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo4">
-                                            <label for="team1Select4">Команда 1</label>
+                                        <div class="team-block team-1-block">
+                                            <div class="team-info-header">
+                                                <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo4">
+                                                <label for="team1Select4">Команда 1</label>
+                                            </div>
+                                            <select class="team-select styled-select" id="team1Select4"><option value="">- Выбрать -</option></select>
                                         </div>
-                                        <select class="team-select styled-select" id="team1Select4"><option value="">- Выбрать -</option></select>
-                                    </div>
-                                    <div class="vs-indicator">VS</div>
-                                    <div class="team-block team-2-block">
-                                          <div class="team-info-header">
-                                            <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo4">
-                                            <label for="team2Select4">Команда 2</label>
+                                        <div class="vs-indicator">VS</div>
+                                        <div class="team-block team-2-block">
+                                            <div class="team-info-header">
+                                                <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo4">
+                                                <label for="team2Select4">Команда 2</label>
+                                            </div>
+                                            <select class="team-select styled-select" id="team2Select4"><option value="">- Выбрать -</option></select>
                                         </div>
-                                        <select class="team-select styled-select" id="team2Select4"><option value="">- Выбрать -</option></select>
-                                    </div>
                                 </div>
                                 <div class="winner-buttons"><button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: T1</button><button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: T2</button></div>
                                 <div class="maps">
@@ -238,7 +328,9 @@
                             <div class="match-footer"><button class="save-match-button app-button primary" data-match-index="4"><i class="fas fa-save"></i> Сохранить Матч 4</button></div>
                         </div>
 
-                    </div> </div> <div id="tab-mapveto" class="tab-panel">
+                    </div>
+                </div>
+                <div id="tab-mapveto" class="tab-panel">
                     <div class="map-veto-block">
                         <div class="map-veto-content">
                             <h1 class="tab-title"><i class="fas fa-map-signs"></i> MAP VETO</h1>
@@ -246,7 +338,7 @@
                                 <div class="map-veto-header"> <label for="matchSelect"><i class="fas fa-filter"></i> Матч для Veto:</label>
                                     <select id="matchSelect" class="control-select styled-select"></select>
                                 </div>
-                
+
                                 <div id="mapVetoTeamDisplayInternal" class="map-veto-team-display-internal">
                                     <div class="team-display team-1">
                                         <span class="team-display-name" id="mapVetoTeam1Name">Команда 1</span>
@@ -290,70 +382,107 @@
                          <div class="casters-grid">
                                 <div class="caster-selection-block card-style">
                                    <h3><i class="fas fa-user-check"></i> Выбрать Кастеров</h3>
-                                   <div class="form-group">
-                                      <label for="caster1Select"><i class="fas fa-microphone"></i> Кастер 1:</label>
-                                      <select id="caster1Select" class="control-select styled-select">
-                                         <option value="">- Выбрать кастера -</option>
-                                      </select>
-                                   </div>
-                                   <div class="form-group">
-                                      <label for="caster2Select"><i class="fas fa-microphone"></i> Кастер 2:</label>
-                                      <select id="caster2Select" class="control-select styled-select">
-                                         <option value="">- Выбрать кастера -</option>
-                                      </select>
-                                   </div>
-                                   <button id="saveSelectedCastersButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Кастеров</button>
+                                  <div class="form-group">
+                                    <label for="caster1Select"><i class="fas fa-microphone"></i> Кастер 1:</label>
+                                    <select id="caster1Select" class="control-select styled-select">
+                                       <option value="">- Выбрать кастера -</option>
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="caster2Select"><i class="fas fa-microphone"></i> Кастер 2:</label>
+                                    <select id="caster2Select" class="control-select styled-select">
+                                       <option value="">- Выбрать кастера -</option>
+                                    </select>
+                                  </div>
+                                  <button id="saveSelectedCastersButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Кастеров</button>
                                 </div>
 
                                 <div class="caster-creation-block card-style">
                                    <h3><i class="fas fa-user-plus"></i> Создать Нового Кастера</h3>
-                                   <form id="addCasterForm">
-                                      <div class="form-group">
-                                         <label for="newCasterName"><i class="fas fa-signature"></i> Имя кастера:</label>
-                                         <input type="text" id="newCasterName" class="header-input" placeholder="Введите имя" required>
-                                      </div>
-                                      <div class="form-group">
-                                         <label for="newCasterSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
-                                         <input type="text" id="newCasterSocial" class="header-input" placeholder="Ссылка или никнейм">
-                                      </div>
-                                      <button type="submit" id="addCasterButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить кастера</button>
-                                   </form>
+                                  <form id="addCasterForm">
+                                    <div class="form-group">
+                                       <label for="newCasterName"><i class="fas fa-signature"></i> Имя кастера:</label>
+                                       <input type="text" id="newCasterName" class="header-input" placeholder="Введите имя" required>
+                                    </div>
+                                    <div class="form-group">
+                                       <label for="newCasterSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
+                                       <input type="text" id="newCasterSocial" class="header-input" placeholder="Ссылка или никнейм">
+                                    </div>
+                                    <button type="submit" id="addCasterButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить кастера</button>
+                                  </form>
                                 </div>
                          </div>
                          <div class="casters-list-block card-style" style="margin-top: var(--spacing-lg);">
-                             <h3><i class="fas fa-list-ul"></i> Список Кастеров</h3>
-                             <div id="castersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
-                                 <p>Загрузка...</p> </div>
+                               <h3><i class="fas fa-list-ul"></i> Список Кастеров</h3>
+                              <div id="castersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
+                                   <p>Загрузка...</p> </div>
                          </div>
+                </div>
+                <div id="tab-timer" class="tab-panel">
+                    <div class="timer-control-container"> <div class="container"> <h1>Управление таймером</h1>
+                            <div class="mode-group">
+                                <label>
+                                    <input type="radio" name="timerMode" value="duration" checked> Обратный отсчёт
+                                </label>
+                                <label>
+                                    <input type="radio" name="timerMode" value="target">
+                                    По таргету
+                                </label>
+                            </div>
+
+                            <div id="timerDurationInputs" class="inputs-group">
+                                <p>Введите время обратного отсчёта:</p>
+                                <label>Часы: <input type="number" id="timerHoursInput" min="0" value="0"></label>
+                                <label>Минуты: <input type="number" id="timerMinutesInput" min="0" value="0"></label>
+                                <label>Секунды: <input type="number" id="timerSecondsInput" min="0" value="0"></label>
+                            </div>
+
+                            <div id="timerTargetInputs" class="inputs-group" style="display: none;">
+                                <p>Введите целевое время (например, 20:00):</p>
+                                <label>Часы: <input type="number" id="timerTargetHoursInput" min="0" max="23" value="20"></label>
+                                <label>Минуты: <input type="number" id="timerTargetMinutesInput" min="0" max="59" value="0"></label>
+                            </div>
+
+                            <button id="setTimerButton">Запустить/Обновить таймер</button>
+                            <div class="message" id="timerMessage"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px; text-align: center;">
+                        <p>Ссылка на страницу таймера (для OBS/vMix):</p>
+                        <a href="/timer.html" target="_blank">/timer.html</a>
+                    </div>
                 </div>
                 <div id="tab-pause" class="tab-panel">
                          <section class="pause-section">
-                             <h1 class="tab-title"><i class="fas fa-pause-circle"></i> Управление Паузой</h1>
-                            <div class="pause-controls-standalone">
-                               <div class="pause-fields-grid">
-                                     <div class="form-group">
-                                         <label for="pauseMessageInput"><i class="fas fa-comment-dots"></i> Сообщение паузы:</label>
-                                         <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
-                                     </div>
-                                     <div class="form-group">
-                                         <label for="pauseTimeInput"><i class="fas fa-clock"></i> Last UPD:</label>
-                                         <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
-                                     </div>
-                               </div>
-                               <button id="savePauseButton" class="app-button primary"><i class="fas fa-save"></i> Save Pause</button>
-                            </div>
+                               <h1 class="tab-title"><i class="fas fa-pause-circle"></i> Управление Паузой</h1>
+                              <div class="pause-controls-standalone">
+                                  <div class="pause-fields-grid">
+                                          <div class="form-group">
+                                              <label for="pauseMessageInput"><i class="fas fa-comment-dots"></i> Сообщение паузы:</label>
+                                              <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
+                                          </div>
+                                          <div class="form-group">
+                                              <label for="pauseTimeInput"><i class="fas fa-clock"></i> Last UPD:</label>
+                                              <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
+                                          </div>
+                                  </div>
+                                  <button id="savePauseButton" class="app-button primary"><i class="fas fa-save"></i> Save Pause</button>
+                              </div>
                          </section>
                 </div>
                  <div id="tab-json" class="tab-panel">
-                     <h1 class="tab-title"><i class="fas fa-code"></i> JSON Вывод</h1>
-                     <div class="json-output-container">
-                         <div class="json-output styled-scrollbar" id="jsonOutput">
-                             JSON data will appear here...
-                         </div>
-                     </div>
+                       <h1 class="tab-title"><i class="fas fa-code"></i> JSON Вывод</h1>
+                      <div class="json-output-container">
+                          <div class="json-output styled-scrollbar" id="jsonOutput">
+                              JSON data will appear here...
+                          </div>
+                      </div>
                 </div>
 
-            </div> </div> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="js/main.js"></script>
