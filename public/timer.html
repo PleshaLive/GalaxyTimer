@@ -1,35 +1,106 @@
-<script>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Таймер</title>
+  <script src="/socket.io/socket.io.js"></script> <style>
+    @font-face {
+      font-family: 'BLENDERPRO-HEAVY';
+      src: url('fonts/BLENDERPRO-HEAVY.ttf') format('truetype');
+      font-weight: bold;
+      font-style: normal;
+    }
+    body {
+      margin: 0;
+      background-color: transparent; /* прозрачный фон для OBS/vMix */
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden; /* Изменено с visible на hidden, если элементы не должны выходить за пределы */
+    }
+    .timer-container {
+      position: relative;
+      width: 100%; /* Используем 100% для заполнения body */
+      height: 100%;
+    }
+    .timer {
+      position: absolute;
+      right: 479px; 
+      top: 380px;
+      white-space: nowrap; 
+      text-align: right; 
+      font-family: 'BLENDERPRO-HEAVY', 'Blender Pro', sans-serif; /* Добавлен Blender Pro как запасной, если основной не загрузится */
+      font-style: normal;
+      font-weight: 900; /* Или bold, если BLENDERPRO-HEAVY уже жирный */
+      font-size: 239.001px;
+      line-height: 287px;
+      color: #e2dcec;
+      transition: opacity 1s ease-out;
+    }
+    .start {
+      position: absolute;
+      right: 500px;
+      top: 285px;
+      white-space: nowrap;
+      text-align: right;
+      font-family: 'BLENDERPRO-HEAVY', 'Blender Pro', sans-serif;
+      font-style: normal;
+      font-weight: 800; /* Или bold */
+      font-size: 95px;
+      line-height: 170px;
+      /* display: flex; align-items: flex-end; -- можно убрать, если не требуется специальное выравнивание */
+      color: #e2dcec;
+      transition: opacity 1s ease-out;
+    }
+    .fade-out {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="timer-container">
+    <div class="start" id="startText">Start In:</div>
+    <div class="timer" id="timerDisplay">00:00:00:000</div>
+  </div>
+
+  <script>
     const timerEl = document.getElementById('timerDisplay');
     const startEl = document.getElementById('startText');
     let currentTargetTime = null;
     let intervalId = null;
 
+    // Проверка, что элементы найдены
+    if (!timerEl || !startEl) {
+        console.error("[TimerDisplay] Critical: timerEl or startEl not found in DOM!");
+        if(timerEl) timerEl.textContent = "DOM ERR";
+    }
+
     function formatTime(distance) {
         const hours = Math.floor(distance / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        const milliseconds = Math.floor((distance % 1000) / 1); // Убедимся, что это целое число
+        // Убедимся, что миллисекунды всегда три цифры
+        const milliseconds = String(distance % 1000).padStart(3, '0');
 
         let displayText;
-        // Всегда показывать часы, если они есть, даже если 00, если общее время > 1 часа
-        // или если изначальная установка была с часами.
-        // Упростим: всегда показывать часы, если таймер больше часа.
-        if (hours > 0 || distance >= 3600000) {
-             displayText = ('0' + hours).slice(-2) + ':' +
-                           ('0' + minutes).slice(-2) + ':' +
-                           ('0' + seconds).slice(-2) + ':' +
-                           ('00' + milliseconds).slice(-3).padStart(3, '0');
-        } else { // Меньше часа
-             displayText = ('0' + minutes).slice(-2) + ':' +
-                           ('0' + seconds).slice(-2) + ':' +
-                           ('00' + milliseconds).slice(-3).padStart(3, '0');
+        if (hours > 0) { // Показывать часы, если они есть
+             displayText = String(hours).padStart(2, '0') + ':' +
+                           String(minutes).padStart(2, '0') + ':' +
+                           String(seconds).padStart(2, '0') + ':' +
+                           milliseconds;
+        } else { // Меньше часа, не показывать часы
+             displayText = String(minutes).padStart(2, '0') + ':' +
+                           String(seconds).padStart(2, '0') + ':' +
+                           milliseconds;
         }
         return displayText;
     }
 
     function displayTime() {
-        if (!currentTargetTime) {
-            timerEl.textContent = formatTime(0); // или '00:00:00:000' / '00:00:000' в зависимости от желаемого формата по умолчанию
+        if (!timerEl || !startEl) return; // Дополнительная проверка
+
+        if (currentTargetTime === null) { // Если таймер не установлен (например, при первой загрузке до получения данных)
+            timerEl.textContent = formatTime(0); 
             timerEl.classList.remove('fade-out');
             startEl.classList.remove('fade-out');
             return;
@@ -40,14 +111,14 @@
 
         if (distance <= 0) {
             timerEl.textContent = formatTime(0);
-            if (!timerEl.classList.contains('fade-out')) { // Применяем fade-out только один раз
+            // Применяем fade-out только если он еще не применен
+            if (!timerEl.classList.contains('fade-out')) { 
                  timerEl.classList.add('fade-out');
+            }
+            if (!startEl.classList.contains('fade-out')) {
                  startEl.classList.add('fade-out');
             }
-            if(intervalId) { // Остановка интервала, если таймер дошел до нуля
-                // clearInterval(intervalId); // Не нужно, так как displayTime вызовется по событию сокета
-                // intervalId = null;
-            }
+            // Очистка интервала не нужна здесь, если обновления приходят по сокету
             return;
         } else {
             timerEl.classList.remove('fade-out');
@@ -60,47 +131,80 @@
         if (intervalId) {
             clearInterval(intervalId);
         }
-        // Обновляем дисплей каждые ~30-50 мс для плавности миллисекунд
-        intervalId = setInterval(displayTime, 47); // Небольшая некруглая цифра
-        displayTime(); // Первоначальный вызов
+        if (currentTargetTime !== null) { // Запускаем интервал только если есть целевое время
+            intervalId = setInterval(displayTime, 47); // Обновляем дисплей для плавности миллисекунд
+        }
+        displayTime(); // Первоначальный вызов для немедленного отображения
     }
 
     // Загрузка начального состояния таймера
     fetch('/timer')
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             console.log("[TimerDisplay] Initial data fetched:", data);
-            currentTargetTime = data.targetTime;
+            if (data && typeof data.targetTime === 'number') {
+                currentTargetTime = data.targetTime;
+            } else {
+                currentTargetTime = null; // Явно ставим null если targetTime не пришел или некорректен
+                console.warn("[TimerDisplay] Initial targetTime is null or invalid.");
+            }
             setupTimerInterval();
         })
         .catch(err => {
             console.error('[TimerDisplay] Error fetching initial timer data:', err);
-            timerEl.textContent = 'ERR';
+            if(timerEl) timerEl.textContent = 'ERR';
+            currentTargetTime = null; // Сброс в случае ошибки
+            setupTimerInterval(); // Показать 00:00:000
         });
 
     // Настройка Socket.IO
-    const socket = io();
+    try {
+        const socket = io();
 
-    socket.on("connect", () => {
-        console.log("[TimerDisplay] Connected to Socket.IO server. ID:", socket.id);
-    });
+        socket.on("connect", () => {
+            console.log("[TimerDisplay] Connected to Socket.IO server. ID:", socket.id);
+            // Можно запросить текущее состояние таймера снова при подключении, если необходимо
+            // socket.emit('requestInitialTimerState'); // Потребует обработчик на сервере
+        });
 
-    socket.on("timerStateUpdate", (data) => {
-        console.log("[TimerDisplay] Received 'timerStateUpdate' from socket:", data);
-        currentTargetTime = data.targetTime;
-        // Перезапускаем интервал для обновления отображения с новым targetTime
-        // или просто обновляем displayTime, если интервал уже есть
-        setupTimerInterval();
-    });
+        socket.on("timerStateUpdate", (data) => {
+            console.log("[TimerDisplay] Received 'timerStateUpdate' from socket:", data);
+            if (data && typeof data.targetTime === 'number') {
+                currentTargetTime = data.targetTime;
+            } else {
+                currentTargetTime = null;
+                 console.warn("[TimerDisplay] Received null or invalid targetTime via socket.");
+            }
+            setupTimerInterval(); // Перезапускаем/обновляем интервал с новым временем
+        });
 
-    socket.on("disconnect", (reason) => {
-        console.warn("[TimerDisplay] Disconnected from Socket.IO server. Reason:", reason);
-        // Можно добавить логику повторного подключения или уведомление пользователю
-    });
-    
-    socket.on("connect_error", (err) => {
-        console.error("[TimerDisplay] Socket.IO connection error:", err);
-        timerEl.textContent = 'N/C'; // No Connection
-    });
+        socket.on("disconnect", (reason) => {
+            console.warn("[TimerDisplay] Disconnected from Socket.IO server. Reason:", reason);
+            if(timerEl) timerEl.textContent = 'N/C'; // No Connection
+            if (intervalId) { // Останавливаем интервал при дисконнекте
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        });
+        
+        socket.on("connect_error", (err) => {
+            console.error("[TimerDisplay] Socket.IO connection error:", err.message);
+            if(timerEl) timerEl.textContent = 'N/C';
+             if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        });
+    } catch (e) {
+        console.error("[TimerDisplay] Failed to initialize Socket.IO. 'io' might be undefined.", e);
+        if(timerEl) timerEl.textContent = 'IO ERR';
+        // Если io не определено, setupTimerInterval все равно вызовется после fetch,
+        // и таймер будет работать на основе первоначальной загрузки, но без обновлений по сокету.
+    }
 
-</script>
+  </script>
+</body>
+</html>
