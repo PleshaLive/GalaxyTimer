@@ -1954,146 +1954,288 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
     }
 }
 
+/* === Основной контейнер вкладки Таймер и двухколоночный макет === */
+#tab-timer .timer-tab-layout-container {
+    display: flex;
+    flex-wrap: wrap; /* Позволит колонкам переноситься на маленьких экранах */
+    gap: var(--spacing-lg, 20px); /* Промежуток между колонками */
+    align-items: flex-start; /* Выравниваем колонки по верху */
+}
+
+#tab-timer .timer-controls-column {
+    flex: 2 1 480px; /* Колонка настроек: может расти, может сжиматься, базовая ширина ~480px */
+    min-width: 300px; 
+}
+
+#tab-timer .timer-link-column {
+    flex: 1 1 280px; /* Колонка ссылки: может расти, может сжиматься, базовая ширина ~280px */
+    min-width: 260px;
+}
+
+/* === Обертка для элементов управления таймером (левая колонка) === */
 #tab-timer .timer-controls-wrapper {
-    /* background-color: var(--color-surface); /* уже должно быть */
-    /* padding: var(--spacing-lg); /* уже должно быть */
-    /* border-radius: var(--border-radius-lg); /* уже должно быть */
-    max-width: 550px; /* Ограничиваем ширину для компактности */
-    margin: 0 auto;   /* Центрируем блок, если он уже родителя */
+    background-color: var(--color-surface);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    /* max-width: 550px; /* Убрано, так как ширина контролируется колонкой */
+    /* margin: 0 auto;   /* Убрано */
+    height: 100%; /* Чтобы карточка занимала всю высоту колонки, если контент меньше */
+    box-sizing: border-box; /* На всякий случай */
 }
 
-#tab-timer .tab-title {
-    margin-bottom: var(--spacing-lg); /* Уменьшаем отступ после заголовка */
+#tab-timer .tab-title { /* Заголовок "Управление таймером" */
+    text-align: center;
+    margin-bottom: var(--spacing-lg); 
+}
+#tab-timer .tab-title i {
+    margin-right: var(--spacing-sm);
 }
 
+/* === Группа выбора режима (Radio-кнопки) === */
 #tab-timer .mode-group-timer {
-    gap: var(--spacing-md); /* Немного уменьшаем промежуток между radio */
-    margin-bottom: var(--spacing-lg); /* Уменьшаем отступ */
-    /* background-color: transparent; /* Можно убрать фон, если он был */
-    /* padding: var(--spacing-xs) 0; */
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-md); /* Промежуток между radio-метками */
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-xs) 0;
+    width: 100%;
 }
 
 #tab-timer .mode-group-timer .radio-label {
-    font-size: 0.9rem; /* Чуть меньше шрифт для меток radio */
-    /* padding: var(--spacing-xs) var(--spacing-xs); */ /* Если нужны паддинги */
-}
-
-#tab-timer .mode-group-timer input[type="radio"] {
-    transform: scale(1); /* Возвращаем обычный размер radio */
-    margin-right: var(--spacing-xs);
+    display: inline-flex !important; 
+    align-items: center;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin: 0;
+    border-radius: var(--border-radius-sm);
+    transition: background-color 0.2s ease;
 }
 
 #tab-timer .mode-group-timer .radio-label:hover {
-    background-color: rgba(var(--rgb-primary, 122, 100, 185), 0.1); /* Легкая подсветка при наведении */
-    border-radius: var(--border-radius-sm, 6px);
+    background-color: rgba(var(--rgb-primary, 122, 100, 185), 0.1);
 }
 
+#tab-timer .mode-group-timer input[type="radio"] {
+    margin-right: var(--spacing-xs); /* Уменьшен отступ */
+    accent-color: var(--color-primary-base);
+    transform: scale(1); /* Обычный размер */
+    vertical-align: middle;
+}
+
+/* === Контейнер для секций ввода (Длительность / Целевое время) === */
 #tab-timer .timer-input-container {
-    margin-bottom: var(--spacing-lg); /* Отступ перед кнопкой */
+    margin-bottom: var(--spacing-lg);
 }
 
 #tab-timer .timer-input-sections {
-    /* Стили для контейнера активной группы полей ввода */
-    /* Убраны фон и рамка, так как они теперь на .timer-controls-wrapper */
     padding-top: var(--spacing-sm);
+    /* background-color: transparent; /* Убедимся, что нет лишнего фона */
+    /* border: none; */
 }
 
 #tab-timer .timer-input-sections .form-section-description {
     font-size: 0.9rem;
-    color: var(--color-text-muted); /* Более приглушенный цвет */
-    margin-bottom: var(--spacing-sm); /* Меньше отступ */
+    color: var(--color-text-muted);
+    margin-bottom: var(--spacing-md); /* Отступ увеличен для разделения от полей */
     text-align: center;
 }
 
+/* === Горизонтальное расположение полей ЧЧ:ММ:СС === */
 #tab-timer .timer-fields-horizontal {
     display: flex;
-    align-items: flex-end; /* Выравниваем по нижней границе полей и разделителей */
-    gap: var(--spacing-sm); /* Промежуток между элементами в строке */
-    justify-content: center; /* Центрируем группу полей */
-    flex-wrap: wrap; /* Для адаптивности, если не помещаются */
-}
-
-#tab-timer .timer-fields-horizontal {
-    display: flex;
-    align-items: flex-start; /* Выравниваем по верху (по лейблам) */
-    gap: var(--spacing-xs);  /* Маленький промежуток между полями и разделителями */
+    align-items: flex-start; /* Выравнивание по верху (по меткам) */
+    gap: var(--spacing-xs);  
     justify-content: center;
+    flex-wrap: nowrap; /* Поля не будут переноситься, если контейнер слишком узкий (лучше wrap для адаптивности) */
+                     /* Если хотите перенос, используйте flex-wrap: wrap; */
 }
 
 #tab-timer .timer-fields-horizontal .form-group.timer-field {
-    flex: 0 1 auto;
-    width: auto; /* Ширина по контенту инпута + лейбла */
-    min-width: 60px; /* Минимальная ширина для поля */
-    max-width: 80px; /* Максимальная ширина, чтобы не были слишком широкими */
+    flex: 0 1 auto; /* Не растягивать, сжиматься при необходимости, базовая ширина по контенту */
+    width: auto; 
+    min-width: 55px; 
+    max-width: 75px; 
+    text-align: center; /* Центрируем содержимое (label + input) внутри этого блока */
+}
+
+#tab-timer .timer-fields-horizontal .form-group.timer-field label {
+    display: block;
+    font-size: 0.7rem; 
+    color: var(--color-text-muted);
+    margin-bottom: 4px; /* Отступ между меткой и полем */
+    text-transform: uppercase; 
+    line-height: 1;
 }
 
 #tab-timer .timer-fields-horizontal input[type="number"].timer-input-value {
     width: 100%;
     text-align: center;
-    font-size: 1.5rem; /* Крупные цифры */
-    padding: var(--spacing-sm) var(--spacing-xs); /* Меньше горизонтальный padding, если нужно */
-    line-height: 1.2; /* Чтобы текст был по центру вертикально */
-    background-color: var(--color-surface-secondary); /* Более темный фон для полей */
+    font-size: 1.4rem; 
+    padding: var(--spacing-sm) 5px; /* Вертикальный отступ основной, горизонтальный минимальный */
+    line-height: 1.3; 
+    background-color: var(--color-surface-secondary); 
     border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm); /* Единый радиус */
 }
 #tab-timer .timer-fields-horizontal input[type="number"].timer-input-value:focus {
     border-color: var(--color-primary-base);
     background-color: var(--color-surface);
+    box-shadow: 0 0 0 2px rgba(var(--rgb-primary), 0.2); /* Меньшая тень фокуса */
 }
 
 #tab-timer .timer-fields-horizontal .timer-field-separator {
-    font-size: 1.5rem; /* Размер двоеточия */
+    font-size: 1.4rem; 
     font-weight: var(--font-weight-normal);
     color: var(--color-text-muted);
     line-height: 1;
-    padding-top: calc(0.7rem + 3px + var(--spacing-sm) + (1.5rem - 1.2rem)/2 - (1.5rem - 1rem)/2 ); /* Хитрое выравнивание по центру инпутов */
-    /* Проще: align-self: center; и немного margin-top, если предыдущее не работает идеально */
-    align-self: center;
-    margin-top: calc(0.7rem + 3px); /* Отступ сверху, равный высоте label + ее margin-bottom */
+    /* Выравниваем по центру инпутов: (высота метки + ее отступ) + (половина высоты инпута) - (половина своей высоты) */
+    /* Это требует точной подгонки, или проще align-items: center; для всей .timer-fields-horizontal */
+    /* При align-items: flex-start; для .timer-fields-horizontal: */
+    margin-top: calc(0.7rem + 4px); /* Высота label + ее margin-bottom */
+    padding-top: calc(var(--spacing-sm) + (1.4rem * 1.3 / 2) - (1.4rem / 2)); /* Выравнивание по текстовой части инпута */
+    align-self: flex-start; /* Так как родитель align-items: flex-start */
 }
 
-/* Если у вас два поля в строке (для "по таргету") */
+/* Для двух полей (режим "По таргету") */
 #tab-timer #timerTargetInputs .timer-fields-horizontal .form-group.timer-field {
-    max-width: 90px; /* Чуть шире, если нужно */
+    max-width: 85px; /* Немного шире, если нужно для двух полей */
 }
 
 
-#tab-timer #setTimerButton.app-button.primary {
-    /* Стили кнопки уже должны быть от .app-button.primary */
-    /* width: 100%; margin-top: var(--spacing-xl); уже инлайн */
-    font-size: 1.05rem; /* Размер текста кнопки */
-    padding: calc(var(--spacing-md) - 2px) var(--spacing-lg); /* Немного скорректировать паддинг, если нужно */
-}
-
-#tab-timer .timer-message-feedback {
-    min-height: 1.3em; /* Уменьшаем зарезервированное место */
-    margin-top: var(--spacing-sm); /* Уменьшаем отступ */
-    font-size: 0.85rem;
-}
-#tab-timer .timer-message-feedback.success-message { /* Можете добавить класс в JS */
-    color: var(--color-success);
-}
-#tab-timer .timer-message-feedback.error-message { /* Можете добавить класс в JS */
-    color: var(--color-error);
-}
-#tab-timer .timer-fields-horizontal .form-group.timer-field label {
-    display: block;
-    text-align: center;
-    font-size: 0.7rem; /* Маленький шрифт для "ЧАСЫ", "МИНУТЫ", "СЕКУНДЫ" */
-    color: var(--color-text-muted);
-    margin-bottom: 3px; /* Очень маленький отступ */
-    text-transform: uppercase; /* КАПС для стиля */
-    line-height: 1;
-}
-
+/* === Кнопка Запуска/Обновления таймера === */
 #tab-timer .timer-action-button.app-button.primary {
-    font-size: 1rem; /* Стандартный размер для кнопки */
+    font-size: 1rem; 
     padding-top: var(--spacing-sm);
     padding-bottom: var(--spacing-sm);
-    margin-top: var(--spacing-lg); /* Отступ сверху от полей ввода */
-    width: auto; /* Ширина по содержимому + padding */
-    min-width: 250px; /* Минимальная ширина кнопки */
-    display: block; /* Чтобы margin:auto работало */
-    margin-left: auto;
-    margin-right: auto;
+    margin-top: var(--spacing-lg); 
+    width: 100%; /* Кнопка на всю ширину колонки настроек */
+    display: block; 
+    /* min-width: 250px; /* Убрано, т.к. width: 100% */
+    /* margin-left: auto; /* Убрано */
+    /* margin-right: auto; /* Убрано */
+}
+
+/* === Сообщение о результате === */
+#tab-timer .timer-message-feedback {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: var(--font-weight-medium);
+    min-height: 1.3em; 
+    margin-top: var(--spacing-sm); 
+}
+#tab-timer .timer-message-feedback.success-message { 
+    color: var(--color-success);
+}
+#tab-timer .timer-message-feedback.error-message { 
+    color: var(--color-error);
+}
+
+
+/* === Блок со ссылкой на таймер (правая колонка) === */
+#tab-timer .timer-link-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    background-color: var(--color-surface-secondary); 
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-lg);
+    box-sizing: border-box;
+}
+
+#tab-timer .timer-link-title {
+    font-size: 1.1rem; /* Меньше, чем главный заголовок вкладки */
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--spacing-md);
+    font-weight: var(--font-weight-semibold);
+}
+
+#tab-timer .timer-url-display-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm); /* Отступ от текста-описания */
+    margin-bottom: var(--spacing-md); /* Отступ до кнопки "Открыть" */
+}
+
+#tab-timer #timerPageUrl.header-input {
+    flex-grow: 1;
+    background-color: var(--color-surface); 
+    color: var(--color-text-muted);
+    cursor: default;
+    font-size: 0.85rem; /* Меньше шрифт для URL */
+    padding: var(--spacing-sm) var(--spacing-md);
+}
+#tab-timer #copyTimerUrlButton.small-button {
+    padding: var(--spacing-sm); 
+    min-width: auto; 
+    font-size: 0.9rem; 
+    background-color: var(--color-surface); /* Совпадает с инпутом */
+    border-color: var(--color-border);
+}
+#tab-timer #copyTimerUrlButton.small-button:hover {
+    background-color: var(--color-primary-base) !important;
+    color: var(--color-text-on-primary) !important;
+}
+#tab-timer #copyTimerUrlButton.small-button i {
+    margin-right: 0; 
+}
+
+#tab-timer .timer-link-column .app-button.primary { /* Кнопка "Открыть /timer.html" */
+    display: flex; /* Для центрирования иконки и текста */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+#tab-timer .timer-link-column .app-button.primary i {
+    margin-right: var(--spacing-sm); /* Отступ для иконки */
+}
+
+
+/* === Адаптивность для двух колонок === */
+@media (max-width: 880px) { 
+    #tab-timer .timer-tab-layout-container {
+        flex-direction: column; 
+    }
+
+    #tab-timer .timer-controls-column,
+    #tab-timer .timer-link-column {
+        flex-basis: auto; 
+        width: 100%;
+    }
+    #tab-timer .timer-link-wrapper {
+        justify-content: flex-start; /* Сброс центрирования по вертикали для компактности */
+        margin-top: 0; /* Убираем отступ, если он был от gap */
+    }
+    #tab-timer .timer-controls-wrapper {
+        /* Можно добавить margin-bottom, если колонки слипаются */
+         margin-bottom: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) { /* Дополнительная адаптация для очень маленьких экранов */
+    #tab-timer .timer-fields-horizontal {
+        flex-direction: column; /* Поля ввода становятся вертикальными */
+        align-items: stretch;   /* Растягиваем на всю ширину */
+        gap: var(--spacing-md); /* Увеличиваем gap для вертикального расположения */
+    }
+    #tab-timer .timer-fields-horizontal .form-group.timer-field {
+        max-width: none; /* Снимаем ограничение по ширине */
+        width: 100%;
+    }
+    #tab-timer .timer-fields-horizontal .timer-field-separator {
+        display: none; /* Скрываем разделители в вертикальном режиме */
+    }
+    #tab-timer .mode-group-timer {
+        flex-direction: column; /* Режимы тоже вертикально */
+        align-items: flex-start; /* Выравниваем по левому краю */
+        gap: var(--spacing-sm);
+    }
 }
