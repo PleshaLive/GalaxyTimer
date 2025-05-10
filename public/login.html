@@ -1,38 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Вход в Dashboard</title>
-  <link rel="stylesheet" href="login.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f6f8; color: #333; }
+        .login-container { background-color: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 360px; }
+        .login-container h2 { text-align: center; margin-bottom: 25px; color: #333; font-weight: 600; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9em; }
+        .form-group input[type="text"], .form-group input[type="password"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1em; }
+        .form-group input[type="text"]:focus, .form-group input[type="password"]:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 2px rgba(0,123,255,.25); }
+        .login-button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: 500; transition: background-color 0.2s; }
+        .login-button:hover { background-color: #0056b3; }
+        .error-message { color: #d9534f; text-align: center; margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <form action="/login" method="post" class="login-form">
-      <div class="form-group">
-        <label for="username">ЛОГИН</label>
-        <input id="username" type="text" name="username" required autocomplete="username" />
-      </div>
-      <div class="form-group">
-        <label for="password">ПАРОЛЬ</label>
-        <input id="password" type="password" name="password" required autocomplete="current-password"/>
-      </div>
-      <button type="submit">ВОЙТИ</button>
-      <p class="error" id="errorMessage">Неверный логин или пароль</p>
-    </form>
-  </div>
-
-  <script>
-    // Простой скрипт для отображения сообщения об ошибке, если URL содержит ?error=1
-    document.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const errorParam = urlParams.get('error');
-      const errorMessageElement = document.getElementById('errorMessage');
-
-      if (errorParam === '1' && errorMessageElement) {
-        errorMessageElement.classList.add('visible'); // Показываем сообщение
-      }
-    });
-  </script>
+    <div class="login-container">
+        <h2>Вход в Панель Управления</h2>
+        <form id="loginForm" action="/login-action" method="POST">
+            <div id="errorMessage" class="error-message"></div>
+            <div class="form-group">
+                <label for="username">Логин:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="login-button">Войти</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const errorMessageDiv = document.getElementById('errorMessage');
+            if (urlParams.has('error')) {
+                errorMessageDiv.textContent = 'Неверный логин или пароль.';
+            }
+        });
+    </script>
 </body>
 </html>

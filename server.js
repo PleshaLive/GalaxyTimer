@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const http = require("http");
 const { Server: SocketIOServer } = require("socket.io");
+const session = require('express-session'); // <--- ДОБАВЛЕНО
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -16,23 +17,72 @@ app.use((req, res, next) => {
 });
 app.use(express.urlencoded({ extended: false })); // Для парсинга URL-encoded данных
 app.use(express.json()); // Для парсинга JSON-данных
-app.use(express.static(path.join(__dirname, "public"))); // Обслуживание статических файлов
+
+// Настройка сессий <--- ДОБАВЛЕНО
+app.use(session({
+    secret: 'ЗАМЕНИТЕ_ЭТО_НА_ОЧЕНЬ_СЕКРЕТНЫЙ_КЛЮЧ_!@#$%^&*()_+', // ОБЯЗАТЕЛЬНО ЗАМЕНИТЕ ЭТОТ КЛЮЧ!
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false, // Установите true, если используете HTTPS в продакшене
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 1 день
+    }
+}));
+
+// --- Вспомогательная функция для проверки аутентификации --- <--- ДОБАВЛЕНО
+function requireLogin(req, res, next) {
+    if (req.session && req.session.loggedIn) {
+        next();
+    } else {
+        res.redirect('/login.html');
+    }
+}
 
 // --- Роуты ---
+
+// Роуты, не требующие аутентификации (логин, выход, проверка состояния) <--- ИЗМЕНЕНО/ДОБАВЛЕНО
+app.post("/login-action", (req, res) => {
+    const { username, password } = req.body;
+    if (username === "God" && password === "2007") {
+        req.session.loggedIn = true;
+        req.session.user = username;
+        res.redirect("/");
+    } else {
+        res.redirect("/login.html?error=1");
+    }
+});
+
+app.get("/logout", (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            console.error("Ошибка при выходе из системы:", err);
+            return res.status(500).send("Не удалось выйти из системы.");
+        }
+        res.redirect('/login.html');
+    });
+});
+
 app.get("/health", (req, res) => {
   // Проверка работоспособности сервера
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-app.get("/", (req, res) => {
+// Защищенный роут для главной страницы <--- ИЗМЕНЕНО
+app.get("/", requireLogin, (req, res) => {
   // Главная страница
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// Общедоступные страницы (пример - teams.html, другие будут обслужены express.static)
 app.get("/teams", (req, res) => {
   // Страница управления командами
   res.sendFile(path.join(__dirname, "public", "teams.html"));
 });
+
+// Обслуживание статических файлов (login.html, css, js, images, timer.html и т.д.)
+// Этот middleware должен быть после специфических роутов, которые он мог бы перекрыть (например, "/").
+app.use(express.static(path.join(__dirname, "public")));
 
 // --- Структуры данных по умолчанию ---
 const defaultLogoPlaceholder = "C:\\projects\\vMix_score\\public\\logos\\none.png"; // Локальная заглушка
@@ -141,7 +191,7 @@ function loadDbData() {
                          savedVRS[key] = { ...defaultVrsStructure, ...(jsonData.vrs[key] || {}) };
                          savedVRS[key].TEAM1 = { ...defaultVrsStructure.TEAM1, ...(jsonData.vrs[key].TEAM1 || {}) };
                          savedVRS[key].TEAM2 = { ...defaultVrsStructure.TEAM2, ...(jsonData.vrs[key].TEAM2 || {}) };
-                     }
+                    }
                  }
             }
             customFieldsData = { ...defaultCustomFieldsStructure, ...(jsonData.customFields || {}) };
@@ -304,11 +354,9 @@ function getVRSResponse(matchId) {
     const rawVrsData = savedVRS[matchId] || { ...defaultVrsStructure };
     const match = savedMatches[matchId - 1] || { ...defaultMatchStructure };
 
-    // --- ИЗМЕНЕНИЕ: Получаем лого напрямую из объекта match ---
     let team1Logo = defaultLogoPlaceholder;
     let team2Logo = defaultLogoPlaceholder;
 
-    // Определяем статус матча для выбора правильного поля с логотипом
     const statusPrefix = match.UPCOM_MATCH_STATUS === "UPCOM" ? "UPCOM_" :
                          match.LIVE_MATCH_STATUS === "LIVE" ? "LIVE_" :
                          match.FINISHED_MATCH_STATUS === "FINISHED" ? "FINISHED_" : "";
@@ -317,7 +365,6 @@ function getVRSResponse(matchId) {
         team1Logo = match[`${statusPrefix}TEAM1_LOGO`] || defaultLogoPlaceholder;
         team2Logo = match[`${statusPrefix}TEAM2_LOGO`] || defaultLogoPlaceholder;
     }
-    // --- КОНЕЦ ИЗМЕНЕНИЯ ---
 
     const emptyBlock = {
         TEAM1: { winPoints: "", losePoints: "", rank: "", currentPoints_win: "", currentPoints_lose: "", currentPoints: "", logo: team1Logo },
@@ -325,12 +372,10 @@ function getVRSResponse(matchId) {
     };
 
     let upcomData = { ...emptyBlock };
-    // Переприсваиваем логотипы для upcomData, так как они могли быть установлены до определения статуса
     upcomData.TEAM1.logo = team1Logo;
     upcomData.TEAM2.logo = team2Logo;
 
     let finishedData = { ...emptyBlock };
-    // Переприсваиваем логотипы для finishedData
     finishedData.TEAM1.logo = team1Logo;
     finishedData.TEAM2.logo = team2Logo;
 
@@ -347,7 +392,6 @@ function getVRSResponse(matchId) {
              TEAM1: { winPoints: formatWinPoints(team1Vrs.winPoints), losePoints: team1Vrs.losePoints !== null ? -Math.abs(team1Vrs.losePoints) : "", rank: team1Vrs.rank ?? "", currentPoints: formatPointsWithPt(team1Vrs.currentPoints), logo: team1Logo },
              TEAM2: { winPoints: formatWinPoints(team2Vrs.winPoints), losePoints: team2Vrs.losePoints !== null ? -Math.abs(team2Vrs.losePoints) : "", rank: team2Vrs.rank ?? "", currentPoints: formatPointsWithPt(team2Vrs.currentPoints), logo: team2Logo }
          };
-        // Очищаем finishedData, если статус не FINISHED
         finishedData = {
             TEAM1: { ...emptyBlock.TEAM1, logo: team1Logo },
             TEAM2: { ...emptyBlock.TEAM2, logo: team2Logo }
@@ -376,7 +420,6 @@ function getVRSResponse(matchId) {
                 TEAM2: { winPoints: "", losePoints: "", rank: team2Vrs.rank ?? "", currentPoints_win: "", currentPoints_lose: "", currentPoints: formatPointsWithPt(team2Vrs.currentPoints), logo: team2Logo }
             };
         }
-        // Очищаем upcomData, если статус FINISHED
         upcomData = {
             TEAM1: { ...emptyBlock.TEAM1, logo: team1Logo },
             TEAM2: { ...emptyBlock.TEAM2, logo: team2Logo }
@@ -404,7 +447,7 @@ function getFormattedSelectedCasters() {
 }
 
 
-// --- API Эндпоинты ---
+// --- API Эндпоинты (Остаются общедоступными) ---
 
 // Матчи
 app.get("/api/matchdata", (req, res) => { res.json(savedMatches); });
@@ -419,13 +462,10 @@ app.put("/api/matchdata/:matchIndex", async (req, res) => {
     if (!req.body || typeof req.body !== 'object') return res.status(400).json({ message: "Некорректный формат данных матча." });
     const matchIndex = index + 1;
     const matchSpecificLogos = {};
-    // Сохраняем логотипы уровня матча, которые пришли от клиента (из gatherSingleMatchData)
     matchSpecificLogos[`FINISHED_TEAM1_LOGO_MATCH${matchIndex}`] = req.body?.[`FINISHED_TEAM1_LOGO_MATCH${matchIndex}`] || defaultLogoPlaceholder;
     matchSpecificLogos[`FINISHED_TEAM2_LOGO_MATCH${matchIndex}`] = req.body?.[`FINISHED_TEAM2_LOGO_MATCH${matchIndex}`] || defaultLogoPlaceholder;
     matchSpecificLogos[`LIVE_TEAM1_LOGO_MATCH${matchIndex}`] = req.body?.[`LIVE_TEAM1_LOGO_MATCH${matchIndex}`] || defaultLogoPlaceholder;
     matchSpecificLogos[`LIVE_TEAM2_LOGO_MATCH${matchIndex}`] = req.body?.[`LIVE_TEAM2_LOGO_MATCH${matchIndex}`] || defaultLogoPlaceholder;
-    // Объединяем дефолтную структуру, пришедшие данные и логотипы уровня матча
-    // Логотипы UPCOM_*, LIVE_*, FINISHED_* и MAP*_logo уже должны быть в req.body с правильными URL
     savedMatches[index] = { ...defaultMatchStructure, ...req.body, ...matchSpecificLogos };
     console.log(`[API][PUT] /api/matchdata/${matchIndex} - Updated match data.`);
     await saveDbDataAsync();
@@ -457,7 +497,7 @@ app.get("/api/vrs/:id", (req, res) => {
     const matchId = req.params.id;
     if (!/^[1-4]$/.test(matchId)) return res.status(404).json({ error: "Некорректный номер матча (1-4)." });
     console.log(`[API][GET] /api/vrs/${matchId} - Sending processed VRS data`);
-    res.json([getVRSResponse(matchId)]); // Используем обновленную функцию
+    res.json([getVRSResponse(matchId)]);
 });
 app.put("/api/vrs/:id", async (req, res) => {
     const matchId = req.params.id;
@@ -470,9 +510,7 @@ app.put("/api/vrs/:id", async (req, res) => {
     savedVRS[matchId].TEAM2 = { ...defaultVrsStructure.TEAM2, ...(req.body.TEAM2 || {}) };
     console.log(`[API][PUT] /api/vrs/${matchId} - Updated VRS data.`);
     await saveDbDataAsync();
-    io.emit("vrsUpdate", savedVRS); // Отправляем все VRS данные
-    // Можно также отправить обновленные данные для конкретного матча, если нужно
-    // io.emit(`vrsUpdate:${matchId}`, getVRSResponse(matchId));
+    io.emit("vrsUpdate", savedVRS);
     console.log("[SOCKET] Emitted 'vrsUpdate' after VRS update.");
     res.status(200).json([savedVRS[matchId]]);
 });
@@ -506,16 +544,15 @@ app.post("/api/pause", async (req, res) => {
     res.status(200).json(savedPauseData);
 });
 
-// Команды (data.json) - ОСТАВЛЕНО КАК ЕСТЬ, ТАК КАК КЛИЕНТ ЗАГРУЖАЕТ КОМАНДЫ ИЗВНЕ
+// Команды (data.json)
 app.get("/api/teams", (req, res) => {
     console.warn("[API][GET] /api/teams - WARNING: This endpoint reads from local data.json, but client is configured to fetch from external API.");
     res.json({ teams: dataJsonContent.teams || [] });
 });
 app.post("/api/teams", async (req, res) => {
     console.warn("[API][POST] /api/teams - WARNING: Client might not use teams added/updated via this local endpoint.");
-    // ... (код добавления команды в data.json)
     const teamName = req.body.name?.trim();
-    const teamLogo = req.body.logo?.trim() || ""; // Принимаем путь/URL как есть
+    const teamLogo = req.body.logo?.trim() || "";
     if (!teamName) { return res.status(400).json({ message: "Название команды не может быть пустым." }); }
     if (dataJsonContent.teams.some(t => t.name.toLowerCase() === teamName.toLowerCase())) {
         return res.status(409).json({ message: `Команда с именем "${teamName}" уже существует в data.json.` });
@@ -523,12 +560,11 @@ app.post("/api/teams", async (req, res) => {
     const newTeam = { id: `${Date.now()}`, name: teamName, logo: teamLogo, score: 0 };
     dataJsonContent.teams.push(newTeam);
     await saveDataJsonAsync();
-    io.emit('teamsUpdate', dataJsonContent.teams); // Уведомляем клиентов об изменении в data.json
+    io.emit('teamsUpdate', dataJsonContent.teams);
     res.status(201).json(newTeam);
 });
 app.put("/api/teams/:id", async (req, res) => {
     console.warn("[API][PUT] /api/teams/:id - WARNING: Client might not use teams added/updated via this local endpoint.");
-    // ... (код обновления команды в data.json)
     const teamId = req.params.id;
     const { name: newNameRaw, logo: newLogoRaw } = req.body;
     const newName = newNameRaw?.trim();
@@ -544,12 +580,11 @@ app.put("/api/teams/:id", async (req, res) => {
     dataJsonContent.teams[teamIndex].name = newName;
     dataJsonContent.teams[teamIndex].logo = newLogo;
     await saveDataJsonAsync();
-    io.emit('teamsUpdate', dataJsonContent.teams); // Уведомляем клиентов об изменении в data.json
+    io.emit('teamsUpdate', dataJsonContent.teams);
     res.status(200).json(dataJsonContent.teams[teamIndex]);
 });
 app.delete("/api/teams/:id", async (req, res) => {
     console.warn("[API][DELETE] /api/teams/:id - WARNING: Client might not use teams added/updated via this local endpoint.");
-    // ... (код удаления команды из data.json)
     const teamId = req.params.id;
     const initialLength = dataJsonContent.teams.length;
     dataJsonContent.teams = dataJsonContent.teams.filter(t => t.id !== teamId);
@@ -557,16 +592,15 @@ app.delete("/api/teams/:id", async (req, res) => {
         return res.status(404).json({ message: `Команда с ID ${teamId} не найдена в data.json.` });
     }
     await saveDataJsonAsync();
-    io.emit('teamsUpdate', dataJsonContent.teams); // Уведомляем клиентов об изменении в data.json
+    io.emit('teamsUpdate', dataJsonContent.teams);
     res.status(204).send();
 });
 
-// --- API для Кастеров (db.json) ---
+// API для Кастеров (db.json)
 app.get("/api/casters", (req, res) => {
     console.log("[API][GET] /api/casters - Sending casters list");
     res.json(savedCasters || []);
 });
-
 app.post("/api/casters", async (req, res) => {
     const casterName = req.body.caster?.trim();
     const casterSocial = req.body.social?.trim() || "";
@@ -582,8 +616,6 @@ app.post("/api/casters", async (req, res) => {
     console.log("[SOCKET] Emitted 'castersUpdate' after adding caster.");
     res.status(201).json(newCaster);
 });
-
-// ЭНДПОИНТ ДЛЯ РЕДАКТИРОВАНИЯ (PUT)
 app.put("/api/casters/:id", async (req, res) => {
     const casterId = req.params.id;
     const { caster: newNameRaw, social: newSocialRaw } = req.body;
@@ -620,8 +652,6 @@ app.put("/api/casters/:id", async (req, res) => {
     }
     res.status(200).json(savedCasters[casterIndex]);
 });
-
-
 app.delete("/api/casters/:id", async (req, res) => {
     const casterId = req.params.id;
     const casterToDelete = savedCasters.find(c => c.id === casterId);
@@ -647,14 +677,12 @@ app.delete("/api/casters/:id", async (req, res) => {
     res.status(204).send();
 });
 
-
 // API для выбранных кастеров
 app.get("/api/selected-casters", (req, res) => {
     console.log("[API][GET] /api/selected-casters - Sending formatted selected casters");
     const formattedData = getFormattedSelectedCasters();
-    res.json([formattedData]); // Отправляем объект. Если нужен массив [{...}], то res.json([formattedData]);
+    res.json([formattedData]);
 });
-
 app.post("/api/selected-casters", async (req, res) => {
     const { caster1, caster2 } = req.body;
     if (caster1 && !savedCasters.some(c => c.caster === caster1)) { return res.status(400).json({ message: `Выбранный Кастер 1 ("${caster1}") не найден.` }); }
@@ -676,21 +704,18 @@ app.get("/casters", (req, res) => {
     res.json(castersForPublicJson);
 });
 
-// --- НОВЫЕ ЭНДПОИНТЫ ДЛЯ ТАЙМЕРА ---
-// GET /timer – вернуть текущее значение таймера
+// НОВЫЕ ЭНДПОИНТЫ ДЛЯ ТАЙМЕРА
 app.get('/timer', (req, res) => {
     console.log('[API][GET] /timer - Sending current timer data:', timerData);
-    res.json(timerData); // timerData уже { targetTime: ... }
+    res.json(timerData);
 });
-
-// POST /timer – принять новое значение таймера (timestamp)
-app.post('/timer', async (req, res) => { // Добавляем async для await saveDbDataAsync
+app.post('/timer', async (req, res) => {
     const { targetTime } = req.body;
-    if (typeof targetTime === 'number' && targetTime > 0) { // targetTime должен быть timestamp
+    if (typeof targetTime === 'number' && targetTime > 0) {
         timerData.targetTime = targetTime;
         console.log('[API][POST] /timer - Timer targetTime updated to:', new Date(targetTime).toLocaleString(), `(Timestamp: ${targetTime})`);
-        await saveDbDataAsync(); // Сохраняем в db.json
-        io.emit('timerStateUpdate', timerData); // Оповещаем клиентов (особенно timer.html)
+        await saveDbDataAsync();
+        io.emit('timerStateUpdate', timerData);
         console.log("[SOCKET] Emitted 'timerStateUpdate' with data:", timerData);
         return res.json({ success: true, message: "Таймер обновлен", targetTime: timerData.targetTime });
     } else {
@@ -698,39 +723,29 @@ app.post('/timer', async (req, res) => { // Добавляем async для awai
         return res.status(400).json({ success: false, error: 'Некорректное значение targetTime. Ожидается timestamp.' });
     }
 });
-
-// GET /set_timer – установить таймер по длительности (через query-параметр)
-// Пример: /set_timer?duration=300000 установит таймер на 5 минут (300000 мс)
 app.get('/set_timer', async (req, res) => {
     const durationStr = req.query.duration;
     if (typeof durationStr === 'undefined') {
         console.log('[API][GET] /set_timer - Ошибка: Параметр duration отсутствует.');
         return res.status(400).json({ success: false, error: 'Параметр duration отсутствует' });
     }
-
     const duration = parseInt(durationStr, 10);
-
     if (isNaN(duration) || duration <= 0) {
         console.log('[API][GET] /set_timer - Ошибка: Неверное значение длительности. Получено:', durationStr);
         return res.status(400).json({ success: false, error: 'Неверное значение длительности. Ожидается положительное число миллисекунд.' });
     }
-
     timerData.targetTime = Date.now() + duration;
     console.log(`[API][GET] /set_timer - Таймер установлен по длительности: ${duration} мс. Новое целевое время: ${new Date(timerData.targetTime).toLocaleString()} (Timestamp: ${timerData.targetTime})`);
-
     try {
-        await saveDbDataAsync(); // Сохраняем изменение в db.json
-        io.emit('timerStateUpdate', timerData); // Оповещаем всех клиентов (включая timer.html)
+        await saveDbDataAsync();
+        io.emit('timerStateUpdate', timerData);
         console.log("[SOCKET] Emitted 'timerStateUpdate' after /set_timer call.");
         res.json({ success: true, message: `Таймер установлен на ${duration / 1000} секунд`, targetTime: timerData.targetTime });
     } catch (error) {
         console.error("[API][GET] /set_timer - Ошибка при сохранении или отправке сокет сообщения:", error);
-        // Пытаемся все равно ответить клиенту, но сообщаем об ошибке на сервере
         res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера при обновлении таймера.' });
     }
 });
-// --- КОНЕЦ НОВЫХ ЭНДПОИНТОВ ДЛЯ ТАЙМЕРА ---
-
 
 // --- Настройка Socket.IO ---
 const server = http.createServer(app);
@@ -742,12 +757,10 @@ io.on("connection", (socket) => {
     socket.emit("customFieldsUpdate", customFieldsData);
     socket.emit("vrsUpdate", savedVRS);
     socket.emit("mapVetoUpdate", savedMapVeto);
-    // НЕ отправляем teamsUpdate при подключении, так как клиент берет их из внешнего API
-    // socket.emit("teamsUpdate", dataJsonContent.teams);
     socket.emit("pauseUpdate", savedPauseData);
     socket.emit("castersUpdate", savedCasters);
-    socket.emit("selectedCastersUpdate", getFormattedSelectedCasters()); // Отправляем в новом формате
-    socket.emit("timerStateUpdate", timerData); // Отправляем текущее состояние таймера новому клиенту
+    socket.emit("selectedCastersUpdate", getFormattedSelectedCasters());
+    socket.emit("timerStateUpdate", timerData);
 
     socket.on("disconnect", (reason) => { console.log(`[SOCKET] Client disconnected: ${socket.id}, Reason: ${reason}`); });
     socket.on('error', (error) => { console.error(`[SOCKET] Socket error for ${socket.id}:`, error); });
@@ -756,6 +769,7 @@ io.on("connection", (socket) => {
 // --- Запуск сервера ---
 server.listen(port, "0.0.0.0", () => {
     console.log(`[SERVER] Сервер запущен на http://0.0.0.0:${port}`);
+    console.log(`[SERVER] Страница входа: http://localhost:${port}/login.html (или ваш IP)`);
 });
 
 // --- Graceful Shutdown ---
@@ -763,8 +777,6 @@ function gracefulShutdown() {
     console.log('[SERVER] Received kill signal, shutting down gracefully.');
     server.close(async () => {
         console.log('[SERVER] Closed out remaining connections.');
-        // await saveDbDataAsync(); // Можно раскомментировать, если нужно сохранение при остановке
-        // await saveDataJsonAsync();
         process.exit(0);
     });
     setTimeout(() => {
