@@ -3,34 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход</title>
+    <title>Вход - Панель Управления</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f4f6f8; color: #333; }
-        .login-container { background-color: #fff; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 360px; }
-        .login-container h2 { text-align: center; margin-bottom: 25px; color: #333; font-weight: 600; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 0.9em; }
-        .form-group input[type="text"], .form-group input[type="password"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1em; }
-        .form-group input[type="text"]:focus, .form-group input[type="password"]:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 2px rgba(0,123,255,.25); }
-        .login-button { width: 100%; padding: 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: 500; transition: background-color 0.2s; }
-        .login-button:hover { background-color: #0056b3; }
-        .error-message { color: #d9534f; text-align: center; margin-bottom: 15px; font-size: 0.9em; min-height: 1.2em; }
+        /* Дополнительные стили для центрирования и специфики страницы входа */
+        body.login-page-body {
+            display: flex;
+            flex-direction: column; /* Позволит разместить заголовок и карточку вертикально */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: var(--spacing-md);
+            /* Фон и цвет текста будут применены из style.css (:root -> body) */
+        }
+
+        .auth-card {
+            background-color: var(--color-surface); /* Основной фон для "карточек" */
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--color-border);
+            box-shadow: var(--shadow-lg); /* Заметная тень */
+            width: 100%;
+            max-width: 450px; /* Максимальная ширина карточки */
+            color: var(--color-text-primary); /* Основной цвет текста */
+        }
+
+        .auth-card .auth-header {
+            text-align: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .auth-card .auth-header i { /* Иконка замка */
+            font-size: 2.5rem;
+            color: var(--color-primary-base);
+            margin-bottom: var(--spacing-sm);
+            display: block; /* Чтобы margin-bottom сработал */
+            text-shadow: var(--text-shadow-primary);
+        }
+
+        .auth-card .auth-header h2 {
+            font-size: 1.8rem;
+            color: var(--color-text-primary); /* Основной текстовый цвет для заголовка */
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-xs); /* Меньший отступ, если есть подзаголовок */
+        }
+        .auth-card .auth-header p {
+            font-size: 0.95rem;
+            color: var(--color-text-secondary);
+            margin-bottom: 0;
+        }
+
+
+        .auth-form .form-group {
+            margin-bottom: var(--spacing-lg); /* Используем переменную для отступов */
+        }
+
+        /* Метки (label) будут стилизованы глобальными стилями из style.css */
+        /* .auth-form label {} */
+
+        /* Поля ввода */
+        .auth-form .form-input {
+            /* Применяем стили, похожие на .header-input из style.css */
+            background-color: var(--color-surface-tertiary);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-primary);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md); /* Немного больше padding для удобства */
+            font-size: 1rem; /* Немного крупнее для основного поля ввода */
+            line-height: 1.5;
+            transition: var(--transition-base);
+            outline: none;
+            width: 100%;
+            font-family: var(--font-family-base);
+            box-shadow: var(--shadow-inset);
+        }
+        .auth-form .form-input:hover {
+            border-color: var(--color-primary-light);
+        }
+        .auth-form .form-input:focus {
+            border-color: var(--color-primary-light);
+            box-shadow: 0 0 0 3px rgba(var(--rgb-primary), 0.3), var(--shadow-inset);
+            background-color: var(--color-surface);
+        }
+        .auth-form .form-input::placeholder {
+            color: var(--color-text-placeholder);
+            opacity: 0.8;
+        }
+
+        /* Сообщение об ошибке */
+        .auth-card .error-display { 
+            color: var(--color-error);
+            background-color: rgba(var(--rgb-error), 0.1);
+            border: 1px solid rgba(var(--rgb-error), 0.5);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-align: center;
+            margin-bottom: var(--spacing-md);
+            font-size: 0.9rem;
+            font-weight: var(--font-weight-medium);
+            min-height: 1.2em; 
+            display: none; /* Скрыто по умолчанию */
+        }
+        .auth-card .error-display.visible { /* JS будет добавлять этот класс */
+            display: block;
+        }
+
+        /* Кнопка отправки формы */
+        .auth-form .submit-button {
+            width: 100%;
+            margin-top: var(--spacing-sm); 
+            padding-top: var(--spacing-md);    /* Делаем кнопку повыше */
+            padding-bottom: var(--spacing-md);
+            font-size: 1rem; /* Шрифт покрупнее */
+            letter-spacing: 0.05em;
+        }
     </style>
 </head>
-<body>
-    <div class="login-container">
-        <h2>Вход в Панель Управления</h2>
-        <form id="loginForm" action="/login-action" method="POST">
-            <div id="errorMessage" class="error-message"></div>
+<body class="login-page-body"> 
+    <div class="auth-card">
+        <div class="auth-header">
+            <i class="fas fa-shield-alt"></i> <h2>Авторизация</h2>
+            <p>Доступ к панели управления</p>
+        </div>
+        
+        <div id="errorMessage" class="error-display"></div> <form id="loginForm" action="/login-action" method="POST" class="auth-form">
             <div class="form-group">
                 <label for="username">Логин:</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" class="form-input" required placeholder="Введите ваш логин">
             </div>
             <div class="form-group">
                 <label for="password">Пароль:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" class="form-input" required placeholder="Введите ваш пароль">
             </div>
-            <button type="submit" class="login-button">Войти</button>
+            <button type="submit" class="app-button primary submit-button">
+                <i class="fas fa-sign-in-alt"></i> Войти
+            </button>
         </form>
     </div>
     <script>
@@ -39,6 +147,7 @@
             const errorMessageDiv = document.getElementById('errorMessage');
             if (urlParams.has('error')) {
                 errorMessageDiv.textContent = 'Неверный логин или пароль.';
+                errorMessageDiv.classList.add('visible'); // Показываем блок с ошибкой
             }
         });
     </script>
