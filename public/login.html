@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
+        /* ... (ваши стили остаются без изменений) ... */
         :root {
             --color-background: #0E0A1C;
             --color-surface: #151127;
@@ -105,7 +106,7 @@
             text-align: center;
             margin-top: var(--spacing-md);
             font-size: 0.9rem;
-            min-height: 1.2em; /* Для предотвращения скачков макета */
+            min-height: 1.2em;
         }
     </style>
 </head>
@@ -127,13 +128,13 @@
     </div>
 
     <script>
-        // Проверяем, если пользователь уже залогинен, перенаправляем на index.html
-        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        // Проверяем, если пользователь уже залогинен (используем localStorage)
+        if (localStorage.getItem('isLoggedIn') === 'true') {
             window.location.href = 'index.html';
         }
 
         document.getElementById('loginForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Предотвращаем стандартную отправку формы
+            event.preventDefault(); 
 
             const usernameInput = document.getElementById('username');
             const passwordInput = document.getElementById('password');
@@ -142,20 +143,16 @@
             const username = usernameInput.value;
             const password = passwordInput.value;
 
-            // Ваши учетные данные
             const correctUsername = 'God';
             const correctPassword = '2007';
 
             if (username === correctUsername && password === correctPassword) {
                 errorMessageElement.textContent = '';
-                // Устанавливаем флаг в sessionStorage, что пользователь вошел
-                sessionStorage.setItem('isLoggedIn', 'true');
-                // Перенаправляем на index.html
+                // Устанавливаем флаг в localStorage, что пользователь вошел
+                localStorage.setItem('isLoggedIn', 'true'); 
                 window.location.href = 'index.html';
             } else {
                 errorMessageElement.textContent = 'Неверный логин или пароль.';
-                // Очищаем поля для безопасности (опционально)
-                // passwordInput.value = ''; 
             }
         });
     </script>

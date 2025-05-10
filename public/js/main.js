@@ -974,9 +974,33 @@ window.addEventListener("DOMContentLoaded", async () => {
         });
         updateTournamentDay(); // Первичный расчет дня турнира
 
-        console.log("DOMContentLoaded: Full application initialization complete. UI is ready.");
+        // =====================================================================
+        // >>> ВСТАВЬТЕ КОД ДЛЯ КНОПКИ "ВЫХОД" ИМЕННО СЮДА <<<
+        // =====================================================================
+        const logoutButton = document.getElementById('logoutButton');
+        if (logoutButton) {
+            logoutButton.addEventListener('click', function() {
+                // Удаляем флаг из localStorage
+                localStorage.removeItem('isLoggedIn');
+                // Перенаправляем на страницу входа
+                window.location.href = 'login.html';
+            });
+            console.log("Logout button event listener added.");
+        } else {
+            console.warn("Logout button with id 'logoutButton' not found.");
+        }
+        // =====================================================================
+        // >>> КОНЕЦ КОДА ДЛЯ КНОПКИ "ВЫХОД" <<<
+        // =====================================================================
+
+
+        // Эта строка должна быть ПОСЛЕ кода кнопки "Выход"
+        console.log("DOMContentLoaded: Full application initialization complete. UI is ready."); 
+
     } catch (error) {
         console.error("DOMContentLoaded: Critical error during initialization:", error);
         document.body.innerHTML = `<div style="color:red; padding: 20px; font-family: sans-serif;">Критическая ошибка при инициализации приложения: ${error.message}. Проверьте консоль для деталей.</div>`;
     }
+
+    
 });
