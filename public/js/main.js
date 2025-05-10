@@ -590,20 +590,20 @@ function calculateTournamentDay() {
         if (end) end.setHours(0, 0, 0, 0);
 
         if (today < start) {
-            displaySpan.textContent = 'Турнир не начался';
+            displaySpan.textContent = 'Not started';
             displaySpan.style.color = 'var(--color-warning)';
         } else if (end && today > end) {
-            displaySpan.textContent = 'Турнир завершен';
+            displaySpan.textContent = 'Ended';
             displaySpan.style.color = 'var(--color-success)';
         } else {
             const diffTime = today - start;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            displaySpan.textContent = `День ${diffDays}`;
+            displaySpan.textContent = `Day ${diffDays}`;
             displaySpan.style.color = 'var(--color-secondary-light)';
         }
     } catch (e) {
-        console.error("Ошибка при расчете дня турнира:", e);
-        displaySpan.textContent = 'Ошибка даты';
+        console.error("ERROR 322:", e);
+        displaySpan.textContent = 'ERROR 322';
         displaySpan.style.color = 'var(--color-error)';
     }
 }
