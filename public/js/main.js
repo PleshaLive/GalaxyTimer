@@ -598,7 +598,7 @@ function calculateTournamentDay() {
         } else {
             const diffTime = today - start;
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-            displaySpan.textContent = `Day ${diffDays}`;
+            displaySpan.textContent = `DAY ${diffDays}`;
             displaySpan.style.color = 'var(--color-secondary-light)';
         }
     } catch (e) {
