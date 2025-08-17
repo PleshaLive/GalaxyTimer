@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерфейс матчей - Фотон [Обновленный Дизайн]</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Следующие стили были предоставлены для одной из ранних версий таймера.
+           Классы в текущей разметке таймера изменились (например, .timer-controls-wrapper вместо .timer-control-container).
+           Эти стили могут потребовать адаптации или уже покрываются основным style.css.
+           Шрифт ProximaNova-Bold будет подключен.
+        */
+        @font-face {
+            font-family: 'ProximaNova-Bold';
+            src: url('fonts/ProximaNova-Bold.ttf') format('truetype'); /* Убедитесь, что путь к шрифту корректен */
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        /* Пример применения шрифта и стилей к новому контейнеру, если необходимо */
+        /*
+        .timer-controls-wrapper {
+            font-family: 'ProximaNova-Bold', sans-serif;
+            background: #222; 
+            color: #fff;
+            padding: 20px; // Уже задается через card-style, возможно
+            border-radius: var(--border-radius-md); 
+        }
+        */
+
+        /* Старые стили для .timer-control-container и его дочерних элементов: */
+         .timer-control-container { /* Этот класс больше не используется напрямую в разметке таймера */
+            font-family: 'ProximaNova-Bold', sans-serif;
+            background: #222;
+            color: #fff;
+            margin: 0; /* Может конфликтовать с layout */
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+        }
+         .timer-control-container .container { /* Этот вложенный .container также отсутствует в новой разметке */
+            max-width: 400px;
+            margin: 0 auto;
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+         .timer-control-container h1 { /* Теперь используется .tab-title */
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #fff;
+        }
+         .timer-control-container .mode-group label { /* Новые классы: .mode-group-timer .radio-label */
+            margin: 0 10px;
+            font-size: 16px;
+            cursor: pointer;
+            color: #fff;
+        }
+         .timer-control-container input[type="number"] { /* Новые классы: .header-input .timer-input-value */
+            width: 100%; /* Может переопределяться стилями .timer-field */
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            text-align: center;
+            background: #444;
+            color: #fff;
+            box-sizing: border-box;
+        }
+         .timer-control-container button { /* Новые классы: .app-button .primary .timer-action-button */
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            background: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            text-transform: none;
+            font-family: 'ProximaNova-Bold', sans-serif;
+        }
+         .timer-control-container button:hover {
+            background: #45a049;
+        }
+
+        /* Confirm Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal-card {
+            background: var(--color-surface, #1f1f25);
+            color: var(--color-text, #fff);
+            border-radius: 12px;
+            width: min(480px, 92vw);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            transform: translateY(10px);
+            opacity: 0;
+            transition: opacity 200ms ease, transform 240ms cubic-bezier(.22,.9,.3,1);
+        }
+        .modal-overlay.visible .modal-card {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 16px 20px 8px;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .modal-body { padding: 0 20px 16px; color: var(--color-text-secondary, #c9c9d3); }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding: 14px 20px 18px;
+            background: rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+        .modal-actions .app-button.small-button { padding: 8px 12px; font-size: 14px; }
+        .modal-icon {
+            width: 28px; height: 28px; flex: 0 0 auto;
+            display: grid; place-items: center;
+            color: var(--color-warning, #ffd166);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .modal-card { transition: none; }
+        }
+    </style>
+
+    <script src="js/auth.js"></script> 
+
+</head>
+<body>
+    <div class="container">
+
+        <header class="site-header card-style">
+            <div class="header-group">
+                <i class="fas fa-calendar-alt header-icon"></i>
+                <input type="text" id="upcomingMatchesInput" placeholder="Upcoming Matches" class="header-input">
+            </div>
+            <div class="header-group">
+                <i class="fas fa-trophy header-icon"></i>
+                <input type="text" id="galaxyBattleInput" placeholder="GALAXY BATTLE" class="header-input">
+            </div>
+            <div class="header-group tournament-dates">
+                <div class="date-group">
+                    <label for="tournamentStart"><i class="fas fa-flag-checkered"></i> Старт:</label>
+                    <input type="date" id="tournamentStart" class="header-input date-input">
+                </div>
+                <div class="date-group">
+                    <label for="tournamentEnd"><i class="fas fa-hourglass-end"></i> Конец:</label>
+                    <input type="date" id="tournamentEnd" class="header-input date-input">
+                </div>
+                <span id="tournamentDayDisplay" class="tournament-day"></span>
+            </div>
+            <div class="header-group">
+                <i class="fas fa-layer-group header-icon"></i>
+                <input type="text" id="groupStageInput" placeholder="ГРУППОВОЙ ЭТАП" class="header-input">
+            </div>
+            <button id="saveHeaderButton" class="app-button primary"><i class="fas fa-save"></i> Сохранить хедер</button>
+        </header>
+
+        <div class="page-title-container">
+            <h1><i class="fas fa-cogs"></i> Панель Управления Матчами</h1>
+        <div class="page-title-actions">
+            <a href="https://waywayway-production.up.railway.app/admin" class="teams-link app-button tertiary"><i class="fas fa-users"></i> Команды</a>
+            <a href="https://cucas-production.up.railway.app/settings.html" class="skins-link app-button tertiary"><i class="fas fa-palette"></i> SKINS</a>
+            <button id="logoutButton" class="app-button tertiary" style="margin-left: 10px;"><i class="fas fa-sign-out-alt"></i> Выход</button>
+        </div>
+        </div>
+
+        <div class="tabs-wrapper">
+            <ul class="tabs-nav">
+                <li class="tab-link active" data-tab="tab-matches"><i class="fas fa-gamepad"></i> Матчи</li>
+                <li class="tab-link" data-tab="tab-mapveto"><i class="fas fa-map-signs"></i> Map Veto</li>
+                <li class="tab-link" data-tab="tab-casters"><i class="fas fa-microphone-alt"></i> Кастеры</li>
+                <li class="tab-link" data-tab="tab-timer"><i class="fas fa-stopwatch"></i> Таймер</li>
+                <li class="tab-link" data-tab="tab-pause"><i class="fas fa-pause-circle"></i> Пауза</li>
+                <li class="tab-link" data-tab="tab-json"><i class="fas fa-code"></i> JSON</li>
+            </ul>
+
+            <div class="tabs-content card-style">
+                <div id="tab-matches" class="tab-panel active">
+                    <div class="matches-grid">
+
+                        <div class="match-column" data-match="1" data-winner="">
+                            <div class="match-header">
+                                <h2>Match 1</h2>
+                                <div class="match-meta">
+                                    <select class="status-select styled-select" id="statusSelect1">
+                                        <option value="UPCOM">UPCOM</option>
+                                        <option value="LIVE">LIVE</option>
+                                        <option value="FINISHED">FINISHED</option>
+                                    </select>
+                                    <input type="text" class="time-input" id="timeInput1" placeholder="--:--" />
+                                </div>
+                            </div>
+                            <div class="match-body">
+                                <div class="match-teams">
+                                    <div class="team-block team-1-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo1">
+                                            <label for="team1Select1">Команда 1</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team1Select1"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                    <div class="vs-indicator">VS</div>
+                                    <div class="team-block team-2-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo1">
+                                            <label for="team2Select1">Команда 2</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team2Select1"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                </div>
+                                <div class="winner-buttons">
+                                    <button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: T1</button>
+                                    <button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: T2</button>
+                                </div>
+                                <div class="maps">
+                                    <h3><i class="fas fa-map-marked-alt"></i> Карты</h3>
+                                    <div class="map-row">
+                                        <select class="map-name-select styled-select">
+                                            <option value="">- Карта -</option><option value="inferno">Inferno</option> <option value="dust2">Dust II</option> <option value="mirage">Mirage</option> <option value="nuke">Nuke</option> <option value="ancient">Ancient</option> <option value="anubis">Anubis</option> <option value="train">Train</option> <option value="vertigo">Vertigo</option> <option value="overpass">Overpass</option>
+                                        </select>
+                                        <input type="text" class="map-score-input" placeholder="-:-" />
+                                    </div>
+                                    <div class="map-row">
+                                        <select class="map-name-select styled-select">
+                                           <option value="">- Карта -</option> <option value="inferno">Inferno</option> <option value="dust2">Dust II</option> <option value="mirage">Mirage</option> <option value="nuke">Nuke</option> <option value="ancient">Ancient</option> <option value="anubis">Anubis</option> <option value="train">Train</option> <option value="vertigo">Vertigo</option> <option value="overpass">Overpass</option>
+                                        </select>
+                                        <input type="text" class="map-score-input" placeholder="-:-" />
+                                    </div>
+                                    <div class="map-row">
+                                        <select class="map-name-select styled-select">
+                                            <option value="">- Карта -</option><option value="inferno">Inferno</option> <option value="dust2">Dust II</option> <option value="mirage">Mirage</option> <option value="nuke">Nuke</option> <option value="ancient">Ancient</option> <option value="anubis">Anubis</option> <option value="train">Train</option> <option value="vertigo">Vertigo</option> <option value="overpass">Overpass</option>
+                                        </select>
+                                        <input type="text" class="map-score-input" placeholder="-:-" />
+                                    </div>
+                                </div>
+                                <div class="vrs-block-wrapper">
+                                    <h3><i class="fas fa-chart-line"></i> VRS Статистика</h3>
+                                    <div class="vrs-block" id="vrsBlock1"></div>
+                                </div>
+                            </div>
+                            <div class="match-footer">
+                                <button class="save-match-button app-button primary" data-match-index="1"><i class="fas fa-save"></i> Сохранить Матч 1</button>
+                            </div>
+                        </div>
+
+                        <div class="match-column" data-match="2" data-winner="">
+                             <div class="match-header">
+                                <h2>Match 2</h2>
+                                <div class="match-meta">
+                                    <select class="status-select styled-select" id="statusSelect2"><option value="UPCOM">UPCOM</option> <option value="LIVE">LIVE</option> <option value="FINISHED">FINISHED</option></select>
+                                    <input type="text" class="time-input" id="timeInput2" placeholder="--:--" />
+                                </div>
+                            </div>
+                            <div class="match-body">
+                                <div class="match-teams">
+                                    <div class="team-block team-1-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo2">
+                                            <label for="team1Select2">Команда 1</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team1Select2"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                    <div class="vs-indicator">VS</div>
+                                    <div class="team-block team-2-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo2">
+                                            <label for="team2Select2">Команда 2</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team2Select2"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                </div>
+                                <div class="winner-buttons"><button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: T1</button><button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: T2</button></div>
+                                <div class="maps">
+                                    <h3><i class="fas fa-map-marked-alt"></i> Карты</h3>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                </div>
+                                <div class="vrs-block-wrapper"><h3><i class="fas fa-chart-line"></i> VRS Статистика</h3><div class="vrs-block" id="vrsBlock2"></div></div>
+                            </div>
+                            <div class="match-footer"><button class="save-match-button app-button primary" data-match-index="2"><i class="fas fa-save"></i> Сохранить Матч 2</button></div>
+                        </div>
+
+                        <div class="match-column" data-match="3" data-winner="">
+                            <div class="match-header">
+                                <h2>Match 3</h2>
+                                <div class="match-meta">
+                                    <select class="status-select styled-select" id="statusSelect3"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
+                                    <input type="text" class="time-input" id="timeInput3" placeholder="--:--" />
+                                </div>
+                            </div>
+                            <div class="match-body">
+                                <div class="match-teams">
+                                    <div class="team-block team-1-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo3">
+                                            <label for="team1Select3">Команда 1</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team1Select3"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                    <div class="vs-indicator">VS</div>
+                                    <div class="team-block team-2-block">
+                                        <div class="team-info-header">
+                                            <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo3">
+                                            <label for="team2Select3">Команда 2</label>
+                                        </div>
+                                        <select class="team-select styled-select" id="team2Select3"><option value="">- Выбрать -</option></select>
+                                    </div>
+                                </div>
+                                <div class="winner-buttons"><button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: T1</button><button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: T2</button></div>
+                                <div class="maps">
+                                    <h3><i class="fas fa-map-marked-alt"></i> Карты</h3>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                </div>
+                                <div class="vrs-block-wrapper"><h3><i class="fas fa-chart-line"></i> VRS Статистика</h3><div class="vrs-block" id="vrsBlock3"></div></div>
+                            </div>
+                           <div class="match-footer"><button class="save-match-button app-button primary" data-match-index="3"><i class="fas fa-save"></i> Сохранить Матч 3</button></div>
+                        </div>
+
+                        <div class="match-column" data-match="4" data-winner="">
+                            <div class="match-header">
+                                <h2>Match 4</h2>
+                                <div class="match-meta">
+                                    <select class="status-select styled-select" id="statusSelect4"><option value="UPCOM">UPCOM</option><option value="LIVE">LIVE</option><option value="FINISHED">FINISHED</option></select>
+                                    <input type="text" class="time-input" id="timeInput4" placeholder="--:--" />
+                                </div>
+                            </div>
+                            <div class="match-body">
+                                <div class="match-teams">
+                                        <div class="team-block team-1-block">
+                                            <div class="team-info-header">
+                                                <img src="/logos/none.png" alt="Team 1 Logo" class="team-logo" id="team1Logo4">
+                                                <label for="team1Select4">Команда 1</label>
+                                            </div>
+                                            <select class="team-select styled-select" id="team1Select4"><option value="">- Выбрать -</option></select>
+                                        </div>
+                                        <div class="vs-indicator">VS</div>
+                                        <div class="team-block team-2-block">
+                                            <div class="team-info-header">
+                                                <img src="/logos/none.png" alt="Team 2 Logo" class="team-logo" id="team2Logo4">
+                                                <label for="team2Select4">Команда 2</label>
+                                            </div>
+                                            <select class="team-select styled-select" id="team2Select4"><option value="">- Выбрать -</option></select>
+                                        </div>
+                                </div>
+                                <div class="winner-buttons"><button class="winner-btn team-1-accent-border" data-team="TEAM1">Победитель: T1</button><button class="winner-btn team-2-accent-border" data-team="TEAM2">Победитель: T2</button></div>
+                                <div class="maps">
+                                   <h3><i class="fas fa-map-marked-alt"></i> Карты</h3>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                    <div class="map-row"><select class="map-name-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select><input type="text" class="map-score-input" placeholder="-:-" /></div>
+                                </div>
+                                <div class="vrs-block-wrapper"><h3><i class="fas fa-chart-line"></i> VRS Статистика</h3><div class="vrs-block" id="vrsBlock4"></div></div>
+                            </div>
+                            <div class="match-footer"><button class="save-match-button app-button primary" data-match-index="4"><i class="fas fa-save"></i> Сохранить Матч 4</button></div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="tab-mapveto" class="tab-panel">
+                    <div class="map-veto-block">
+                        <div class="map-veto-content">
+                            <h1 class="tab-title"><i class="fas fa-map-signs"></i> MAP VETO</h1>
+                            <div id="mapVetoMatchAndTeamsHeader" class="card-style map-veto-combined-header">
+                                <div class="map-veto-header"> <label for="matchSelect"><i class="fas fa-filter"></i> Матч для Veto:</label>
+                                    <select id="matchSelect" class="control-select styled-select"></select>
+                                </div>
+
+                                <div id="mapVetoTeamDisplayInternal" class="map-veto-team-display-internal">
+                                    <div class="team-display team-1">
+                                        <span class="team-display-name" id="mapVetoTeam1Name">Команда 1</span>
+                                        <img src="/logos/none.png" alt="Team 1 Logo" class="team-display-logo" id="mapVetoTeam1Logo">
+                                    </div>
+                                    <div class="vs-indicator">VS</div>
+                                    <div class="team-display team-2">
+                                        <img src="/logos/none.png" alt="Team 2 Logo" class="team-display-logo" id="mapVetoTeam2Logo">
+                                        <span class="team-display-name" id="mapVetoTeam2Name">Команда 2</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-wrapper styled-scrollbar">
+                                <table id="vetoTable">
+                                    <thead>
+                                        <tr>
+                                            <th><i class="fas fa-tasks"></i> ACTION</th>
+                                            <th><i class="fas fa-globe-americas"></i> MAP NAME</th>
+                                            <th class="team-1-text-accent">TEAM 1</th>
+                                            <th class="team-2-text-accent">TEAM 2</th>
+                                            <th><i class="fas fa-retweet"></i> SIDE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-index="1"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="2"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="3"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="4"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="5"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="6"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                        <tr data-index="7"><td><select class="veto-action control-select styled-select"><option value="BAN">BAN</option><option value="PICK">PICK</option><option value="DECIDER">DECIDER</option></select></td><td><select class="veto-map control-select styled-select"><option value="">- Карта -</option><option value="inferno">Inferno</option><option value="dust2">Dust II</option><option value="mirage">Mirage</option><option value="nuke">Nuke</option><option value="ancient">Ancient</option><option value="anubis">Anubis</option><option value="train">Train</option><option value="vertigo">Vertigo</option><option value="overpass">Overpass</option></select></td><td colspan="2"><select class="veto-team control-select styled-select"><option value="TEAM1" class="team-1-option">TEAM 1</option><option value="TEAM2" class="team-2-option">TEAM 2</option></select></td><td><select class="veto-side control-select styled-select"><option value="-">-</option><option value="CT">CT</option><option value="T">T</option></select></td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <button id="saveMapVetoButton" class="app-button primary"><i class="fas fa-save"></i> Save Map Veto</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-casters" class="tab-panel">
+                         <h1 class="tab-title"><i class="fas fa-microphone-alt"></i> Управление Кастерами</h1>
+                         <div class="casters-grid">
+                                <div class="caster-selection-block card-style">
+                                   <h3><i class="fas fa-user-check"></i> Выбрать Кастеров</h3>
+                                  <div class="form-group">
+                                    <label for="caster1Select"><i class="fas fa-microphone"></i> Кастер 1:</label>
+                                    <select id="caster1Select" class="control-select styled-select">
+                                       <option value="">- Выбрать кастера -</option>
+                                    </select>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="caster2Select"><i class="fas fa-microphone"></i> Кастер 2:</label>
+                                    <select id="caster2Select" class="control-select styled-select">
+                                       <option value="">- Выбрать кастера -</option>
+                                    </select>
+                                  </div>
+                                  <button id="saveSelectedCastersButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Кастеров</button>
+                                </div>
+
+                                <div class="caster-creation-block card-style">
+                                   <h3><i class="fas fa-user-plus"></i> Создать Нового Кастера</h3>
+                                  <form id="addCasterForm">
+                                    <div class="form-group">
+                                       <label for="newCasterName"><i class="fas fa-signature"></i> Имя кастера:</label>
+                                       <input type="text" id="newCasterName" class="header-input" placeholder="Введите имя" required>
+                                    </div>
+                                    <div class="form-group">
+                                       <label for="newCasterSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
+                                       <input type="text" id="newCasterSocial" class="header-input" placeholder="Ссылка или никнейм">
+                                    </div>
+                                    <button type="submit" id="addCasterButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить кастера</button>
+                                  </form>
+                                </div>
+                         </div>
+                         <div class="casters-list-block card-style" style="margin-top: var(--spacing-lg);">
+                               <h3><i class="fas fa-list-ul"></i> Список Кастеров</h3>
+                              <div id="castersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
+                                   <p>Загрузка...</p> </div>
+                         </div>
+                </div>
+                <div id="tab-timer" class="tab-panel">
+                    <div class="timer-tab-layout-container">
+                        <div class="timer-controls-column">
+                            <div class="card-style timer-controls-wrapper">
+                                <h1 class="tab-title" style="margin-bottom: var(--spacing-lg);"><i class="fas fa-stopwatch"></i> Управление таймером</h1>
+
+                                <div class="form-group mode-group-timer">
+                                    <label class="radio-label">
+                                        <input type="radio" name="timerMode" value="duration" checked>
+                                        Обратный отсчёт
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="timerMode" value="target">
+                                        По таргету
+                                    </label>
+                                </div>
+
+                                <div class="timer-input-container">
+                                    <div id="timerDurationInputs" class="timer-input-sections">
+                                        <p class="form-section-description">Установите длительность таймера:</p>
+                                        <div class="timer-fields-horizontal">
+                                            <div class="form-group timer-field">
+                                                <label for="timerHoursInput">ЧАСЫ</label>
+                                                <input type="number" id="timerHoursInput" class="header-input timer-input-value" min="0" value="0" placeholder="00">
+                                            </div>
+                                            <span class="timer-field-separator">:</span>
+                                            <div class="form-group timer-field">
+                                                <label for="timerMinutesInput">МИНУТЫ</label>
+                                                <input type="number" id="timerMinutesInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
+                                            </div>
+                                            <span class="timer-field-separator">:</span>
+                                            <div class="form-group timer-field">
+                                                <label for="timerSecondsInput">СЕКУНДЫ</label>
+                                                <input type="number" id="timerSecondsInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div id="timerTargetInputs" class="timer-input-sections" style="display: none;">
+                                        <p class="form-section-description">Установите целевое время:</p>
+                                        <div class="timer-fields-horizontal">
+                                            <div class="form-group timer-field">
+                                                <label for="timerTargetHoursInput">ЧАСЫ</label>
+                                                <input type="number" id="timerTargetHoursInput" class="header-input timer-input-value" min="0" max="23" value="20" placeholder="00">
+                                            </div>
+                                            <span class="timer-field-separator">:</span>
+                                            <div class="form-group timer-field">
+                                                <label for="timerTargetMinutesInput">МИНУТЫ</label>
+                                                <input type="number" id="timerTargetMinutesInput" class="header-input timer-input-value" min="0" max="59" value="0" placeholder="00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="setTimerButton" class="app-button primary timer-action-button">Запустить/Обновить таймер</button>
+                                <div id="timerMessage" class="timer-message-feedback" style="min-height: 1.3em; margin-top: var(--spacing-md);"></div>
+                            </div>
+                        </div>
+
+                        <div class="timer-link-column">
+                            <div class="card-style timer-link-wrapper">
+                                <h2 class="timer-link-title">Страница таймера</h2>
+
+                                <div class="mini-timer-preview-container">
+                                    <div id="miniTimerPreviewDisplay" class="mini-timer-time">00:00</div>
+                                    <div id="miniTimerPreviewStatus" class="mini-timer-status">(остановлен)</div>
+                                </div>
+                                <p style="color: var(--color-text-secondary); margin-bottom: var(--spacing-md); font-size: 0.9rem; text-align: center;">
+                                    Ссылка для OBS/vMix:
+                                </p>
+                                <div class="timer-url-display-container">
+                                    <input type="text" id="timerPageUrl" class="header-input" value="/timer.html" readonly>
+                                    <button id="copyTimerUrlButton" class="app-button tertiary small-button" title="Копировать ссылку">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                                <a href="/timer.html" target="_blank" class="app-button primary" style="margin-top: var(--spacing-md); display: block; text-align: center;">
+                                    <i class="fas fa-external-link-alt"></i> Открыть в новой вкладке
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div id="tab-pause" class="tab-panel">
+                         <section class="pause-section">
+                               <h1 class="tab-title"><i class="fas fa-pause-circle"></i> Управление Паузой</h1>
+                              <div class="pause-controls-standalone">
+                                  <div class="pause-fields-grid">
+                                          <div class="form-group">
+                                              <label for="pauseMessageInput"><i class="fas fa-comment-dots"></i> Сообщение паузы:</label>
+                                              <input type="text" id="pauseMessageInput" placeholder="Причина паузы..." class="header-input pause-message">
+                                          </div>
+                                          <div class="form-group">
+                                              <label for="pauseTimeInput"><i class="fas fa-clock"></i> Last UPD:</label>
+                                              <input type="text" id="pauseTimeInput" placeholder="HH:MM" class="header-input pause-time">
+                                          </div>
+                                  </div>
+                                  <div style="display:flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                      <button id="savePauseButton" class="app-button primary"><i class="fas fa-save"></i> Save Pause</button>
+                                      <button id="togglePauseShowButton" class="app-button tertiary"><i class="fas fa-eye"></i> Show</button>
+                                      <a href="/pause?scale=1&anchor=tr" target="_blank" class="app-button primary"><i class="fas fa-external-link-alt"></i> Открыть /pause (100% • top-right)</a>
+                                  </div>
+                              </div>
+                         </section>
+                </div>
+                 <div id="tab-json" class="tab-panel">
+                       <h1 class="tab-title"><i class="fas fa-code"></i> JSON Вывод</h1>
+                      <div class="json-output-container">
+                          <div class="json-output styled-scrollbar" id="jsonOutput">
+                              JSON data will appear here...
+                          </div>
+                      </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="js/main.js"></script>
+
+    <!-- Confirm Modal -->
+    <div id="confirmOverlay" class="modal-overlay" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+            <div class="modal-header">
+                <span class="modal-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                <div id="confirmTitle">Показать графику паузы?</div>
+            </div>
+            <div id="confirmMessage" class="modal-body">Подтвердите, что готовы вывести паузу в эфир.</div>
+            <div class="modal-actions">
+                <button id="confirmNo" class="app-button tertiary small-button"><i class="fas fa-times"></i> Отмена</button>
+                <button id="confirmYes" class="app-button primary small-button"><i class="fas fa-check"></i> Да, показать</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,173 @@
+/* login.css */
+/* Убираем импорт шрифта Blender Pro, так как он вызывал ошибки в консоли */
+/* @import url('https://fonts.googleapis.com/css2?family=Blender+Pro:wght@500&display=swap'); */
+
+body {
+  margin: 0;
+  padding: 0;
+  /* Плавный анимированный градиент */
+  background: linear-gradient(-45deg, #1E1E1E, #2C243B, #1E1E1E, #2C243B);
+  background-size: 600% 600%; /* Увеличенный размер для плавной анимации */
+  animation: gradientBG 20s ease infinite; /* Анимация градиента */
+  /* Используем системные шрифты как запасной вариант */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  display: flex; /* Центрирование контейнера по вертикали и горизонтали */
+  height: 100vh; /* Высота на весь экран */
+  align-items: center; /* Вертикальное центрирование */
+  justify-content: center; /* Горизонтальное центрирование */
+  overflow: hidden; /* Скрыть возможные полосы прокрутки от псевдоэлементов */
+}
+
+/* Анимация фона */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.login-container {
+  position: relative; /* Для позиционирования псевдоэлементов */
+  width: 320px; /* Ширина контейнера */
+  padding: 50px 24px; /* Внутренние отступы */
+  background: #2C243B; /* Фон контейнера */
+  border: 2px solid #503BA9; /* Рамка */
+  border-radius: 12px; /* Скругление углов */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6); /* Тень */
+  overflow: hidden; /* Скрыть выходящие части псевдоэлементов */
+  /* Небольшой 3D эффект (опционально) */
+  transform: perspective(600px) rotateX(2deg);
+  transition: transform 0.5s ease, box-shadow 0.5s ease; /* Плавные переходы */
+  z-index: 1; /* Чтобы был над псевдоэлементами фона */
+}
+
+/* Декоративные "блобы" для фона (псевдоэлементы) */
+.login-container::before,
+.login-container::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%; /* Круглая форма */
+  filter: blur(80px); /* Сильное размытие */
+  opacity: 0.6; /* Полупрозрачность */
+  z-index: -1; /* Позади основного контента */
+}
+.login-container::before {
+  width: 200px; height: 200px;
+  background: #503BA9; /* Фиолетовый блоб */
+  top: -60px; left: -60px; /* Позиционирование */
+}
+.login-container::after {
+  width: 150px; height: 150px;
+  background: #57492E; /* Золотистый блоб */
+  bottom: -50px; right: -50px; /* Позиционирование */
+}
+
+/* Эффект при наведении на контейнер */
+.login-container:hover {
+  transform: perspective(600px) rotateX(0deg) translateY(-10px); /* Выравнивание и подъем */
+  box-shadow: 0 12px 32px rgba(0,0,0,0.7); /* Увеличение тени */
+}
+
+/* Стили для группы полей формы */
+.login-form .form-group {
+  margin-bottom: 24px; /* Отступ снизу */
+}
+
+/* Стили для лейблов */
+.login-form label {
+  display: block; /* Занимает всю ширину */
+  font-size: 18px; /* Размер шрифта лейбла (уменьшил) */
+  line-height: 1.4;
+  font-weight: 500;
+  color: #a0a0a0; /* Цвет текста лейбла (светлее) */
+  text-transform: uppercase; /* Верхний регистр */
+  margin-bottom: 8px; /* Отступ снизу */
+  letter-spacing: 0.05em; /* Межбуквенный интервал */
+}
+
+/* Стили для полей ввода */
+.login-form input {
+  width: 100%; /* На всю ширину */
+  height: 40px; /* Высота поля */
+  background: #191919; /* Темный фон поля */
+  border: 1px solid transparent; /* Прозрачная рамка по умолчанию */
+  border-radius: 6px; /* Скругление углов */
+  padding: 4px 12px; /* Внутренние отступы */
+  font-size: 16px; /* Размер шрифта ввода (уменьшил) */
+  color: #e0e0e0; /* Цвет текста ввода */
+  text-transform: uppercase; /* Верхний регистр */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease; /* Плавные переходы */
+  box-sizing: border-box; /* Учитывать padding и border в ширине */
+}
+
+/* Стили для полей ввода при фокусе */
+.login-form input:focus {
+  outline: none; /* Убираем стандартный контур */
+  border-color: #503BA9; /* Цвет рамки при фокусе */
+  box-shadow: 0 0 8px rgba(80,59,169,0.6); /* Тень при фокусе */
+  background: #1f1a2b; /* Слегка меняем фон при фокусе */
+}
+
+/* Стили для кнопки входа */
+.login-form button {
+  display: block; /* Блочный элемент */
+  width: 220px; /* Ширина кнопки */
+  height: 45px; /* Высота кнопки */
+  margin: 16px auto 0; /* Отступы (сверху, авто по бокам, снизу) для центрирования */
+  background: linear-gradient(135deg, #57492E, #6A593F); /* Градиент фона */
+  border: none; /* Убираем рамку */
+  border-radius: 8px; /* Скругление углов */
+  color: #FFFFFF; /* Белый цвет текста */
+  font-size: 20px; /* Размер шрифта (уменьшил) */
+  line-height: 45px; /* Выравнивание текста по вертикали */
+  font-weight: 500;
+  text-transform: uppercase; /* Верхний регистр */
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3); /* Небольшая тень текста */
+  position: relative; /* Для псевдоэлемента */
+  overflow: hidden; /* Скрыть выходящие части псевдоэлемента */
+  cursor: pointer; /* Курсор-указатель */
+  box-shadow: 0 4px 12px rgba(87,73,46,0.6); /* Тень кнопки */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+}
+
+/* Псевдоэлемент для эффекта блика при наведении */
+.login-form button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at top left,
+                  rgba(255,255,255,0.2),
+                  transparent 60%);
+  opacity: 0; /* Скрыт по умолчанию */
+  transition: opacity 0.3s ease; /* Плавное появление */
+}
+
+/* Эффекты при наведении на кнопку */
+.login-form button:hover {
+  transform: translateY(-3px) scale(1.03); /* Подъем и небольшое увеличение */
+  box-shadow: 0 8px 20px rgba(87,73,46,0.7); /* Увеличение тени */
+}
+.login-form button:hover::before {
+  opacity: 1; /* Появление блика */
+}
+
+/* Эффект при нажатии на кнопку */
+.login-form button:active {
+  transform: translateY(0) scale(0.97); /* Возврат и небольшое сжатие */
+  box-shadow: 0 3px 8px rgba(87,73,46,0.5); /* Уменьшение тени */
+}
+
+/* Стили для сообщения об ошибке */
+.login-form .error {
+  margin-top: 16px; /* Отступ сверху */
+  text-align: center; /* Центрирование текста */
+  color: #F44336; /* Красный цвет текста */
+  font-size: 14px; /* Размер шрифта */
+  display: none; /* Скрыто по умолчанию */
+  font-weight: 500;
+}
+
+/* Класс для отображения сообщения об ошибке */
+.login-form .error.visible {
+  display: block; /* Показываем блок */
+}

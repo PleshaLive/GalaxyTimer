@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pause Overlay</title>
+  <style>
+    @font-face {
+      font-family: 'Blender Pro';
+      src: url('/fonts/BLENDERPRO-HEAVY.TTF') format('truetype');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    /* Center + scale wrapper */
+    #overlaySizer {
+      position: fixed;
+  /* top/left and transform set via JS based on anchor */
+  transform-origin: top left;
+      pointer-events: none; /* pass-through clicks by default */
+    }
+    .pause-root {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+    }
+    /* Rectangle 1 */
+    .rect-1 {
+      position: absolute;
+      width: 364px;
+      height: 72px;
+      left: 1244px;
+      top: 36px;
+      background: rgba(135, 18, 18, 0.46);
+    }
+    /* Rectangle 2 */
+    .rect-2 {
+      position: absolute;
+      width: 364px;
+      height: 25px;
+      left: 1244px;
+      top: 108px;
+      background: #AA2828;
+    }
+    .pause-label {
+      position: absolute;
+      width: 338px;
+      height: 50px;
+      left: 1257px;
+      top: 46px;
+      font-family: 'Blender Pro', system-ui, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      line-height: 17px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      /* allow wrapping like in design */
+      white-space: normal;
+      word-break: break-word;
+    }
+    .technical-pause {
+      position: absolute;
+      width: 138px;
+      height: 15px;
+      left: 1257px;
+      top: 113px;
+      font-family: 'Blender Pro', system-ui, sans-serif;
+      font-weight: 900;
+      font-size: 15px;
+      line-height: 18px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+    }
+    .last-upd {
+      position: absolute;
+      width: 144px;
+      height: 15px;
+      left: 1451px;
+      top: 113px;
+      font-family: 'Blender Pro', system-ui, sans-serif;
+      font-weight: 900;
+      font-size: 15px;
+      line-height: 18px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+    }
+    /* Fancy appear/disappear (staggered) */
+    .pause-root .anim {
+      opacity: 0;
+      transform: translateY(-6px);
+      filter: blur(0.5px);
+      transition: opacity 220ms ease-out, transform 260ms cubic-bezier(.22,.9,.3,1), filter 260ms ease-out;
+    }
+    #pauseOverlayWrapper.visible .pause-root .anim {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    /* Stagger timings */
+  .pause-root .rect-1 { transition-delay: 40ms; }
+  .pause-root .rect-2 { transition-delay: 40ms; }
+    .pause-root .pause-label { transition-delay: 140ms; }
+    .pause-root .technical-pause { transition-delay: 180ms; }
+    .pause-root .last-upd { transition-delay: 210ms; }
+
+    /* Respect reduced motion with override support */
+    @media (prefers-reduced-motion: reduce) {
+      :root:not(.force-motion) #pauseOverlayWrapper,
+      :root:not(.force-motion) .pause-root .anim {
+        transition: none !important;
+      }
+    }
+    /* Force reduce via class (URL motion=off/reduce) */
+    :root.force-reduce #pauseOverlayWrapper,
+    :root.force-reduce .pause-root .anim {
+      transition: none !important;
+    }
+    /* Wrapper controlled by 'show' flag with fade animation */
+    #pauseOverlayWrapper {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 300ms ease-in-out, visibility 300ms step-end;
+      will-change: opacity;
+      pointer-events: none; /* no interactions */
+    }
+    #pauseOverlayWrapper.visible {
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 300ms ease-in-out, visibility 0s step-start;
+    }
+  </style>
+</head>
+<body>
+  <div id="pauseOverlayWrapper">
+    <div id="overlaySizer">
+      <div class="pause-root">
+  <div class="rect-1 anim"></div>
+  <div class="rect-2 anim"></div>
+  <div id="pauseMessageEl" class="pause-label anim">Сообщение паузы</div>
+  <div class="technical-pause anim">Technical pause</div>
+  <div id="lastUpdEl" class="last-upd anim">Last UPD:</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const wrapper = document.getElementById('pauseOverlayWrapper');
+    const sizer = document.getElementById('overlaySizer');
+    const pauseMessageEl = document.getElementById('pauseMessageEl');
+    const lastUpdEl = document.getElementById('lastUpdEl');
+
+    const BASE_W = 1920;
+    const BASE_H = 1080;
+
+  // URL params: scale=fit|width|height|none|<number>, anchor=tl|tr|bl|br|center, scroll=1, debug=1, maxScale=<number>
+  const usp = new URLSearchParams(location.search);
+  const scaleParam = (usp.get('scale') || '1').toLowerCase(); // default 1:1 as requested
+  const anchorParam = (usp.get('anchor') || 'tr').toLowerCase(); // default top-right
+    const maxScaleParam = parseFloat(usp.get('maxscale') || '0');
+  const enableScroll = usp.get('scroll') === '1';
+  const debugOutline = usp.get('debug') === '1';
+  const motionParam = (usp.get('motion') || '').toLowerCase();
+  const showParam = usp.get('show');
+  const forceParam = usp.get('force');
+  const hasForcedShow = (showParam !== null) || (forceParam !== null);
+  const forcedShowValue = ((showParam ?? forceParam) === '1');
+    if (enableScroll) {
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
+    }
+    if (debugOutline) {
+      sizer.style.outline = '1px dashed rgba(0,255,128,0.8)';
+      sizer.style.boxShadow = '0 0 0 2px rgba(0,255,128,0.2) inset';
+    }
+    // Reduced motion override from URL
+  if (motionParam === 'on' || motionParam === '') { // default to ON for pause.html
+      document.documentElement.classList.add('force-motion');
+      document.documentElement.classList.remove('force-reduce');
+    } else if (motionParam === 'off' || motionParam === 'reduce') {
+      document.documentElement.classList.add('force-reduce');
+      document.documentElement.classList.remove('force-motion');
+    }
+
+    function computeScale() {
+      const vw = window.innerWidth || document.documentElement.clientWidth;
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      let scale;
+      if (!isNaN(parseFloat(scaleParam))) {
+        scale = Math.max(0.1, parseFloat(scaleParam));
+      } else if (scaleParam === 'width' || scaleParam === 'w') {
+        scale = vw / BASE_W;
+      } else if (scaleParam === 'height' || scaleParam === 'h') {
+        scale = vh / BASE_H;
+      } else if (scaleParam === 'none' || scaleParam === '1:1') {
+        scale = 1;
+      } else { // 'fit' (default)
+        scale = Math.min(vw / BASE_W, vh / BASE_H);
+      }
+      if (!isNaN(maxScaleParam) && maxScaleParam > 0) {
+        scale = Math.min(scale, maxScaleParam);
+      }
+      return Math.max(0.1, scale);
+    }
+
+    function positionSizer(scale) {
+      // Set intrinsic size for crisp layout
+      sizer.style.width = BASE_W + 'px';
+      sizer.style.height = BASE_H + 'px';
+      let top = '50%';
+      let left = '50%';
+      let tx = '-50%';
+      let ty = '-50%';
+      switch (anchorParam) {
+        case 'tl': case 'top-left':
+          top = '0%'; left = '0%'; tx = '0%'; ty = '0%'; break;
+        case 'tr': case 'top-right':
+          top = '0%'; left = '100%'; tx = '-100%'; ty = '0%'; break;
+        case 'bl': case 'bottom-left':
+          top = '100%'; left = '0%'; tx = '0%'; ty = '-100%'; break;
+        case 'br': case 'bottom-right':
+          top = '100%'; left = '100%'; tx = '-100%'; ty = '-100%'; break;
+        default: // center
+          top = '50%'; left = '50%'; tx = '-50%'; ty = '-50%';
+      }
+      sizer.style.top = top;
+      sizer.style.left = left;
+      sizer.style.transform = `translate(${tx}, ${ty}) scale(${scale})`;
+    }
+
+    function applyScale() {
+      const s = computeScale();
+      positionSizer(s);
+    }
+    window.addEventListener('resize', () => {
+      // micro debounce
+      clearTimeout(window.__pauseResizeTid);
+      window.__pauseResizeTid = setTimeout(applyScale, 16);
+    });
+
+    function normalizeShowFlag(v) {
+      if (typeof v === 'string') {
+        const s = v.trim().toLowerCase();
+        return s === '1' || s === 'true' || s === 'yes' || s === 'on';
+      }
+      return !!v;
+    }
+
+    function applyPauseState(data) {
+  const show = hasForcedShow ? forcedShowValue : normalizeShowFlag(data && data.show);
+      if (show) wrapper.classList.add('visible'); else wrapper.classList.remove('visible');
+      const msg = (data && data.pause) ? String(data.pause) : '';
+      pauseMessageEl.textContent = msg || '—';
+      const upd = (data && data.lastUpd) ? String(data.lastUpd) : '';
+      lastUpdEl.textContent = upd ? `Last UPD: ${upd}` : 'Last UPD:';
+  // Re-apply scale on state changes
+  applyScale();
+    }
+
+  // Optional debug banner when forced
+  if (hasForcedShow && debugOutline) {
+      const dbg = document.createElement('div');
+      dbg.textContent = 'FORCED SHOW (url)';
+      dbg.style.position = 'fixed';
+      dbg.style.bottom = '8px';
+      dbg.style.left = '8px';
+      dbg.style.padding = '4px 8px';
+      dbg.style.background = 'rgba(255,0,0,0.7)';
+      dbg.style.color = '#fff';
+      dbg.style.font = '12px sans-serif';
+      dbg.style.zIndex = '9999';
+      document.body.appendChild(dbg);
+    }
+
+    // Initial fetch
+  fetch('/api/pause')
+      .then(r => r.json())
+      .then(arr => applyPauseState(Array.isArray(arr) ? arr[0] : arr))
+      .catch(() => applyPauseState({ show: false }));
+
+    // Live updates
+    const socket = io();
+    socket.on('pauseUpdate', (data) => {
+      applyPauseState(data);
+    });
+
+  // Polling fallback every 2s in case socket misses
+  setInterval(() => {
+    fetch('/api/pause').then(r => r.json()).then(arr => {
+      applyPauseState(Array.isArray(arr) ? arr[0] : arr);
+    }).catch(() => {});
+  }, 2000);
+
+  // Initial scale
+  applyScale();
+  </script>
+</body>
+</html>

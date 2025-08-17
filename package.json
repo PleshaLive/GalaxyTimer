@@ -1,0 +1,15 @@
+{
+  "name": "csgo-gsi-dashboard",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^4.18.2",
+    "express-basic-auth": "^1.2.1",
+    "express-session": "^1.18.1",
+    "socket.io": "^4.8.1"
+  }
+}
