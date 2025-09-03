@@ -1077,5 +1077,5 @@ window.addEventListener("DOMContentLoaded", async () => {
         document.body.innerHTML = `<div style="color:red; padding: 20px; font-family: sans-serif;">Критическая ошибка при инициализации приложения: ${error.message}. Проверьте консоль для деталей.</div>`;
     }
 
-    
+    // === No global zoom — fixed at 100% ===
 });

@@ -111,6 +111,7 @@ let savedPauseData = {};
 let savedCasters = []; // Список всех кастеров {id, caster, social}
 let savedSelectedCasters = { ...defaultSelectedCastersStructure }; // Имена выбранных кастеров
 let timerData = { targetTime: null }; // <-- НОВОЕ: для данных таймера
+let livePulseUntil = 0; // Временная метка (ms), до которой состояние Live:+ активно
 
 // --- Пути к файлам ---
 const dbFilePath = path.join(__dirname, "db.json"); // Основной файл БД
@@ -760,6 +761,31 @@ app.get('/set_timer', async (req, res) => {
         console.error("[API][GET] /set_timer - Ошибка при сохранении или отправке сокет сообщения:", error);
         res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера при обновлении таймера.' });
     }
+});
+
+// --- ЭНДПОИНТЫ ДЛЯ ПРОСТОГО "Live:+/-" ПУЛЬСА НА 1 СЕКУНДУ ---
+// Нажатие кнопки "Pause" на отдельной странице вызывает этот эндпоинт.
+// Он включает состояние Live:+ на 1 секунду (продлевая, если уже активно).
+app.post('/api/live/pulse', (req, res) => {
+    const DURATION_MS = 1000; // 1 секунда
+    const now = Date.now();
+    // Если пульс уже активен, продлеваем от текущего предела; иначе от now
+    livePulseUntil = Math.max(livePulseUntil, now) + DURATION_MS;
+    console.log(`[API][POST] /api/live/pulse -> Live:+ до ${new Date(livePulseUntil).toISOString()}`);
+    res.json({ success: true, until: livePulseUntil });
+});
+
+// Текстовая "JSON страничка": возвращает строку вида "Live:+" или "Live:-"
+// Удобно для подхвата в OBS как текст из URL
+app.get('/live', (req, res) => {
+    const isPlus = Date.now() < livePulseUntil;
+    res.type('text/plain').send(`Live:${isPlus ? '+' : '-'}`);
+});
+
+// Альтернативный JSON-эндпоинт на случай, если нужен именно JSON-формат
+app.get('/live.json', (req, res) => {
+    const isPlus = Date.now() < livePulseUntil;
+    res.json({ Live: isPlus ? '+' : '-' });
 });
 
 // --- Настройка Socket.IO ---

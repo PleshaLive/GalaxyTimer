@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+  "start": "node server.js",
+  "start:3000": "set PORT=3000 && node server.js",
+  "start:3001": "set PORT=3001 && node server.js"
   },
   "dependencies": {
     "cookie-parser": "^1.4.7",

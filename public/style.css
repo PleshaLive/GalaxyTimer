@@ -187,10 +187,16 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
+/* When auto-fit zoom is active, prevent scrollbars to keep the UI compact */
+/* When auto-fit zoom is active, prevent horizontal scroll and allow vertical */
+/* No auto-zoom overflow adjustments */
+
 .container {
     max-width: 1920px;
     margin: 0 auto;
     padding: var(--spacing-lg) var(--spacing-xl);
+    /* Ensure container itself won’t create scrollbars when auto-zoomed */
+    overflow: visible;
 }
 
 .card-style {
@@ -1522,13 +1528,7 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
     #saveHeaderButton { width: 100%; margin-top: var(--spacing-md); margin-left: 0; } /* Reset margin-left */
     .tournament-day { text-align: left; padding: var(--spacing-sm); margin-left: 0; width: 100%; }
 
-    /* Pause Tab adjustments for consistency */
-    .pause-section { /* Assuming .pause-section is the main container in this tab */
-        /* flex-direction: column; align-items: stretch; /* This was in original, might be for a specific layout not visible here */
-    }
-    .pause-fields-grid { /* If this is the direct child for fields */
-        /* flex-direction: column; align-items: stretch; width: 100%; gap: var(--spacing-sm); /* Original style, might be too aggressive if it's already inside a flex column */
-    }
+    /* Pause Tab adjustments for consistency (no-op placeholders removed) */
     .pause-controls-standalone .header-input { width: 100%; } /* .header-input is already 100% width */
     .pause-controls-standalone .app-button { width: 100%; margin-top: var(--spacing-md); align-self: auto; } /* Reset align-self */
 
@@ -2295,6 +2295,8 @@ select#matchSelect.select2-hidden-accessible /* If #matchSelect is a select */
     gap: var(--spacing-sm); /* Используем вашу переменную для отступа */
 }
 
-.skins-link {
-    /* Сюда можно добавить специфичные стили для кнопки SKINS, если потребуется */
-}
+/* Zoom controls styling */
+/* Zoom controls removed */
+
+/* No per-tab scaling */
+
