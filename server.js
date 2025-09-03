@@ -39,6 +39,15 @@ function requireLogin(req, res, next) {
     }
 }
 
+// Отдельная защита для страницы Pulse (собственный пароль)
+function requirePulseAuth(req, res, next) {
+    if (req.session && req.session.pulseAuth) {
+        return next();
+    }
+    // Можно передать редирект-назад, если нужно
+    res.redirect('/pulse-login.html');
+}
+
 // --- Роуты ---
 
 // Роуты, не требующие аутентификации (логин, выход, проверка состояния) <--- ИЗМЕНЕНО/ДОБАВЛЕНО
@@ -63,6 +72,16 @@ app.get("/logout", (req, res) => {
     });
 });
 
+// Логин для Pulse-страницы (отдельный пароль)
+app.post('/pulse-login', (req, res) => {
+    const { password } = req.body;
+    if (password === '2007') {
+        req.session.pulseAuth = true;
+        return res.redirect('/pulse.html');
+    }
+    return res.redirect('/pulse-login.html?error=1');
+});
+
 app.get("/health", (req, res) => {
   // Проверка работоспособности сервера
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
@@ -82,6 +101,10 @@ app.get("/teams", (req, res) => {
 
 // Обслуживание статических файлов (login.html, css, js, images, timer.html и т.д.)
 // Этот middleware должен быть после специфических роутов, которые он мог бы перекрыть (например, "/").
+// --- Пульсовая страница требует отдельной аутентификации ---
+app.get('/pulse.html', requirePulseAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pulse.html'));
+});
 app.use(express.static(path.join(__dirname, "public")));
 
 // --- Структуры данных по умолчанию ---
@@ -766,7 +789,7 @@ app.get('/set_timer', async (req, res) => {
 // --- ЭНДПОИНТЫ ДЛЯ ПРОСТОГО "Live:+/-" ПУЛЬСА НА 1 СЕКУНДУ ---
 // Нажатие кнопки "Pause" на отдельной странице вызывает этот эндпоинт.
 // Он включает состояние Live:+ на 1 секунду (продлевая, если уже активно).
-app.post('/api/live/pulse', (req, res) => {
+app.post('/api/live/pulse', requirePulseAuth, (req, res) => {
     const DURATION_MS = 3000; // 3 секунды
     const now = Date.now();
     // Если текущее окно пульса уже активно, повторные нажатия игнорируем (не продлеваем)

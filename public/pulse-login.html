@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pulse Login</title>
+  <link rel="stylesheet" href="/login.css">
+  <style>
+    /* Centered small login card */
+    html, body { height: 100%; }
+    body { margin: 0; display: grid; place-items: center; background: #0E0A1C; }
+    .card { background:#151127; border:1px solid #3B325C; border-radius: 12px; width: min(92vw, 420px); padding: 22px; color:#F0F2F5; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    h1 { font-size: 1.3rem; margin: 0 0 14px; color:#9370DB; text-align:center; }
+    form { display:grid; gap:12px; }
+    input[type="password"], input[type="text"] { width:100%; padding: 10px 12px; border-radius: 8px; border:1px solid #3B325C; background:#151127; color:#F0F2F5; }
+    .btn { display:inline-flex; justify-content:center; align-items:center; padding:10px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.12); color:#fff; cursor:pointer; text-transform:uppercase; font-weight:700; letter-spacing:.03em; }
+    .primary { background: linear-gradient(145deg,#7A64B9,#6A5ACD); }
+    .error { color:#ff8787; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Pulse: Вход</h1>
+    <form method="post" action="/pulse-login">
+      <input type="password" name="password" placeholder="Пароль" autocomplete="current-password" required>
+      <button class="btn primary" type="submit">Войти</button>
+    </form>
+    <div class="error" id="err" style="display:none;">Неверный пароль</div>
+  </div>
+  <script>
+    // Покажем ошибку если ?error=1
+    const params = new URLSearchParams(location.search);
+    if (params.get('error') === '1') {
+      document.getElementById('err').style.display = '';
+    }
+  </script>
+</body>
+</html>
