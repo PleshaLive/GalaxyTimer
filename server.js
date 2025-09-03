@@ -767,11 +767,15 @@ app.get('/set_timer', async (req, res) => {
 // Нажатие кнопки "Pause" на отдельной странице вызывает этот эндпоинт.
 // Он включает состояние Live:+ на 1 секунду (продлевая, если уже активно).
 app.post('/api/live/pulse', (req, res) => {
-    const DURATION_MS = 1000; // 1 секунда
+    const DURATION_MS = 3000; // 3 секунды
     const now = Date.now();
-    // Если пульс уже активен, продлеваем от текущего предела; иначе от now
-    livePulseUntil = Math.max(livePulseUntil, now) + DURATION_MS;
-    console.log(`[API][POST] /api/live/pulse -> Live:+ до ${new Date(livePulseUntil).toISOString()}`);
+    // Если текущее окно пульса уже активно, повторные нажатия игнорируем (не продлеваем)
+    if (now >= livePulseUntil) {
+        livePulseUntil = now + DURATION_MS; // Запускаем новое 3-секундное окно
+        console.log(`[API][POST] /api/live/pulse -> START Live:+ до ${new Date(livePulseUntil).toISOString()}`);
+    } else {
+        console.log(`[API][POST] /api/live/pulse -> IGNORE (уже активно до ${new Date(livePulseUntil).toISOString()})`);
+    }
     res.json({ success: true, until: livePulseUntil });
 });
 
