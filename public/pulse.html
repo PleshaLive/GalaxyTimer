@@ -19,23 +19,58 @@
       letter-spacing: 0.03em;
       box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 30px rgba(122,100,185,0.35);
     }
+
+    /* Confirmation Overlay */
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 9999; }
+    .confirm-overlay.open { display: grid; }
+    .confirm-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); padding: 28px; box-shadow: var(--shadow-lg); width: min(92vw, 720px); }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .confirm-actions { grid-template-columns: 1fr; } }
+    .big-confirm { height: clamp(80px, 16vh, 140px); font-size: clamp(22px, 4vw, 38px); font-weight: 900; letter-spacing: 0.02em; border-radius: var(--border-radius-lg); text-transform: uppercase; }
+    /* Success (green) button variant */
+    .app-button.success { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; color: var(--color-text-on-accent) !important; box-shadow: var(--glow-success) !important; }
+    .app-button.success:hover { background-color: var(--color-success-dark) !important; }
   </style>
   <script>
-    async function sendPulse(){
-      const btn = document.getElementById('pulseBtn');
-      btn.disabled = true;
-      try {
-        await fetch('/api/live/pulse', { method:'POST' });
-      } finally {
-        // Кнопка включит 3-секундный пульс; повторные клики в окно игнорятся на сервере
-        setTimeout(() => { btn.disabled = false; }, 400); // мелкая защита от дребезга UI
+    function openConfirm(){
+      const overlay = document.getElementById('confirmOverlay');
+      const mainBtn = document.getElementById('pulseBtn');
+      mainBtn.disabled = true;
+      overlay.classList.add('open');
+    }
+
+    function closeConfirm(){
+      const overlay = document.getElementById('confirmOverlay');
+      const mainBtn = document.getElementById('pulseBtn');
+      overlay.classList.remove('open');
+      setTimeout(() => { mainBtn.disabled = false; }, 150);
+    }
+
+    async function confirmLive(){
+      const liveBtn = document.getElementById('confirmLiveBtn');
+      const cancelBtn = document.getElementById('confirmCancelBtn');
+      liveBtn.disabled = true; cancelBtn.disabled = true;
+      try { await fetch('/api/live/pulse', { method:'POST' }); }
+      catch(_) {}
+      finally {
+        liveBtn.disabled = false; cancelBtn.disabled = false; closeConfirm();
       }
     }
   </script>
 </head>
 <body>
   <div class="wrap">
-    <button id="pulseBtn" class="app-button primary big-center-button" onclick="sendPulse()">PAUSE • LIVE:+</button>
+    <button id="pulseBtn" class="app-button primary big-center-button" onclick="openConfirm()">PAUSE • LIVE:+</button>
+  </div>
+
+  <!-- Confirmation Overlay -->
+  <div id="confirmOverlay" class="confirm-overlay" aria-hidden="true">
+    <div class="confirm-box">
+      <div class="confirm-actions">
+        <button id="confirmLiveBtn" class="app-button success big-confirm" onclick="confirmLive()">Live</button>
+        <button id="confirmCancelBtn" class="app-button danger big-confirm" onclick="closeConfirm()">Cancel</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>
