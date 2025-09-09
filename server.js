@@ -105,6 +105,9 @@ app.get("/teams", (req, res) => {
 app.get('/pulse.html', requirePulseAuth, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pulse.html'));
 });
+app.get('/start.html', requirePulseAuth, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'start.html'));
+});
 app.use(express.static(path.join(__dirname, "public")));
 
 // --- Структуры данных по умолчанию ---
@@ -135,6 +138,7 @@ let savedCasters = []; // Список всех кастеров {id, caster, so
 let savedSelectedCasters = { ...defaultSelectedCastersStructure }; // Имена выбранных кастеров
 let timerData = { targetTime: null }; // <-- НОВОЕ: для данных таймера
 let livePulseUntil = 0; // Временная метка (ms), до которой состояние Live:+ активно
+let startPulseUntil = 0; // Временная метка (ms), до которой состояние START:+ активно
 
 // --- Пути к файлам ---
 const dbFilePath = path.join(__dirname, "db.json"); // Основной файл БД
@@ -786,6 +790,44 @@ app.get('/set_timer', async (req, res) => {
     }
 });
 
+// Установка таймера по локальному времени суток: /set_timer_at?time=HH:mm[(:ss)]
+// Пример: /set_timer_at?time=13:00 -> поставит таймер на ближайшие 13:00 (сегодня или завтра, если уже прошло)
+app.get('/set_timer_at', async (req, res) => {
+    const timeStr = (req.query.time || '').toString().trim();
+    if (!timeStr) {
+        return res.status(400).json({ success: false, error: "Параметр 'time' обязателен. Формат: HH:mm или HH:mm:ss" });
+    }
+
+    const match = timeStr.match(/^([0-1]?\d|2[0-3]):([0-5]\d)(?::([0-5]\d))?$/);
+    if (!match) {
+        return res.status(400).json({ success: false, error: "Неверный формат 'time'. Используйте HH:mm или HH:mm:ss" });
+    }
+
+    const hour = parseInt(match[1], 10);
+    const minute = parseInt(match[2], 10);
+    const second = match[3] ? parseInt(match[3], 10) : 0;
+
+    const now = new Date();
+    const target = new Date(now);
+    target.setHours(hour, minute, second, 0);
+    // Если указанное время уже прошло сегодня, переносим на завтра
+    if (target.getTime() <= now.getTime()) {
+        target.setDate(target.getDate() + 1);
+    }
+
+    try {
+        timerData.targetTime = target.getTime();
+        console.log(`[API][GET] /set_timer_at - Таймер установлен на ${target.toLocaleString()} (Timestamp: ${timerData.targetTime}) по запросу time=${timeStr}`);
+        await saveDbDataAsync();
+        io.emit('timerStateUpdate', timerData);
+        console.log("[SOCKET] Emitted 'timerStateUpdate' after /set_timer_at call.");
+        return res.json({ success: true, message: `Таймер установлен на ${target.toLocaleTimeString()}`, targetTime: timerData.targetTime });
+    } catch (error) {
+        console.error("[API][GET] /set_timer_at - Ошибка при сохранении/эмите:", error);
+        return res.status(500).json({ success: false, error: 'Внутренняя ошибка сервера при обновлении таймера.' });
+    }
+});
+
 // --- ЭНДПОИНТЫ ДЛЯ ПРОСТОГО "Live:+/-" ПУЛЬСА НА 1 СЕКУНДУ ---
 // Нажатие кнопки "Pause" на отдельной странице вызывает этот эндпоинт.
 // Он включает состояние Live:+ на 1 секунду (продлевая, если уже активно).
@@ -813,6 +855,29 @@ app.get('/live', (req, res) => {
 app.get('/live.json', (req, res) => {
     const isPlus = Date.now() < livePulseUntil;
     res.json({ Live: isPlus ? '+' : '-' });
+});
+
+// --- START pulse endpoints (3s, non-stacking) ---
+app.post('/api/start/pulse', requirePulseAuth, (req, res) => {
+    const DURATION_MS = 3000; // 3 seconds
+    const now = Date.now();
+    if (now >= startPulseUntil) {
+        startPulseUntil = now + DURATION_MS;
+        console.log(`[API][POST] /api/start/pulse -> START:+ до ${new Date(startPulseUntil).toISOString()}`);
+    } else {
+        console.log(`[API][POST] /api/start/pulse -> IGNORE (уже активно до ${new Date(startPulseUntil).toISOString()})`);
+    }
+    res.json({ success: true, until: startPulseUntil });
+});
+
+app.get('/start', (req, res) => {
+    const isPlus = Date.now() < startPulseUntil;
+    res.type('text/plain').send(`START:${isPlus ? '+' : '-'}`);
+});
+
+app.get('/start.json', (req, res) => {
+    const isPlus = Date.now() < startPulseUntil;
+    res.json({ START: isPlus ? '+' : '-' });
 });
 
 // --- Настройка Socket.IO ---

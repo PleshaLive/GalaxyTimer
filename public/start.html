@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>START Pulse</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: var(--color-background); display: grid; place-items: center; }
+    .wrap { display: grid; place-items: center; width: 100%; padding: 24px; }
+    .big-center-button { 
+      width: clamp(260px, 55vw, 640px);
+      height: clamp(90px, 20vh, 180px);
+      font-size: clamp(24px, 4.5vw, 44px);
+      font-weight: 800;
+      border-radius: var(--border-radius-xl);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 30px rgba(122,100,185,0.35);
+    }
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 9999; }
+    .confirm-overlay.open { display: grid; }
+    .confirm-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); padding: 28px; box-shadow: var(--shadow-lg); width: min(92vw, 720px); }
+    .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 520px) { .confirm-actions { grid-template-columns: 1fr; } }
+    .big-confirm { height: clamp(80px, 16vh, 140px); font-size: clamp(22px, 4vw, 38px); font-weight: 900; letter-spacing: 0.02em; border-radius: var(--border-radius-lg); text-transform: uppercase; }
+    .app-button.success { background-color: var(--color-success) !important; border-color: var(--color-success-dark) !important; color: var(--color-text-on-accent) !important; box-shadow: var(--glow-success) !important; }
+    .app-button.success:hover { background-color: var(--color-success-dark) !important; }
+  </style>
+  <script>
+    function openConfirm(){
+      const overlay = document.getElementById('confirmOverlay');
+      const mainBtn = document.getElementById('startBtn');
+      mainBtn.disabled = true;
+      overlay.classList.add('open');
+    }
+    function closeConfirm(){
+      const overlay = document.getElementById('confirmOverlay');
+      const mainBtn = document.getElementById('startBtn');
+      overlay.classList.remove('open');
+      setTimeout(() => { mainBtn.disabled = false; }, 150);
+    }
+    async function confirmStart(){
+      const yes = document.getElementById('confirmStartBtn');
+      const no = document.getElementById('confirmCancelBtn');
+      yes.disabled = true; no.disabled = true;
+      try { await fetch('/api/start/pulse', { method:'POST' }); }
+      catch(_) {}
+      finally { yes.disabled = false; no.disabled = false; closeConfirm(); }
+    }
+  </script>
+</head>
+<body>
+  <div class="wrap">
+    <button id="startBtn" class="app-button primary big-center-button" onclick="openConfirm()">START</button>
+  </div>
+  <div id="confirmOverlay" class="confirm-overlay" aria-hidden="true">
+    <div class="confirm-box">
+      <div class="confirm-actions">
+        <button id="confirmStartBtn" class="app-button success big-confirm" onclick="confirmStart()">START</button>
+        <button id="confirmCancelBtn" class="app-button danger big-confirm" onclick="closeConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
