@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>START Pulse</title>
   <link rel="stylesheet" href="/style.css">
-  <script src="/socket.io/socket.io.js"></script>
+  <!-- No socket needed here; countdown is local to this page -->
   <style>
     html, body { height: 100%; }
     body { margin: 0; background: var(--color-background); display: grid; place-items: center; }
@@ -39,7 +39,7 @@
     .app-button.success:hover { background-color: var(--color-success-dark) !important; }
   </style>
   <script>
-    let currentTargetTime = null;
+    let localEndTime = null; // локальная цель (только для этой страницы)
     let intervalId = null;
 
     function formatMMSS(distance){
@@ -53,15 +53,16 @@
       const panel = document.getElementById('startTimerPanel');
       const valEl = document.getElementById('startTimerDisplay');
       if (!panel || !valEl) return;
-      if (currentTargetTime === null) {
+      if (localEndTime === null) {
         panel.classList.remove('active');
         return;
       }
       const now = Date.now();
-      const distance = currentTargetTime - now;
+      const distance = localEndTime - now;
       if (distance <= 0) {
         valEl.textContent = '00:00';
         panel.classList.remove('active');
+        localEndTime = null;
         return;
       }
       valEl.textContent = formatMMSS(distance);
@@ -70,37 +71,14 @@
 
     function ensureTimerInterval(){
       if (intervalId) clearInterval(intervalId);
-      if (currentTargetTime !== null) {
+      if (localEndTime !== null) {
         intervalId = setInterval(updateTimerPanel, 250);
       }
       updateTimerPanel();
     }
 
-    // Инициализация: получаем текущее значение таймера
-    fetch('/timer')
-      .then(r => r.ok ? r.json() : Promise.reject(r.status))
-      .then(data => {
-        if (data && typeof data.targetTime === 'number') {
-          currentTargetTime = data.targetTime;
-        } else {
-          currentTargetTime = null;
-        }
-        ensureTimerInterval();
-      })
-      .catch(() => { currentTargetTime = null; ensureTimerInterval(); });
-
-    // Socket.io для живых обновлений таймера
-    try {
-      const socket = io();
-      socket.on('timerStateUpdate', (data) => {
-        if (data && typeof data.targetTime === 'number') {
-          currentTargetTime = data.targetTime;
-        } else {
-          currentTargetTime = null;
-        }
-        ensureTimerInterval();
-      });
-    } catch (e) { /* без сокета тоже ок, просто без live-апдейтов */ }
+    // Инициализация без сервера: панель скрыта до старта
+    ensureTimerInterval();
 
     function openConfirm(){
       const overlay = document.getElementById('confirmOverlay');
@@ -114,25 +92,16 @@
       overlay.classList.remove('open');
       setTimeout(() => { mainBtn.disabled = false; }, 150);
     }
-    async function confirmStart(){
+  async function confirmStart(){
       const yes = document.getElementById('confirmStartBtn');
       const no = document.getElementById('confirmCancelBtn');
       yes.disabled = true; no.disabled = true;
       try {
-        // 1) Установим глобальный таймер на 2 минуты с текущего момента
-        const targetTime = Date.now() + 2 * 60 * 1000; // 2 минуты в мс
-        const resp = await fetch('/timer', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetTime })
-        });
-        if (!resp.ok) {
-          console.error('[START] Failed to set 2-minute timer. Status:', resp.status);
-        }
-        // Локально обновим отображение до прихода сокет-сообщения
-        currentTargetTime = targetTime;
-        ensureTimerInterval();
-        // 2) Запустим 3-секундный START-пульс (для текстового индикатора)
+    // Локальный таймер на 2 минуты, без влияния на /timer.html
+    localEndTime = Date.now() + 2 * 60 * 1000; // 2 минуты в мс
+    ensureTimerInterval();
+
+    // Запустим 3-секундный START-пульс (для текстового индикатора)
         await fetch('/api/start/pulse', { method:'POST' });
       }
       catch(_) {}
