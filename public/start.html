@@ -45,7 +45,20 @@
       const yes = document.getElementById('confirmStartBtn');
       const no = document.getElementById('confirmCancelBtn');
       yes.disabled = true; no.disabled = true;
-      try { await fetch('/api/start/pulse', { method:'POST' }); }
+      try {
+        // 1) Установим глобальный таймер на 2 минуты с текущего момента
+        const targetTime = Date.now() + 2 * 60 * 1000; // 2 минуты в мс
+        const resp = await fetch('/timer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetTime })
+        });
+        if (!resp.ok) {
+          console.error('[START] Failed to set 2-minute timer. Status:', resp.status);
+        }
+        // 2) Запустим 3-секундный START-пульс (для текстового индикатора)
+        await fetch('/api/start/pulse', { method:'POST' });
+      }
       catch(_) {}
       finally { yes.disabled = false; no.disabled = false; closeConfirm(); }
     }
