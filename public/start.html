@@ -5,10 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>START Pulse</title>
   <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io/socket.io.js"></script>
   <style>
     html, body { height: 100%; }
     body { margin: 0; background: var(--color-background); display: grid; place-items: center; }
     .wrap { display: grid; place-items: center; width: 100%; padding: 24px; }
+    .timer-panel { 
+      display: none; /* появится, когда есть активный таймер */
+      margin-bottom: 18px; 
+      text-align: center; 
+      color: var(--color-text-primary, #F0F2F5);
+    }
+    .timer-panel.active { display: block; }
+    .timer-title { opacity: 0.85; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .timer-value { font-weight: 900; font-size: clamp(28px, 4.2vw, 56px); line-height: 1.1; }
     .big-center-button { 
       width: clamp(260px, 55vw, 640px);
       height: clamp(90px, 20vh, 180px);
@@ -29,6 +39,69 @@
     .app-button.success:hover { background-color: var(--color-success-dark) !important; }
   </style>
   <script>
+    let currentTargetTime = null;
+    let intervalId = null;
+
+    function formatMMSS(distance){
+      const totalSec = Math.max(0, Math.floor(distance / 1000));
+      const minutes = Math.floor(totalSec / 60);
+      const seconds = totalSec % 60;
+      return String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
+    }
+
+    function updateTimerPanel(){
+      const panel = document.getElementById('startTimerPanel');
+      const valEl = document.getElementById('startTimerDisplay');
+      if (!panel || !valEl) return;
+      if (currentTargetTime === null) {
+        panel.classList.remove('active');
+        return;
+      }
+      const now = Date.now();
+      const distance = currentTargetTime - now;
+      if (distance <= 0) {
+        valEl.textContent = '00:00';
+        panel.classList.remove('active');
+        return;
+      }
+      valEl.textContent = formatMMSS(distance);
+      panel.classList.add('active');
+    }
+
+    function ensureTimerInterval(){
+      if (intervalId) clearInterval(intervalId);
+      if (currentTargetTime !== null) {
+        intervalId = setInterval(updateTimerPanel, 250);
+      }
+      updateTimerPanel();
+    }
+
+    // Инициализация: получаем текущее значение таймера
+    fetch('/timer')
+      .then(r => r.ok ? r.json() : Promise.reject(r.status))
+      .then(data => {
+        if (data && typeof data.targetTime === 'number') {
+          currentTargetTime = data.targetTime;
+        } else {
+          currentTargetTime = null;
+        }
+        ensureTimerInterval();
+      })
+      .catch(() => { currentTargetTime = null; ensureTimerInterval(); });
+
+    // Socket.io для живых обновлений таймера
+    try {
+      const socket = io();
+      socket.on('timerStateUpdate', (data) => {
+        if (data && typeof data.targetTime === 'number') {
+          currentTargetTime = data.targetTime;
+        } else {
+          currentTargetTime = null;
+        }
+        ensureTimerInterval();
+      });
+    } catch (e) { /* без сокета тоже ок, просто без live-апдейтов */ }
+
     function openConfirm(){
       const overlay = document.getElementById('confirmOverlay');
       const mainBtn = document.getElementById('startBtn');
@@ -56,6 +129,9 @@
         if (!resp.ok) {
           console.error('[START] Failed to set 2-minute timer. Status:', resp.status);
         }
+        // Локально обновим отображение до прихода сокет-сообщения
+        currentTargetTime = targetTime;
+        ensureTimerInterval();
         // 2) Запустим 3-секундный START-пульс (для текстового индикатора)
         await fetch('/api/start/pulse', { method:'POST' });
       }
@@ -66,6 +142,10 @@
 </head>
 <body>
   <div class="wrap">
+    <div id="startTimerPanel" class="timer-panel" aria-live="polite">
+      <div class="timer-title">Timer</div>
+      <div id="startTimerDisplay" class="timer-value">00:00</div>
+    </div>
     <button id="startBtn" class="app-button primary big-center-button" onclick="openConfirm()">START</button>
   </div>
   <div id="confirmOverlay" class="confirm-overlay" aria-hidden="true">
