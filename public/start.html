@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="/style.css">
   <!-- No socket needed here; countdown is local to this page -->
   <style>
-    html, body { height: 100%; }
-    body { margin: 0; background: var(--color-background); display: grid; place-items: center; }
-    .wrap { display: grid; place-items: center; width: 100%; padding: 24px; }
+  html, body { height: 100%; }
+  /* Top-aligned layout (stick to top), centered horizontally */
+  body { margin: 0; background: var(--color-background); min-height: 100%; display: flex; align-items: flex-start; justify-content: center; }
+  .wrap { display: grid; place-items: center; width: 100%; padding: 24px; }
     .timer-panel { 
       display: none; /* появится, когда есть активный таймер */
       margin-bottom: 18px; 
@@ -29,9 +30,10 @@
       letter-spacing: 0.03em;
       box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 30px rgba(122,100,185,0.35);
     }
-    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 9999; }
-    .confirm-overlay.open { display: grid; }
-    .confirm-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); padding: 28px; box-shadow: var(--shadow-lg); width: min(92vw, 720px); }
+  .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: none; place-items: center; z-index: 9999; }
+  .confirm-overlay.open { display: grid; }
+  .confirm-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--border-radius-xl); padding: 28px; box-shadow: var(--shadow-lg); width: min(92vw, 720px); opacity: 0; transform: translateY(12px); }
+  .confirm-overlay.open .confirm-box { animation: fadeIn 0.25s ease-out forwards; }
     .confirm-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 520px) { .confirm-actions { grid-template-columns: 1fr; } }
     .big-confirm { height: clamp(80px, 16vh, 140px); font-size: clamp(22px, 4vw, 38px); font-weight: 900; letter-spacing: 0.02em; border-radius: var(--border-radius-lg); text-transform: uppercase; }
