@@ -193,6 +193,7 @@
                 <li class="tab-link active" data-tab="tab-matches"><i class="fas fa-gamepad"></i> Матчи</li>
                 <li class="tab-link" data-tab="tab-mapveto"><i class="fas fa-map-signs"></i> Map Veto</li>
                 <li class="tab-link" data-tab="tab-casters"><i class="fas fa-microphone-alt"></i> Кастеры</li>
+                <li class="tab-link" data-tab="tab-observers"><i class="fas fa-eye"></i> Observers</li>
                 <li class="tab-link" data-tab="tab-timer"><i class="fas fa-stopwatch"></i> Таймер</li>
                 <li class="tab-link" data-tab="tab-pause"><i class="fas fa-pause-circle"></i> Пауза</li>
                 <li class="tab-link" data-tab="tab-json"><i class="fas fa-code"></i> JSON</li>
@@ -471,6 +472,30 @@
                                    <p>Загрузка...</p> </div>
                          </div>
                 </div>
+                     <div id="tab-observers" class="tab-panel">
+                                 <h1 class="tab-title"><i class="fas fa-eye"></i> Управление Observers</h1>
+                                 <div class="casters-grid">
+                                          <div class="caster-creation-block card-style">
+                                              <h3><i class="fas fa-user-plus"></i> Создать Нового Observer</h3>
+                                             <form id="addObserverForm">
+                                                <div class="form-group">
+                                                    <label for="newObserverName"><i class="fas fa-signature"></i> Имя:</label>
+                                                    <input type="text" id="newObserverName" class="header-input" placeholder="Введите имя" required>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="newObserverSocial"><i class="fas fa-share-alt"></i> Социальная сеть:</label>
+                                                    <input type="text" id="newObserverSocial" class="header-input" placeholder="Ссылка или никнейм">
+                                                </div>
+                                                <button type="submit" id="addObserverButton" class="app-button primary"><i class="fas fa-plus-circle"></i> Добавить observer</button>
+                                             </form>
+                                          </div>
+                                 </div>
+                                 <div class="casters-list-block card-style" style="margin-top: var(--spacing-lg);">
+                                         <h3><i class="fas fa-list-ul"></i> Список Observers</h3>
+                                        <div id="observersListContainer" class="styled-scrollbar" style="max-height: 300px; overflow-y: auto; padding: var(--spacing-sm);">
+                                              <p>Загрузка...</p> </div>
+                                 </div>
+                     </div>
                 <div id="tab-timer" class="tab-panel">
                     <div class="timer-tab-layout-container">
                         <div class="timer-controls-column">

@@ -6,6 +6,7 @@ import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionS
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 import { initCasters, loadCasters, updateCastersUIFromSocket, updateSelectedCastersUIFromSocket, loadSelectedCasters } from "./casters.js";
+import { initObservers, updateObserversUIFromSocket } from "./observers.js";
 import { initTimerControls } from "./timerControl.js";
 
 // Инициализация Socket.IO клиента
@@ -22,6 +23,7 @@ const initPromise = initMatches(); // Запускает загрузку спи
 initMapVeto(); // Инициализация элементов управления и логики для Map Veto
 initVRS();     // Инициализация элементов управления и логики для VRS блоков
 initCasters(); // Инициализация модуля кастеров (загружает данные внутри)
+initObservers(); // Инициализация модуля observers
 
 
 // --- Вспомогательная функция для форматирования времени мини-таймера ---
@@ -162,6 +164,12 @@ socket.on("castersUpdate", (casters) => {
     console.log("[SOCKET] Received 'castersUpdate' with data:", casters);
     if (typeof updateCastersUIFromSocket === 'function') {
         updateCastersUIFromSocket(casters);
+    }
+});
+socket.on("observersUpdate", (observers) => {
+    console.log("[SOCKET] Received 'observersUpdate' with data:", observers);
+    if (typeof updateObserversUIFromSocket === 'function') {
+        updateObserversUIFromSocket(observers);
     }
 });
 
