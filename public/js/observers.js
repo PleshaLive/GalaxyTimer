@@ -3,12 +3,15 @@ import { saveData } from './api.js';
 import { setButtonState } from './main.js';
 
 let allObservers = [];
+let currentSelectedObserverName = null;
 
 const addObserverFormElement = document.getElementById('addObserverForm');
 const newObserverNameInputElement = document.getElementById('newObserverName');
 const newObserverSocialInputElement = document.getElementById('newObserverSocial');
 const addObserverButtonElement = document.getElementById('addObserverButton');
 const observersListContainerElement = document.getElementById('observersListContainer');
+const observerSelectElement = document.getElementById('observerSelect');
+const saveSelectedObserverButtonElement = document.getElementById('saveSelectedObserverButton');
 
 export async function loadObservers() {
   console.log('[Observers] Loading observers...');
@@ -22,7 +25,40 @@ export async function loadObservers() {
     if (observersListContainerElement)
       observersListContainerElement.innerHTML = '<p style="color: var(--color-error);">Не удалось загрузить список observers.</p>';
   }
+  populateObserverSelect();
   displayObserversList();
+}
+
+export async function loadSelectedObserver() {
+  console.log('[Observers] Loading selected observer...');
+  try {
+    const resp = await fetch('/api/selected-observer');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const arr = await resp.json();
+    const data = Array.isArray(arr) && arr[0] ? arr[0] : { observer: null };
+    currentSelectedObserverName = data.observer || null;
+  } catch (e) {
+    console.error('[Observers] Failed to load selected observer:', e);
+    currentSelectedObserverName = null;
+  }
+  populateObserverSelect();
+}
+
+function populateObserverSelect() {
+  if (!observerSelectElement) return;
+  const prev = observerSelectElement.value;
+  const candidates = allObservers.map(o => o.observer);
+  let toSelect = '';
+  if (prev && candidates.includes(prev)) toSelect = prev;
+  else if (currentSelectedObserverName && candidates.includes(currentSelectedObserverName)) toSelect = currentSelectedObserverName;
+  observerSelectElement.innerHTML = '<option value="">- Выбрать observer -</option>';
+  allObservers.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.observer;
+    opt.textContent = o.observer;
+    observerSelectElement.appendChild(opt);
+  });
+  observerSelectElement.value = toSelect;
 }
 
 function displayObserversList() {
@@ -190,12 +226,37 @@ async function handleDeleteObserver(id, name) {
 export function updateObserversUIFromSocket(updatedObservers) {
   console.log('[Observers Socket] Received observersUpdate:', updatedObservers);
   allObservers = Array.isArray(updatedObservers) ? updatedObservers : [];
+  populateObserverSelect();
   displayObserversList();
+}
+
+export function updateSelectedObserverUIFromSocket(selected) {
+  console.log('[Observers Socket] Received selectedObserverUpdate:', selected);
+  currentSelectedObserverName = selected?.observer || null;
+  if (observerSelectElement) observerSelectElement.value = currentSelectedObserverName || '';
 }
 
 export function initObservers() {
   console.log('[Observers] Initializing observers module...');
   if (addObserverFormElement) addObserverFormElement.addEventListener('submit', handleAddObserverSubmit);
   else console.warn('[Observers] Add form not found');
-  loadObservers();
+  if (saveSelectedObserverButtonElement) {
+    saveSelectedObserverButtonElement.addEventListener('click', async () => {
+      const name = observerSelectElement?.value || null;
+      if (name && !allObservers.some(o => o.observer === name)) return;
+      setButtonState(saveSelectedObserverButtonElement, 'saving', 'Сохранение...');
+      try {
+        const result = await saveData('/api/selected-observer', { observer: name }, 'POST');
+        currentSelectedObserverName = result.data?.observer || name || null;
+        setButtonState(saveSelectedObserverButtonElement, 'saved', 'Назначено!');
+      } catch (e) {
+        console.error('[Observers] Save selected failed:', e);
+        setButtonState(saveSelectedObserverButtonElement, 'error', e.message || 'Ошибка');
+        alert(`Ошибка назначения observer: ${e.message}`);
+      }
+    });
+  } else {
+    console.warn('[Observers] Save selected observer button not found');
+  }
+  Promise.all([loadObservers(), loadSelectedObserver()]).then(() => console.log('[Observers] Data loaded.'));
 }

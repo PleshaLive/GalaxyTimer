@@ -6,7 +6,7 @@ import { initMapVeto, gatherMapVetoData, updateVetoTeamOptions, styleVetoActionS
 import { initVRS, gatherSingleVRSData, updateVRSTeamNames } from "./vrs.js";
 import { saveData } from "./api.js";
 import { initCasters, loadCasters, updateCastersUIFromSocket, updateSelectedCastersUIFromSocket, loadSelectedCasters } from "./casters.js";
-import { initObservers, updateObserversUIFromSocket } from "./observers.js";
+import { initObservers, updateObserversUIFromSocket, updateSelectedObserverUIFromSocket } from "./observers.js";
 import { initTimerControls } from "./timerControl.js";
 
 // Инициализация Socket.IO клиента
@@ -170,6 +170,12 @@ socket.on("observersUpdate", (observers) => {
     console.log("[SOCKET] Received 'observersUpdate' with data:", observers);
     if (typeof updateObserversUIFromSocket === 'function') {
         updateObserversUIFromSocket(observers);
+    }
+});
+socket.on("selectedObserverUpdate", (selected) => {
+    console.log("[SOCKET] Received 'selectedObserverUpdate' with data:", selected);
+    if (typeof updateSelectedObserverUIFromSocket === 'function') {
+        updateSelectedObserverUIFromSocket(selected);
     }
 });
 

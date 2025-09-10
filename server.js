@@ -127,6 +127,8 @@ const defaultPauseDataStructure = { pause: "", lastUpd: "", show: false };
 const defaultCasterStructure = { id: "", caster: "", social: "" };
 const defaultSelectedCastersStructure = { caster1: null, caster2: null }; // Хранит только ИМЕНА выбранных кастеров
 const defaultObserverStructure = { id: "", observer: "", social: "" };
+// Для выбранного OBSERVER храним только имя; соц.сеть подставляем при выдаче
+const defaultSelectedObserver = null;
 
 // --- Хранилища данных в памяти ---
 let savedMatches = [];
@@ -141,6 +143,7 @@ let timerData = { targetTime: null }; // <-- НОВОЕ: для данных т�
 let livePulseUntil = 0; // Временная метка (ms), до которой состояние Live:+ активно
 let startPulseUntil = 0; // Временная метка (ms), до которой состояние START:+ активно
 let savedObservers = []; // Список всех обсерверов {id, observer, social}
+let savedSelectedObserver = defaultSelectedObserver; // Имя выбранного обсерверa или null
 
 // --- Пути к файлам ---
 const dbFilePath = path.join(__dirname, "db.json"); // Основной файл БД
@@ -169,6 +172,7 @@ function loadDbData() {
             casters: [],
             selectedCasters: { ...defaultSelectedCastersStructure },
             observers: [],
+            selectedObserver: defaultSelectedObserver,
             timerData: { targetTime: null } // <-- НОВОЕ ПОЛЕ В DB
         };
 
@@ -184,6 +188,7 @@ function loadDbData() {
             savedCasters = defaultDb.casters;
             savedSelectedCasters = defaultDb.selectedCasters;
             savedObservers = defaultDb.observers;
+            savedSelectedObserver = defaultDb.selectedObserver;
             timerData = defaultDb.timerData; // <-- ЗАГРУЗКА
         } else {
             const rawData = fs.readFileSync(dbFilePath, "utf8");
@@ -235,6 +240,9 @@ function loadDbData() {
             savedObservers = Array.isArray(jsonData.observers)
                 ? jsonData.observers.map(o => ({ ...defaultObserverStructure, ...o }))
                 : [];
+            savedSelectedObserver = typeof jsonData.selectedObserver === 'string' || jsonData.selectedObserver === null
+                ? jsonData.selectedObserver
+                : defaultSelectedObserver;
             timerData = jsonData.timerData || { targetTime: null }; // <-- ЗАГРУЗКА ИЗ JSON ИЛИ ДЕФОЛТ
 
             console.log("[DATA] Data loaded successfully from db.json, timerData:", timerData);
@@ -261,6 +269,7 @@ function loadDbData() {
                 casters: [],
                 selectedCasters: { ...defaultSelectedCastersStructure },
                 observers: [],
+                selectedObserver: defaultSelectedObserver,
                 timerData: { targetTime: null } // <-- НОВОЕ ПОЛЕ В DB (в catch)
             };
         }
@@ -272,6 +281,7 @@ function loadDbData() {
         savedCasters = defaultDb.casters;
         savedSelectedCasters = defaultDb.selectedCasters;
     savedObservers = defaultDb.observers || [];
+    savedSelectedObserver = defaultDb.selectedObserver;
         timerData = defaultDb.timerData; // <-- ЗАГРУЗКА В CATCH
     }
 }
@@ -314,6 +324,7 @@ async function saveDbDataAsync() {
       pauseData: savedPauseData,
       casters: savedCasters,
     observers: savedObservers,
+    selectedObserver: savedSelectedObserver,
       selectedCasters: savedSelectedCasters, // Сохраняем только имена
       timerData: timerData // <-- СОХРАНЕНИЕ ДАННЫХ ТАЙМЕРА
     };
@@ -482,6 +493,18 @@ function getFormattedSelectedCasters() {
         else { console.warn(`[Server] Ранее выбранный caster2 "${savedSelectedCasters.caster2}" не найден.`); }
     }
     return result;
+}
+
+/**
+ * Формирует объект выбранного обсерверa с социалками.
+ */
+function getFormattedSelectedObserver() {
+    if (!savedSelectedObserver) return { observer: null, social: null };
+    const obs = savedObservers.find(o => o.observer === savedSelectedObserver);
+    if (obs) {
+        return { observer: obs.observer, social: obs.social };
+    }
+    return { observer: savedSelectedObserver, social: null };
 }
 
 
@@ -789,6 +812,32 @@ app.get("/observers", (req, res) => {
     console.log("[API][GET] /observers - Sending public JSON of observers");
     res.json(observersForPublicJson);
 });
+
+// API для выбранного OBSERVER
+app.get("/api/selected-observer", (req, res) => {
+    console.log("[API][GET] /api/selected-observer - Sending formatted selected observer");
+    const formatted = getFormattedSelectedObserver();
+    res.json([formatted]);
+});
+app.post("/api/selected-observer", async (req, res) => {
+    const { observer } = req.body || {};
+    if (observer && !savedObservers.some(o => o.observer === observer)) {
+        return res.status(400).json({ message: `Выбранный Observer (\"${observer}\") не найден.` });
+    }
+    savedSelectedObserver = observer || null;
+    console.log("[API][POST] /api/selected-observer - Updated selected observer:", savedSelectedObserver);
+    await saveDbDataAsync();
+    const formatted = getFormattedSelectedObserver();
+    io.emit('selectedObserverUpdate', formatted);
+    console.log("[SOCKET] Emitted 'selectedObserverUpdate'.");
+    res.status(200).json({ success: true, message: "Выбранный observer обновлен.", data: formatted });
+});
+
+// Публичный JSON выбранного OBSERVER
+app.get('/observer.json', (req, res) => {
+    const formatted = getFormattedSelectedObserver();
+    res.json(formatted);
+});
 // API для выбранных кастеров
 app.get("/api/selected-casters", (req, res) => {
     console.log("[API][GET] /api/selected-casters - Sending formatted selected casters");
@@ -962,6 +1011,7 @@ io.on("connection", (socket) => {
     socket.emit("pauseUpdate", savedPauseData);
     socket.emit("castersUpdate", savedCasters);
     socket.emit("observersUpdate", savedObservers);
+    socket.emit("selectedObserverUpdate", getFormattedSelectedObserver());
     socket.emit("selectedCastersUpdate", getFormattedSelectedCasters());
     socket.emit("timerStateUpdate", timerData);
 

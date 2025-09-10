@@ -474,7 +474,17 @@
                 </div>
                      <div id="tab-observers" class="tab-panel">
                                  <h1 class="tab-title"><i class="fas fa-eye"></i> Управление Observers</h1>
-                                 <div class="casters-grid">
+                                                     <div class="casters-grid">
+                                                                    <div class="caster-selection-block card-style">
+                                                                         <h3><i class="fas fa-user-check"></i> Выбрать Observer</h3>
+                                                                         <div class="form-group">
+                                                                             <label for="observerSelect"><i class="fas fa-eye"></i> Observer:</label>
+                                                                             <select id="observerSelect" class="control-select styled-select">
+                                                                                 <option value="">- Выбрать observer -</option>
+                                                                             </select>
+                                                                         </div>
+                                                                         <button id="saveSelectedObserverButton" class="app-button primary"><i class="fas fa-user-tag"></i> Назначить Observer</button>
+                                                                    </div>
                                           <div class="caster-creation-block card-style">
                                               <h3><i class="fas fa-user-plus"></i> Создать Нового Observer</h3>
                                              <form id="addObserverForm">
