@@ -44,8 +44,9 @@ function requirePulseAuth(req, res, next) {
     if (req.session && req.session.pulseAuth) {
         return next();
     }
-    // Можно передать редирект-назад, если нужно
-    res.redirect('/pulse-login.html');
+    // Запоминаем целевую страницу и пробрасываем как returnTo
+    const returnTo = encodeURIComponent(req.originalUrl || '/pulse.html');
+    res.redirect(`/pulse-login.html?returnTo=${returnTo}`);
 }
 
 // --- Роуты ---
@@ -74,12 +75,22 @@ app.get("/logout", (req, res) => {
 
 // Логин для Pulse-страницы (отдельный пароль)
 app.post('/pulse-login', (req, res) => {
-    const { password } = req.body;
+    const { password, returnTo } = req.body || {};
     if (password === '2007') {
         req.session.pulseAuth = true;
-        return res.redirect('/pulse.html');
+        // Безопасный редирект назад: разрешаем только внутренние пути
+        let target = '/pulse.html';
+        if (typeof returnTo === 'string' && returnTo.startsWith('/')) {
+            // Мини-Whitelist: разрешаем основные страницы с их query
+            const base = returnTo.split('?')[0];
+            if (base === '/pulse.html' || base === '/start.html') {
+                target = returnTo;
+            }
+        }
+        return res.redirect(target);
     }
-    return res.redirect('/pulse-login.html?error=1');
+    const rt = typeof returnTo === 'string' && returnTo.startsWith('/') ? `&returnTo=${encodeURIComponent(returnTo)}` : '';
+    return res.redirect(`/pulse-login.html?error=1${rt}`);
 });
 
 app.get("/health", (req, res) => {

@@ -21,7 +21,8 @@
 <body>
   <div class="card">
     <h1>Login</h1>
-    <form method="post" action="/pulse-login">
+    <form id="pulseLoginForm" method="post" action="/pulse-login">
+      <input type="hidden" name="returnTo" id="returnToInput" value="">
       <input type="password" name="password" placeholder="Pass" autocomplete="current-password" required>
       <button class="btn primary" type="submit">Enter</button>
     </form>
@@ -32,6 +33,11 @@
     const params = new URLSearchParams(location.search);
     if (params.get('error') === '1') {
       document.getElementById('err').style.display = '';
+    }
+    // Прокинем returnTo из query в hidden input формы
+    const rt = params.get('returnTo');
+    if (rt && rt.startsWith('/')) {
+      document.getElementById('returnToInput').value = rt;
     }
   </script>
 </body>
