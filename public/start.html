@@ -10,6 +10,16 @@
   html, body { height: 100%; }
   body { margin: 0; background: var(--color-background); display: grid; place-items: center; }
   .wrap { display: grid; place-items: center; width: 100%; padding: 24px; }
+    /* Local 2-minute countdown (above the button) */
+    .local-timer-panel {
+      display: none; /* becomes visible when local countdown is active */
+      margin-bottom: 18px;
+      text-align: center;
+      color: var(--color-text-primary, #F0F2F5);
+    }
+    .local-timer-panel.active { display: block; }
+    .local-timer-title { opacity: 0.85; font-size: 14px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .local-timer-value { font-weight: 900; font-size: clamp(28px, 4.2vw, 56px); line-height: 1.1; }
     .timer-panel { 
       margin-top: 18px; 
       text-align: center; 
@@ -37,6 +47,45 @@
     .app-button.success:hover { background-color: var(--color-success-dark) !important; }
   </style>
   <script>
+    // Локальный 2-минутный таймер (над кнопкой)
+    let localEndTime = null;
+    let localIntervalId = null;
+
+    function formatMMSS(distance){
+      const totalSec = Math.max(0, Math.floor(distance / 1000));
+      const minutes = Math.floor(totalSec / 60);
+      const seconds = totalSec % 60;
+      return String(minutes).padStart(2,'0') + ':' + String(seconds).padStart(2,'0');
+    }
+
+    function updateLocalTimerPanel(){
+      const localPanel = document.getElementById('localTimerPanel');
+      const localValEl = document.getElementById('localTimerDisplay');
+      if (!localPanel || !localValEl) return;
+      if (localEndTime === null) {
+        localPanel.classList.remove('active');
+        return;
+      }
+      const now = Date.now();
+      const distance = localEndTime - now;
+      if (distance <= 0) {
+        localValEl.textContent = '00:00';
+        localPanel.classList.remove('active');
+        localEndTime = null;
+        return;
+      }
+      localValEl.textContent = formatMMSS(distance);
+      localPanel.classList.add('active');
+    }
+
+    function ensureLocalTimerInterval(){
+      if (localIntervalId) clearInterval(localIntervalId);
+      if (localEndTime !== null) {
+        localIntervalId = setInterval(updateLocalTimerPanel, 250);
+      }
+      updateLocalTimerPanel();
+    }
+
     // Глобальный таймер (как в timer.html), показывается ПОД кнопкой START
     const panel = document.getElementById('startTimerPanel');
     const valEl = document.getElementById('startTimerDisplay');
@@ -99,6 +148,9 @@
       const no = document.getElementById('confirmCancelBtn');
       yes.disabled = true; no.disabled = true;
       try {
+  // Запускаем локальный таймер на 2 минуты (не влияет на общий таймер)
+  localEndTime = Date.now() + 2 * 60 * 1000;
+  ensureLocalTimerInterval();
         // Запустим 3-секундный START-пульс (для текстового индикатора)
         await fetch('/api/start/pulse', { method:'POST' });
       }
@@ -135,6 +187,11 @@
 </head>
 <body>
   <div class="wrap">
+    <!-- Local countdown above the button -->
+    <div id="localTimerPanel" class="local-timer-panel" aria-live="polite">
+      <div class="local-timer-title">Timer</div>
+      <div id="localTimerDisplay" class="local-timer-value">00:00</div>
+    </div>
     <button id="startBtn" class="app-button primary big-center-button" onclick="openConfirm()">START</button>
     <div id="startTimerPanel" class="timer-panel" aria-live="polite">
       <div class="timer-title">Main Timer</div>
