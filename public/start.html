@@ -86,11 +86,11 @@
       updateLocalTimerPanel();
     }
 
-    // Глобальный таймер (как в timer.html), показывается ПОД кнопкой START
-    const panel = document.getElementById('startTimerPanel');
-    const valEl = document.getElementById('startTimerDisplay');
-    let currentTargetTime = null;
-    let intervalId = null;
+  // Глобальный таймер (как в timer.html), показывается ПОД кнопкой START
+  let panel; // назначим после загрузки DOM
+  let valEl; // назначим после загрузки DOM
+  let currentTargetTime = null;
+  let intervalId = null;
 
     function formatTime(distance) {
       const hours = Math.floor(distance / (1000 * 60 * 60));
@@ -158,31 +158,37 @@
       finally { yes.disabled = false; no.disabled = false; closeConfirm(); }
     }
 
-    // Загрузка начального состояния глобального таймера
-    fetch('/timer')
-      .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-      .then(data => {
-        if (data && typeof data.targetTime === 'number') {
-          currentTargetTime = data.targetTime;
-        } else {
-          currentTargetTime = null;
-        }
-        setupTimerInterval();
-      })
-      .catch(() => { currentTargetTime = null; setupTimerInterval(); });
+    // Инициализация после готовности DOM
+    window.addEventListener('DOMContentLoaded', () => {
+      panel = document.getElementById('startTimerPanel');
+      valEl = document.getElementById('startTimerDisplay');
 
-    // Подписка на обновления по сокетам
-    try {
-      const socket = io();
-      socket.on('timerStateUpdate', (data) => {
-        if (data && typeof data.targetTime === 'number') {
-          currentTargetTime = data.targetTime;
-        } else {
-          currentTargetTime = null;
-        }
-        setupTimerInterval();
-      });
-    } catch (e) { /* noop: если сокетов нет, оставим только fetch */ }
+      // Загрузка начального состояния глобального таймера
+      fetch('/timer')
+        .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+        .then(data => {
+          if (data && typeof data.targetTime === 'number') {
+            currentTargetTime = data.targetTime;
+          } else {
+            currentTargetTime = null;
+          }
+          setupTimerInterval();
+        })
+        .catch(() => { currentTargetTime = null; setupTimerInterval(); });
+
+      // Подписка на обновления по сокетам
+      try {
+        const socket = io();
+        socket.on('timerStateUpdate', (data) => {
+          if (data && typeof data.targetTime === 'number') {
+            currentTargetTime = data.targetTime;
+          } else {
+            currentTargetTime = null;
+          }
+          setupTimerInterval();
+        });
+      } catch (e) { /* noop: если сокетов нет, оставим только fetch */ }
+    });
   </script>
 </head>
 <body>
