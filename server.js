@@ -836,7 +836,11 @@ app.post("/api/selected-observer", async (req, res) => {
 // Публичный JSON выбранного OBSERVER
 app.get('/observer.json', (req, res) => {
     const formatted = getFormattedSelectedObserver();
-    res.json(formatted);
+    // Возвращаем массив с одним объектом, либо пустой массив, если не выбран
+    if (!formatted || !formatted.observer) {
+        return res.json([]);
+    }
+    return res.json([formatted]);
 });
 // API для выбранных кастеров
 app.get("/api/selected-casters", (req, res) => {
